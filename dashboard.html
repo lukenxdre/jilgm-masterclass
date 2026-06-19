@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - JILGM Masterclass</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="auth.js?v=2.1"></script>
+    <style>
+        /* ── Live-update toast ─────────────────────────────────────── */
+        #liveUpdateToast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: linear-gradient(135deg, rgba(212,175,55,0.18), rgba(212,175,55,0.08));
+            border: 1px solid rgba(212,175,55,0.5);
+            color: #f5d97e;
+            padding: 0.6rem 1.1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-family: var(--font-sans, 'Outfit', sans-serif);
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+        }
+        #liveUpdateToast.visible { opacity: 1; transform: translateY(0); }
+
+        /* ── Dashboard hero header ─────────────────────────────────── */
+        .dash-hero {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg,
+                rgba(11,23,44,0.97) 0%,
+                rgba(20,38,70,0.95) 40%,
+                rgba(11,23,44,0.97) 100%);
+            border: 1px solid rgba(212,175,55,0.2);
+            border-radius: 20px;
+            padding: 2.4rem 2.4rem 1.6rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 0 80px rgba(212,175,55,0.03);
+        }
+        .dash-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 80% at 5% 50%, rgba(212,175,55,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 95% 20%, rgba(212,175,55,0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .dash-hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .dash-hero-label {
+            font-family: var(--font-sans, 'Outfit', sans-serif);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent-gold, #d4af37);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .dash-hero-label::before,
+        .dash-hero-label::after {
+            content: '';
+            display: block;
+            width: 28px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold, #d4af37));
+        }
+        .dash-hero-label::before { transform: rotate(180deg); }
+        .dash-hero-welcome {
+            font-family: var(--font-serif, 'Playfair Display', serif);
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-style: italic;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+            margin: 0 0 0.4rem;
+            line-height: 1.2;
+        }
+        .dash-hero-welcome span {
+            color: var(--accent-gold-light, #f5d97e);
+            text-shadow: 0 0 30px rgba(245,217,126,0.4);
+        }
+        .dash-hero-sub {
+            font-size: 0.92rem;
+            color: var(--text-secondary, #8a9bb0);
+            margin: 0;
+            line-height: 1.6;
+        }
+        /* User badge */
+        .dash-user-badge {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(212,175,55,0.2);
+            border-radius: 14px;
+            padding: 0.9rem 1.3rem;
+            flex-shrink: 0;
+            backdrop-filter: blur(10px);
+        }
+        .dash-user-info { text-align: right; }
+        .dash-user-name {
+            font-family: var(--font-sans, 'Outfit', sans-serif);
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-primary, #f0ece4);
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+        .dash-user-role {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--accent-gold-light, #f5d97e);
+            font-weight: 700;
+        }
+        .dash-avatar {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-gold-light, #f5d97e), var(--accent-gold-dark, #a07728));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            font-family: var(--font-serif, 'Playfair Display', serif);
+            color: var(--bg-dark, #0b172c);
+            box-shadow: 0 0 0 3px rgba(212,175,55,0.25), 0 4px 12px rgba(0,0,0,0.4);
+        }
+        /* Divider strip */
+        .dash-hero-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.4rem 0 1.2rem;
+        }
+        .dash-hero-divider-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(212,175,55,0.3), transparent);
+        }
+        .dash-hero-diamond {
+            width: 6px; height: 6px;
+            background: var(--accent-gold, #d4af37);
+            transform: rotate(45deg);
+            flex-shrink: 0;
+        }
+        /* Stat strip */
+        .dash-hero-stats {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        .dash-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary, #8a9bb0);
+        }
+        .dash-stat-icon {
+            font-size: 1rem;
+            line-height: 1;
+        }
+        .dash-stat strong {
+            color: var(--accent-gold-light, #f5d97e);
+            font-weight: 600;
+        }
+
+        /* ── Module cards ─────────────────────────────────────── */
+        .mod-card {
+            position: relative;
+            border-radius: 16px;
+            background: var(--bg-card, rgba(15,30,55,0.9));
+            border: 1px solid rgba(212,175,55,0.15);
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .mod-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.45);
+            border-color: rgba(212,175,55,0.35);
+        }
+        .mod-card-accent {
+            height: 4px;
+            width: 100%;
+            background: linear-gradient(90deg, var(--accent-gold-dark,#a07728), var(--accent-gold-light,#f5d97e), var(--accent-gold-dark,#a07728));
+        }
+        .mod-card-accent.locked { background: rgba(255,255,255,0.08); }
+        .mod-card-accent.completed { background: linear-gradient(90deg,#166534,#4ade80,#166534); }
+        .mod-card-body {
+            padding: 1.4rem 1.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .mod-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.8rem;
+        }
+        .mod-num {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--accent-gold, #d4af37);
+            font-family: var(--font-sans,'Outfit',sans-serif);
+        }
+        .mod-status-pill {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.2rem 0.65rem;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .mod-status-pill.unlocked   { background:rgba(212,175,55,0.12); color:#f5d97e; border:1px solid rgba(212,175,55,0.3); }
+        .mod-status-pill.completed  { background:rgba(74,222,128,0.1);  color:#4ade80; border:1px solid rgba(74,222,128,0.3); }
+        .mod-status-pill.locked     { background:rgba(255,255,255,0.05);color:var(--text-secondary,#8a9bb0); border:1px solid rgba(255,255,255,0.1); }
+        .mod-title {
+            font-family: var(--font-serif,'Playfair Display',serif);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary,#f0ece4);
+            margin: 0 0 0.5rem;
+            line-height: 1.35;
+        }
+        .mod-lock-msg {
+            font-size: 0.78rem;
+            color: var(--text-secondary,#8a9bb0);
+            margin-bottom: 1.2rem;
+            flex: 1;
+        }
+        .mod-card .btn {
+            margin-top: auto;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+            text-decoration: none;
+            display: block;
+        }
+    </style>
+</head>
+<body class="dashboard-layout">
+
+    <!-- Live update toast -->
+    <div id="liveUpdateToast">✦ Content updated by admin</div>
+
+    <aside class="sidebar">
+        <a href="index.html" class="logo-sidebar-brand">
+            <img src="hero_logo.png" alt="JILGM Riyadh Logo" class="sidebar-logo">
+        </a>
+        <nav class="sidebar-nav">
+            <a href="#" id="student-nav-curriculum" class="active">My Curriculum</a>
+            <a href="#" id="student-nav-resources">Resources</a>
+            <a href="#" id="student-nav-announcements">Announcements <span id="ann-badge" class="badge" style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
+            <a href="#" id="student-nav-grades">Grades & Remarks <span id="grades-badge" class="badge" style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
+            <a href="#" onclick="AuthAPI.logout(); return false;" style="margin-top: auto; color: #ef4444;">Log Out</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-content">
+        <!-- ── Dashboard hero header ──────────────────────────────────── -->
+        <div class="dash-hero">
+            <div class="dash-hero-top">
+                <!-- Left: greeting -->
+                <div>
+                    <div class="dash-hero-label">JILGM Riyadh Leadership Masterclass</div>
+                    <h1 id="welcomeMessage" class="dash-hero-welcome">Welcome back, <span>Student</span>!</h1>
+                    <p class="dash-hero-sub">Continue your journey in servant leadership and spiritual formation.</p>
+                </div>
+                <!-- Right: user badge -->
+                <div class="dash-user-badge">
+                    <div class="dash-user-info">
+                        <span class="dash-user-name" id="userFullName">Student</span>
+                        <span class="dash-user-role">Ministry Apprentice</span>
+                    </div>
+                    <div class="dash-avatar" id="userAvatar">S</div>
+                </div>
+            </div>
+
+            <!-- Decorative gold divider -->
+            <div class="dash-hero-divider">
+                <div class="dash-hero-divider-line"></div>
+                <div class="dash-hero-diamond"></div>
+                <div class="dash-hero-divider-line"></div>
+            </div>
+
+            <!-- Tagline / stat strip -->
+            <div class="dash-hero-stats">
+                <div class="dash-stat"><span class="dash-stat-icon">📖</span> <span>Word &mdash; <strong>Rooted in Truth</strong></span></div>
+                <div class="dash-stat"><span class="dash-stat-icon">🏛️</span> <span>Lead &mdash; <strong>With Purpose</strong></span></div>
+                <div class="dash-stat"><span class="dash-stat-icon">🤝</span> <span>Serve &mdash; <strong>With Humility</strong></span></div>
+                <div class="dash-stat"><span class="dash-stat-icon">🌍</span> <span>Impact &mdash; <strong>Beyond Borders</strong></span></div>
+            </div>
+        </div>
+
+        <!-- 1. CURRICULUM PANEL -->
+        <div id="panel-curriculum">
+            <div class="dashboard-grid">
+                <!-- Progress Card -->
+                <div class="dash-card glass-card" style="grid-column: 1 / -1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="margin: 0;">Overall Progress</h3>
+                        <span id="overallProgressText" style="color: var(--accent-gold); font-weight: bold;">0%</span>
+                    </div>
+                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                        <div id="overallProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); border-radius: 4px; transition: width 0.5s ease;"></div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Modules Container -->
+                <div id="dynamicModulesContainer" style="display: contents;"></div>
+            </div>
+        </div>
+
+        <!-- 2. RESOURCES PANEL -->
+        <div id="panel-resources" class="hidden">
+            <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-primary);">Resource Library</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Access reading materials, PowerPoint presentation decks, video replays, and other guides.</p>
+            
+            <div class="dashboard-grid" id="resourcesGrid">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+
+        <!-- 3. ANNOUNCEMENTS PANEL -->
+        <div id="panel-announcements" class="hidden">
+            <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-primary);">Announcements</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Stay updated with the latest instructions and posts from your leadership instructors.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;" id="announcementsList">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+
+        <!-- 4. GRADES PANEL -->
+        <div id="panel-grades" class="hidden">
+            <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-primary);">Grades & Remarks</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Review your grades for interactive checks and view teacher feedback on your reflections and uploads.</p>
+            
+            <!-- Mastery Percentage Card -->
+            <div class="dash-card glass-card" style="margin-bottom: 2rem; border-color: rgba(170, 132, 28, 0.4); padding: 1.8rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                    <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-primary);">Academic Mastery</h3>
+                    <span id="masteryScoreText" style="color: var(--accent-gold-dark); font-weight: bold; font-size: 1.35rem;">0%</span>
+                </div>
+                <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.05); border-radius: 4px; overflow: hidden; margin-bottom: 0.5rem;">
+                    <div id="masteryProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #15803d, #4ade80); border-radius: 4px; transition: width 0.5s ease;"></div>
+                </div>
+                <p style="margin: 0; font-size: 0.82rem; color: var(--text-secondary);" id="masteryStatsText">Points: 0 / 0 auto-graded questions correct.</p>
+            </div>
+ 
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;" id="gradesList">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (window.syncPromise) {
+                try { await window.syncPromise; } catch(err) { console.warn(err); }
+            }
+
+            // Protect this route
+            AuthAPI.requireAuth();
+
+            function updateDashboardDOM() {
+                const user = AuthAPI.getCurrentUser();
+                if (!user) return;
+
+                // Welcomes
+                document.getElementById('welcomeMessage').innerHTML = `Welcome back, <span>${user.firstName}!</span>`;
+                document.getElementById('userFullName').innerText = `${user.firstName} ${user.lastName}`;
+                document.getElementById('userAvatar').innerText = user.firstName.charAt(0).toUpperCase();
+
+                // Dynamic Progress Calculations
+                const progress = user.progress || 0;
+                document.getElementById('overallProgressText').innerText = `${progress}%`;
+                document.getElementById('overallProgressBar').style.width = `${progress}%`;
+
+                // Render Modules dynamically
+                const dynamicModulesContainer = document.getElementById('dynamicModulesContainer');
+                dynamicModulesContainer.innerHTML = '';
+
+                const modsContent = AuthAPI.getModulesContent();
+                const modIds = Object.keys(modsContent);
+                const unlockedModules = AuthAPI.getUnlockedModules();
+                const studentAnswers = user.answers || [];
+
+                const modulesData = modIds.map((id, index) => {
+                    const prereqId = index > 0 ? modIds[index - 1] : null;
+                    const prereqName = prereqId ? (modsContent[prereqId].title || `Module ${index}`) : null;
+                    return {
+                        id: id,
+                        title: modsContent[id].title || `Module ${index + 1}`,
+                        badge: `Module ${index + 1}`,
+                        prereq: prereqId,
+                        prereqName: prereqName,
+                        link: `module.html?id=${id}`
+                    };
+                });
+
+                modulesData.forEach((mod) => {
+                    const isReleasedGlobally = unlockedModules.includes(mod.id);
+                    const hasPrereq = mod.prereq ? studentAnswers.some(a => a.moduleId === mod.prereq) : true;
+                    const isCompleted = studentAnswers.some(a => a.moduleId === mod.id);
+
+                    // Build richer card
+                    const card = document.createElement('div');
+                    card.className = 'mod-card';
+
+                    // Determine state
+                    let accentClass = 'unlocked';
+                    let pillIcon = '✦';
+                    let pillLabel = 'Available';
+                    let pillClass = 'unlocked';
+                    let btnEl = '';
+                    let lockMsg = '';
+
+                    if (!isReleasedGlobally) {
+                        accentClass = 'locked';
+                        pillIcon = '🔒'; pillLabel = 'Locked'; pillClass = 'locked';
+                        lockMsg = '<span class="mod-lock-msg">This module has not been released by your instructor yet.</span>';
+                        btnEl = `<button class="btn btn-secondary mod-card-btn" disabled style="cursor:not-allowed;opacity:0.5;">🔒 Not Yet Available</button>`;
+                        card.style.opacity = '0.65';
+                    } else if (!hasPrereq) {
+                        accentClass = 'locked';
+                        pillIcon = '🔒'; pillLabel = 'Locked'; pillClass = 'locked';
+                        lockMsg = `<span class="mod-lock-msg">Complete <em>${mod.prereqName || 'the previous module'}</em> first to unlock this one.</span>`;
+                        btnEl = `<button class="btn btn-secondary mod-card-btn" disabled style="cursor:not-allowed;opacity:0.5;">🔒 Complete Prerequisite</button>`;
+                        card.style.opacity = '0.65';
+                    } else if (isCompleted) {
+                        accentClass = 'completed';
+                        pillIcon = '✅'; pillLabel = 'Completed'; pillClass = 'completed';
+                        lockMsg = '<span class="mod-lock-msg" style="color:#4ade80;">You have completed this module.</span>';
+                        btnEl = `<a href="${mod.link}" class="btn btn-secondary mod-card-btn" style="width:100%;text-align:center;text-decoration:none;display:block;box-sizing:border-box;">↩ Review Lesson</a>`;
+                    } else {
+                        pillIcon = '▶'; pillLabel = 'Available'; pillClass = 'unlocked';
+                        lockMsg = '<span class="mod-lock-msg">This module is ready for you to begin.</span>';
+                        btnEl = `<a href="${mod.link}" class="btn btn-primary mod-card-btn" style="width:100%;text-align:center;text-decoration:none;display:block;box-sizing:border-box;">Start Module →</a>`;
+                    }
+
+                    card.innerHTML = `
+                        <div class="mod-card-accent ${accentClass}"></div>
+                        <div class="mod-card-body">
+                            <div class="mod-card-top">
+                                <span class="mod-num">${mod.badge}</span>
+                                <span class="mod-status-pill ${pillClass}">${pillIcon} ${pillLabel}</span>
+                            </div>
+                            <h3 class="mod-title">${mod.title}</h3>
+                            ${lockMsg}
+                            ${btnEl}
+                        </div>
+                    `;
+                    dynamicModulesContainer.appendChild(card);
+                });
+            }
+
+            // ── Real-time sync helper ────────────────────────────────────────
+            // Called by BOTH the storage event (cross-tab) and BroadcastChannel
+            // (same-tab + cross-tab) so admin changes reflect instantly everywhere.
+            function showLiveToast(msg) {
+                const toast = document.getElementById('liveUpdateToast');
+                if (!toast) return;
+                toast.textContent = '✦ ' + (msg || 'Content updated by admin');
+                toast.classList.add('visible');
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => toast.classList.remove('visible'), 3200);
+            }
+
+            // ── Sidebar Tab Switching ──
+            const btnCurriculum = document.getElementById('student-nav-curriculum');
+            const btnResources = document.getElementById('student-nav-resources');
+            const btnAnnouncements = document.getElementById('student-nav-announcements');
+            const btnGrades = document.getElementById('student-nav-grades');
+ 
+            const panelCurriculum = document.getElementById('panel-curriculum');
+            const panelResources = document.getElementById('panel-resources');
+            const panelAnnouncements = document.getElementById('panel-announcements');
+            const panelGrades = document.getElementById('panel-grades');
+ 
+            function switchTab(activeBtn, activePanel) {
+                [btnCurriculum, btnResources, btnAnnouncements, btnGrades].forEach(btn => { if (btn) btn.classList.remove('active'); });
+                [panelCurriculum, panelResources, panelAnnouncements, panelGrades].forEach(p => { if (p) p.classList.add('hidden'); });
+ 
+                activeBtn.classList.add('active');
+                activePanel.classList.remove('hidden');
+            }
+ 
+            btnCurriculum.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTab(btnCurriculum, panelCurriculum);
+            });
+ 
+            btnResources.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTab(btnResources, panelResources);
+                renderResourcesStudent();
+            });
+ 
+            btnAnnouncements.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTab(btnAnnouncements, panelAnnouncements);
+                renderAnnouncementsStudent();
+                
+                // Reset notification unread counts
+                localStorage.setItem('jilgm_unread_announcements', '0');
+                updateAnnBadge();
+            });
+
+            btnGrades.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTab(btnGrades, panelGrades);
+                renderGradesStudent();
+                
+                // Reset remarks notification
+                const user = AuthAPI.getCurrentUser();
+                if (user) {
+                    AuthAPI.markRemarksAsRead(user.id);
+                    updateGradesBadge();
+                }
+            });
+
+            // ── Announcements Student Side ──
+            const announcementsList = document.getElementById('announcementsList');
+            function renderAnnouncementsStudent() {
+                if (!announcementsList) return;
+                const list = AuthAPI.getAnnouncements();
+                announcementsList.innerHTML = '';
+
+                if (list.length === 0) {
+                    announcementsList.innerHTML = '<div class="dash-card glass-card" style="text-align:center;padding:3rem;color:var(--text-secondary);">No announcements posted yet. Check back later!</div>';
+                } else {
+                    list.forEach(ann => {
+                        const card = document.createElement('div');
+                        card.className = 'dash-card glass-card';
+                        card.style.padding = '2rem';
+                        card.innerHTML = `
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;border-bottom:1px solid rgba(255,255,255,0.03);padding-bottom:0.5rem;flex-wrap:wrap;gap:0.5rem;">
+                                <h3 style="margin:0;font-family:var(--font-serif);color:var(--accent-gold-light);">${ann.title}</h3>
+                                <span style="font-size:0.8rem;color:var(--text-secondary);">${new Date(ann.date).toLocaleDateString()}</span>
+                            </div>
+                            <div style="font-size:0.95rem;line-height:1.6;color:var(--text-primary);">${ann.content}</div>
+                        `;
+                        announcementsList.appendChild(card);
+                    });
+                }
+            }
+
+            // ── Resources Student Side ──
+            const resourcesGrid = document.getElementById('resourcesGrid');
+            function renderResourcesStudent() {
+                if (!resourcesGrid) return;
+                const list = AuthAPI.getResources();
+                resourcesGrid.innerHTML = '';
+
+                if (list.length === 0) {
+                    resourcesGrid.innerHTML = '<div class="dash-card glass-card" style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-secondary);">No resources uploaded yet.</div>';
+                } else {
+                    list.forEach(res => {
+                        const card = document.createElement('div');
+                        card.className = 'dash-card glass-card';
+                        card.style.padding = '1.8rem';
+                        card.style.display = 'flex';
+                        card.style.flexDirection = 'column';
+                        card.style.justifyContent = 'space-between';
+                        card.style.gap = '1.2rem';
+
+                        let icon = '🔗';
+                        if (res.type === 'pdf') icon = '📄';
+                        else if (res.type === 'ppt') icon = '📊';
+                        else if (res.type === 'video') icon = '🎥';
+                        else if (res.type === 'docx') icon = '📝';
+
+                        card.innerHTML = `
+                            <div>
+                                <span class="badge" style="margin-bottom:0.8rem;background:rgba(212,175,55,0.08);color:var(--accent-gold-light);">${res.type.toUpperCase()}</span>
+                                <h3 style="margin:0 0 0.5rem;font-size:1.15rem;font-family:var(--font-sans);display:flex;align-items:center;gap:0.4rem;">
+                                    <span>${icon}</span> ${res.name}
+                                </h3>
+                            </div>
+                            <a href="${res.url}" target="_blank" class="btn btn-primary" style="text-align:center;text-decoration:none;font-size:0.85rem;padding:0.6rem 1rem;">View Resource</a>
+                        `;
+                        resourcesGrid.appendChild(card);
+                    });
+                }
+            }
+
+            // ── Notification badge update ──
+            function updateAnnBadge() {
+                const badge = document.getElementById('ann-badge');
+                if (!badge) return;
+                const count = parseInt(localStorage.getItem('jilgm_unread_announcements') || '0');
+                if (count > 0) {
+                    badge.innerText = count.toString();
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
+            function updateGradesBadge() {
+                const badge = document.getElementById('grades-badge');
+                if (!badge) return;
+                const user = AuthAPI.getCurrentUser();
+                if (!user) {
+                    badge.style.display = 'none';
+                    return;
+                }
+                const count = AuthAPI.getUnreadRemarksCount(user.id);
+                if (count > 0) {
+                    badge.innerText = count.toString();
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
+            const gradesList = document.getElementById('gradesList');
+            function renderGradesStudent() {
+                if (!gradesList) return;
+                const user = AuthAPI.getCurrentUser();
+                if (!user) return;
+                
+                const answers = user.answers || [];
+                const modsContent = AuthAPI.getModulesContent();
+                
+                // Calculate mastery percentage
+                let pointsEarned = 0;
+                let totalMaxScore = 0;
+                answers.forEach(ans => {
+                    if (ans.score !== null && ans.maxScore !== null && ans.type !== 'reflection' && ans.type !== 'file_upload') {
+                        pointsEarned += ans.score;
+                        totalMaxScore += ans.maxScore;
+                    }
+                });
+                
+                const masteryScoreText = document.getElementById('masteryScoreText');
+                const masteryProgressBar = document.getElementById('masteryProgressBar');
+                const masteryStatsText = document.getElementById('masteryStatsText');
+                
+                if (masteryScoreText && masteryProgressBar && masteryStatsText) {
+                    if (totalMaxScore > 0) {
+                        const pct = Math.round((pointsEarned / totalMaxScore) * 100);
+                        masteryScoreText.innerText = `${pct}%`;
+                        masteryProgressBar.style.width = `${pct}%`;
+                        masteryStatsText.innerText = `Mastery Grade: Completed ${pointsEarned} of ${totalMaxScore} auto-graded items correctly.`;
+                    } else {
+                        masteryScoreText.innerText = '0%';
+                        masteryProgressBar.style.width = '0%';
+                        masteryStatsText.innerText = 'No auto-graded items completed yet.';
+                    }
+                }
+                
+                gradesList.innerHTML = '';
+                
+                if (answers.length === 0) {
+                    gradesList.innerHTML = '<div class="dash-card glass-card" style="text-align:center;padding:3rem;color:var(--text-secondary);">You have not completed any activities yet. Start a module and submit your responses!</div>';
+                    return;
+                }
+                
+                // Group answers by module ID
+                const grouped = {};
+                answers.forEach(ans => {
+                    if (!grouped[ans.moduleId]) {
+                        grouped[ans.moduleId] = [];
+                    }
+                    grouped[ans.moduleId].push(ans);
+                });
+                
+                Object.keys(grouped).forEach(modId => {
+                    const mod = modsContent[modId];
+                    if (!mod) return;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'dash-card glass-card';
+                    card.style.padding = '2rem';
+                    card.style.display = 'flex';
+                    card.style.flexDirection = 'column';
+                    card.style.gap = '1.2rem';
+                    
+                    const listHtml = grouped[modId].map(ans => {
+                        let badgeColor = 'rgba(212,175,55,0.1)';
+                        let badgeText = ans.type.replace('_', ' ').toUpperCase();
+                        let scoreHtml = '';
+                        let contentHtml = '';
+                        
+                        if (ans.isCorrect !== null && ans.score !== null) {
+                            badgeColor = ans.isCorrect ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+                            scoreHtml = `
+                                <div style="font-size: 0.9rem; font-weight: bold; color: ${ans.isCorrect ? '#15803d' : '#b91c1c'}; margin-top: 0.5rem;">
+                                    Grade: ${ans.score} / ${ans.maxScore} (${ans.isCorrect ? 'Correct' : 'Incorrect'})
+                                </div>
+                            `;
+                        }
+                        
+                        if (ans.answer) {
+                            contentHtml = `<p style="margin: 0.5rem 0 0; color: var(--text-secondary); font-size: 0.95rem; font-style: italic;">"${ans.answer}"</p>`;
+                        } else if (ans.file) {
+                            contentHtml = `
+                                <div style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; background: rgba(0,0,0,0.05); padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--glass-border); max-width: fit-content;">
+                                    <span>📎</span>
+                                    <span style="font-family: monospace; font-size: 0.85rem; color: var(--text-primary);">${ans.file.name} (${ans.file.size})</span>
+                                </div>
+                            `;
+                        }
+                        
+                        let remarkBubble = '';
+                        if (ans.teacherRemarks) {
+                            remarkBubble = `
+                                <div style="background: rgba(170,132,28,0.06); border-left: 3px solid var(--accent-gold); padding: 0.8rem 1.2rem; border-radius: 4px 12px 12px 4px; margin-top: 0.8rem;">
+                                    <p style="margin: 0 0 0.3rem; font-size: 0.75rem; color: var(--accent-gold-dark); font-weight: bold;">💬 Instructor Feedback (${ans.teacherRemarksAdmin || 'Teacher'}):</p>
+                                    <p style="margin: 0; font-size: 0.88rem; line-height: 1.4; font-style: italic; color: var(--text-primary);">${ans.teacherRemarks}</p>
+                                </div>
+                            `;
+                        } else if (ans.type === 'reflection' || ans.type === 'file_upload') {
+                            remarkBubble = `
+                                <div style="background: rgba(0,0,0,0.02); border-left: 3px solid rgba(0,0,0,0.1); padding: 0.8rem 1.2rem; border-radius: 4px; margin-top: 0.8rem; font-size: 0.82rem; color: var(--text-secondary);">
+                                    ⏳ Awaiting instructor feedback and comments.
+                                </div>
+                            `;
+                        }
+                        
+                        return `
+                            <div style="border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 1rem; margin-bottom: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
+                                    <h4 style="margin: 0; font-size: 1.05rem; color: var(--accent-gold-dark);">${ans.question}</h4>
+                                    <span class="badge" style="background: ${badgeColor}; color: var(--accent-gold-dark); border: 1px solid rgba(170,132,28,0.25); font-size: 0.65rem;">${badgeText}</span>
+                                </div>
+                                ${contentHtml}
+                                ${scoreHtml}
+                                ${remarkBubble}
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    card.innerHTML = `
+                        <div style="border-bottom: 2.5px solid rgba(170,132,28,0.2); padding-bottom: 0.6rem;">
+                            <h3 style="margin: 0; font-family: var(--font-serif); font-size: 1.35rem; color: var(--text-primary);">${mod.title}</h3>
+                            <p style="margin: 0.2rem 0 0; font-size: 0.82rem; color: var(--text-secondary);">${mod.subtitle || ''}</p>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            ${listHtml}
+                        </div>
+                    `;
+                    gradesList.appendChild(card);
+                });
+            }
+ 
+            function handleAdminSync(msg) {
+                const currentUser = AuthAPI.getCurrentUser();
+                if (currentUser) {
+                    const students = AuthAPI.getAllStudents();
+                    const freshUser = students.find(s => s.id === currentUser.id);
+                    if (freshUser && freshUser.status === 'approved') {
+                        localStorage.setItem('jilgm_current_user', JSON.stringify(freshUser));
+                    } else {
+                        AuthAPI.logout();
+                        return;
+                    }
+                }
+                updateDashboardDOM();
+                updateAnnBadge();
+                updateGradesBadge();
+                
+                // If currently viewing resources, announcements, or grades tabs, update them too
+                if (btnResources.classList.contains('active')) renderResourcesStudent();
+                if (btnAnnouncements.classList.contains('active')) renderAnnouncementsStudent();
+                if (btnGrades.classList.contains('active')) renderGradesStudent();
+ 
+                showLiveToast(msg);
+            }
+
+            // Cross-tab sync via storage event (fires in OTHER tabs only)
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'jilgm_unlocked_modules' || e.key === 'jilgm_modules_content' || e.key === 'jilgm_students' || e.key === 'jilgm_announcements' || e.key === 'jilgm_resources') {
+                    handleAdminSync();
+                }
+            });
+
+            // Same-tab + cross-tab sync via BroadcastChannel (fires everywhere)
+            try {
+                const dashChannel = new BroadcastChannel('jilgm_sync');
+                dashChannel.onmessage = (e) => {
+                    const type = e.data && e.data.type;
+                    if (type === 'module_updated') {
+                        handleAdminSync('Module content updated');
+                    } else if (type === 'unlock_changed') {
+                        const payload = e.data.payload || {};
+                        handleAdminSync(payload.isUnlocked ? 'New module released!' : 'Module access changed');
+                    } else if (type === 'modules_changed') {
+                        handleAdminSync('Curriculum updated');
+                    } else if (type === 'student_updated') {
+                        handleAdminSync('Your enrolment status was updated');
+                    } else if (type === 'announcements_changed') {
+                        handleAdminSync('New announcements posted');
+                    } else if (type === 'resources_changed') {
+                        handleAdminSync('Resource files updated');
+                    } else if (type === 'remarks_updated') {
+                        handleAdminSync('New teacher feedback posted');
+                    }
+                };
+            } catch(err) { /* BroadcastChannel not supported – storage event is the fallback */ }
+
+            // Run on initial load
+            updateDashboardDOM();
+            updateAnnBadge();
+        });
+    </script>
+</body>
+</html>

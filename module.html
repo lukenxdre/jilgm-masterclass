@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Module - JILGM Masterclass</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="auth.js?v=2.1"></script>
+    <style>
+        .module-layout {
+            max-width: 960px;
+            margin: 2rem auto 0;
+        }
+        
+        .lesson-text p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .lesson-text h2 {
+            font-size: 1.8rem;
+            color: var(--accent-gold-light);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-text h3 {
+            color: var(--accent-gold-light);
+            margin-top: 1.8rem;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .lesson-image {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            margin: 1.5rem 0;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 15px rgba(212,175,55,0.1);
+        }
+
+        blockquote {
+            border-left: 3px solid var(--accent-gold);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 1.15rem;
+            color: var(--text-primary);
+        }
+
+        .dropzone {
+            border: 2px dashed var(--glass-border);
+            padding: 2.5rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: rgba(0,0,0,0.2);
+            margin-top: 1rem;
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--accent-gold);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .progress-ring {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        @media (max-width: 900px) {
+            .module-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="dashboard-layout" style="min-height: 100vh;">
+
+    <aside class="sidebar">
+        <a href="index.html" class="logo-sidebar-brand">
+            <img src="hero_logo.png" alt="JILGM Riyadh Logo" class="sidebar-logo">
+        </a>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="active" id="sidebarBackBtn">← Back to Dashboard</a>
+            <a href="#">Module Resources</a>
+            <a href="#" onclick="AuthAPI.logout(); return false;" style="margin-top: auto; color: #ef4444;">Log Out</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-content">
+        <div class="dashboard-header" style="margin-bottom: 2rem;">
+            <div>
+                <span class="badge" style="margin-bottom: 0.5rem; display: inline-block;" id="moduleLabel">Module</span>
+                <h1 id="moduleTitle">Module Title</h1>
+                <p style="color: var(--text-secondary); margin-top: 0.2rem;" id="moduleSubtitle">Module Subtitle...</p>
+            </div>
+        </div>
+
+        <div class="module-layout">
+            <!-- Single Column: Lesson Content and Embedded Activities -->
+            <div class="glass-card" style="padding: 2.5rem; border-color: rgba(255,255,255,0.05); margin-bottom: 3rem;" id="lessonContentCard">
+                <div class="lesson-text" id="lessonTextContainer">
+                    <!-- Populated dynamically by JS -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+            const moduleId = urlParams.get('id') || 'module1';
+            const isPreview = urlParams.get('preview') === 'true';
+
+            if (!isPreview) {
+                if (window.syncPromise) {
+                    try { await window.syncPromise; } catch(err) { console.warn(err); }
+                }
+                AuthAPI.requireAuth();
+                if (!AuthAPI.isModuleUnlocked(moduleId)) {
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+            } else {
+                const backBtn = document.getElementById('sidebarBackBtn');
+                if (backBtn) {
+                    backBtn.innerText = '← Back to Admin';
+                    backBtn.href = 'admin.html';
+                }
+            }
+
+            function renderModuleUI() {
+                const currentUser = AuthAPI.getCurrentUser();
+                // Load module data
+                const moduleData = AuthAPI.getModule(moduleId);
+                if (!moduleData) {
+                    document.getElementById('moduleTitle').innerText = 'Module Not Found';
+                    document.getElementById('lessonTextContainer').innerHTML = '<p>The requested module does not exist or has not been created yet.</p>';
+                    return;
+                }
+
+                // Bind title & headers
+                const modsContent = AuthAPI.getModulesContent();
+                const modIds = Object.keys(modsContent);
+                const moduleIndex = modIds.indexOf(moduleId) + 1;
+                document.getElementById('moduleLabel').innerText = `Module ${moduleIndex > 0 ? moduleIndex : ''}`;
+                document.getElementById('moduleTitle').innerText = moduleData.title;
+                document.getElementById('moduleSubtitle').innerText = moduleData.subtitle;
+
+                const lessonContainer = document.getElementById('lessonTextContainer');
+                const tasksContainer = document.getElementById('lessonTextContainer'); // Point both to lessonTextContainer for 1-column inline layout
+
+                lessonContainer.innerHTML = '';
+
+                let hasInteractive = false;
+                const studentAnswers = currentUser ? (currentUser.answers || []) : [];
+                const existingSubmission = studentAnswers.find(a => a.moduleId === moduleId) || {};
+
+                // Render components
+                // Helper function to apply color and background highlight settings
+                function applyCustomStyling(element, block) {
+                    if (block.color === 'navy') {
+                        element.style.color = '#0056b3';
+                    } else if (block.color === 'gold') {
+                        element.style.color = 'var(--accent-gold)';
+                    } else if (block.color === 'red') {
+                        element.style.color = '#ef4444';
+                    } else if (block.color === 'green') {
+                        element.style.color = '#22c55e';
+                    }
+
+                    if (block.font) {
+                        if (block.font === 'serif') {
+                            element.style.fontFamily = 'var(--font-serif)';
+                        } else if (block.font === 'monospace') {
+                            element.style.fontFamily = 'monospace';
+                        } else if (block.font === 'default') {
+                            element.style.fontFamily = 'var(--font-sans)';
+                        }
+                    }
+
+                    if (block.bg && block.bg !== 'none') {
+                        element.style.padding = '1rem 1.2rem';
+                        element.style.borderRadius = '8px';
+                        element.style.marginBottom = '1.5rem';
+                        element.style.display = 'block';
+                        if (block.bg === 'soft-gold') {
+                            element.style.background = 'linear-gradient(135deg, rgba(212, 175, 55, 0.14), rgba(212, 175, 55, 0.04))';
+                            element.style.borderLeft = '5px solid var(--accent-gold)';
+                            element.style.boxShadow = '0 4px 15px rgba(212, 175, 55, 0.05)';
+                        } else if (block.bg === 'soft-navy') {
+                            element.style.background = 'linear-gradient(135deg, rgba(11, 23, 44, 0.08), rgba(11, 23, 44, 0.02))';
+                            element.style.borderLeft = '5px solid var(--text-primary)';
+                            element.style.boxShadow = '0 4px 15px rgba(11, 23, 44, 0.03)';
+                        } else if (block.bg === 'soft-red') {
+                            element.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(239, 68, 68, 0.02))';
+                            element.style.borderLeft = '5px solid #ef4444';
+                            element.style.boxShadow = '0 4px 15px rgba(239, 68, 68, 0.03)';
+                        } else if (block.bg === 'soft-green') {
+                            element.style.background = 'linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(34, 197, 94, 0.02))';
+                            element.style.borderLeft = '5px solid #22c55e';
+                            element.style.boxShadow = '0 4px 15px rgba(34, 197, 94, 0.03)';
+                        }
+                    }
+                }
+
+                moduleData.components.forEach((comp, index) => {
+                    if (!comp || !comp.type) return;
+                    const staticTypes = ['header', 'header_h1', 'header_h2', 'header_h3', 'text', 'quote', 'image', 'callout', 'bullet_list', 'toggle_list', 'divider'];
+                    if (staticTypes.includes(comp.type)) {
+                        let blockEl;
+                        if (comp.type === 'header_h1') {
+                            blockEl = document.createElement('h1');
+                            blockEl.className = 'lesson-h1';
+                            blockEl.innerHTML = comp.content;
+                        } else if (comp.type === 'header_h2') {
+                            blockEl = document.createElement('h2');
+                            blockEl.className = 'lesson-h2';
+                            blockEl.innerHTML = comp.content;
+                        } else if (comp.type === 'header' || comp.type === 'header_h3') {
+                            blockEl = document.createElement('h3');
+                            blockEl.className = 'lesson-h3';
+                            blockEl.innerHTML = comp.content;
+                        } else if (comp.type === 'text') {
+                            blockEl = document.createElement('p');
+                            blockEl.style.marginBottom = '1.2rem';
+                            blockEl.innerHTML = comp.content;
+                        } else if (comp.type === 'quote') {
+                            blockEl = document.createElement('blockquote');
+                            blockEl.innerHTML = comp.content;
+                        } else if (comp.type === 'image') {
+                            blockEl = document.createElement('img');
+                            blockEl.src = comp.content;
+                            blockEl.alt = 'Lesson Image';
+                            blockEl.className = 'lesson-image';
+                        } else if (comp.type === 'callout') {
+                            blockEl = document.createElement('div');
+                            blockEl.style.display = 'flex';
+                            blockEl.style.gap = '1rem';
+                            blockEl.style.alignItems = 'flex-start';
+                            blockEl.style.background = 'rgba(170, 132, 28, 0.06)';
+                            blockEl.style.border = '1px solid rgba(170, 132, 28, 0.15)';
+                            blockEl.style.padding = '1.2rem';
+                            blockEl.style.borderRadius = '12px';
+                            blockEl.style.marginBottom = '1.5rem';
+                            blockEl.innerHTML = `
+                                <span style="font-size: 1.5rem; line-height: 1;">${comp.emoji || '💡'}</span>
+                                <div style="flex: 1; font-size: 1rem; color: var(--text-primary); line-height: 1.5;">${comp.content}</div>
+                            `;
+                        } else if (comp.type === 'bullet_list') {
+                            blockEl = document.createElement('ul');
+                            blockEl.style.paddingLeft = '2rem';
+                            blockEl.style.marginBottom = '1.5rem';
+                            const lines = comp.content.split('\n');
+                            lines.forEach(line => {
+                                if (line.trim()) {
+                                    const li = document.createElement('li');
+                                    li.style.marginBottom = '0.5rem';
+                                    li.innerHTML = line.trim().replace(/^-\s*/, '');
+                                    blockEl.appendChild(li);
+                                }
+                            });
+                        } else if (comp.type === 'toggle_list') {
+                            blockEl = document.createElement('details');
+                            blockEl.style.marginBottom = '1.5rem';
+                            blockEl.style.cursor = 'pointer';
+                            blockEl.style.outline = 'none';
+                            blockEl.innerHTML = `
+                                <summary style="font-weight: 600; font-family: var(--font-serif); font-size: 1.2rem; color: var(--accent-gold); outline: none; margin-bottom: 0.5rem;">${comp.title || 'Click to toggle'}</summary>
+                                <div style="padding-left: 1.5rem; color: var(--text-primary); line-height: 1.6; font-size: 1rem;">${comp.content}</div>
+                            `;
+                        } else if (comp.type === 'divider') {
+                            blockEl = document.createElement('hr');
+                            blockEl.style.border = 'none';
+                            blockEl.style.borderTop = '1.5px solid var(--glass-border)';
+                            blockEl.style.margin = '2rem 0';
+                        }
+
+                        if (blockEl) {
+                            applyCustomStyling(blockEl, comp);
+                            lessonContainer.appendChild(blockEl);
+                        }
+                    } else if (comp.type === 'question') {
+                        hasInteractive = true;
+                        // Render reflection question form
+                        const taskCard = document.createElement('div');
+                        taskCard.className = 'glass-card';
+                        taskCard.style.padding = '2rem';
+                        taskCard.style.borderColor = 'var(--accent-gold-dark)';
+                        taskCard.style.marginTop = '2.5rem';
+                        
+                        const answeredObj = studentAnswers.find(a => a.moduleId === moduleId && a.componentIndex === index);
+                        const answeredText = answeredObj ? answeredObj.answer : '';
+
+                        let remarksHtml = '';
+                        if (answeredObj && answeredObj.teacherRemarks) {
+                            remarksHtml = `
+                                <div class="teacher-remarks-card" style="background: rgba(212,175,55,0.08); border: 1.5px solid var(--accent-gold); border-radius: 12px; padding: 1.2rem; margin-top: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.4rem;">
+                                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--accent-gold-light); display: flex; align-items: center; gap: 0.4rem;">
+                                            <span>💬</span> Teacher Feedback
+                                        </span>
+                                        <span style="font-size: 0.72rem; color: var(--text-secondary);">${new Date(answeredObj.teacherRemarksDate).toLocaleDateString()} by ${answeredObj.teacherRemarksAdmin || 'Admin'}</span>
+                                    </div>
+                                    <p style="margin: 0; font-size: 0.9rem; line-height: 1.5; color: var(--text-primary); font-style: italic;">"${answeredObj.teacherRemarks}"</p>
+                                </div>
+                            `;
+                        }
+ 
+                        taskCard.innerHTML = `
+                            <h3 style="margin-bottom: 1rem; color: var(--accent-gold);">Module Reflection</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">To complete this module, write your personal reflection below.</p>
+                            
+                            <div id="msg-reflection-${index}" class="auth-error" style="display: none; margin-bottom: 1.2rem;"></div>
+ 
+                            <form id="form-reflection-${index}">
+                                <label style="display: block; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.8rem; font-weight: 500; line-height: 1.4;">
+                                    ${comp.content}
+                                </label>
+                                <textarea id="input-reflection-${index}" required class="glass-input" rows="8" placeholder="${isPreview ? 'Reflection input is disabled in preview mode.' : 'Type your response here... (minimum 20 characters)'}" style="width: 100%; resize: vertical; line-height: 1.5; font-family: var(--font-sans); margin-bottom: 1rem;" ${isPreview ? 'disabled' : ''}>${answeredText}</textarea>
+                                <button type="submit" class="btn btn-primary" style="width: 100%;" ${isPreview ? 'disabled style="opacity: 0.6; cursor: not-allowed;"' : ''}>
+                                    ${isPreview ? 'Submit Reflection (Preview Mode)' : (answeredText ? 'Update Reflection' : 'Submit Reflection')}
+                                </button>
+                                ${remarksHtml}
+                            </form>
+                        `;
+                        tasksContainer.appendChild(taskCard);
+ 
+                        // Bind form event
+                        setTimeout(() => {
+                            const refForm = document.getElementById(`form-reflection-${index}`);
+                            const refMsg = document.getElementById(`msg-reflection-${index}`);
+                            const refInput = document.getElementById(`input-reflection-${index}`);
+ 
+                            if (answeredText) {
+                                refMsg.style.display = 'block';
+                                refMsg.style.background = 'rgba(34, 197, 94, 0.1)';
+                                refMsg.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+                                refMsg.style.color = '#4ade80';
+                                refMsg.innerText = 'Completed! You can update your answer above.';
+                            }
+ 
+                            refForm.addEventListener('submit', (e) => {
+                                e.preventDefault();
+                                if (isPreview) return;
+                                refMsg.style.display = 'none';
+                                const ansText = refInput.value.trim();
+ 
+                                if (ansText.length < 20) {
+                                    refMsg.style.display = 'block';
+                                    refMsg.style.background = 'rgba(239, 68, 68, 0.1)';
+                                    refMsg.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                                    refMsg.style.color = '#ef4444';
+                                    refMsg.innerText = 'Please write a reflection of at least 20 characters.';
+                                    return;
+                                }
+ 
+                                const btn = refForm.querySelector('button');
+                                btn.innerText = 'Submitting reflection...';
+ 
+                                setTimeout(() => {
+                                    const res = AuthAPI.submitAnswer(currentUser.id, moduleId, comp.content, ansText, null, index, { type: 'reflection' });
+                                    btn.innerText = answeredText ? 'Update Reflection' : 'Submit Reflection';
+                                    if (res.success) {
+                                        refMsg.style.display = 'block';
+                                        refMsg.style.background = 'rgba(34, 197, 94, 0.1)';
+                                        refMsg.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+                                        refMsg.style.color = '#4ade80';
+                                        refMsg.innerText = 'Reflection submitted! Updating progress...';
+                                        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+                                    }
+                                }, 800);
+                            });
+                        }, 0);
+
+                    } else if (comp.type === 'file_upload') {
+                        hasInteractive = true;
+                        // Render interactive file upload block
+                        const uploadCard = document.createElement('div');
+                        uploadCard.className = 'glass-card';
+                        uploadCard.style.padding = '2rem';
+                        uploadCard.style.borderColor = 'var(--glass-border)';
+                        uploadCard.style.marginTop = '2.5rem';
+ 
+                        const answeredObj = studentAnswers.find(a => a.moduleId === moduleId && a.componentIndex === index);
+                        const uploadedFile = answeredObj && answeredObj.file ? answeredObj.file : null;
+                        const uploadTitle = comp.title || 'Submit Assignment File';
+                        const uploadInstructions = comp.content || 'Upload files required for this module (e.g. PDF, DOCX, ZIP).';
+ 
+                        let remarksHtml = '';
+                        if (answeredObj && answeredObj.teacherRemarks) {
+                            remarksHtml = `
+                                <div class="teacher-remarks-card" style="background: rgba(212,175,55,0.08); border: 1.5px solid var(--accent-gold); border-radius: 12px; padding: 1.2rem; margin-top: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: left;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.4rem;">
+                                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--accent-gold-light); display: flex; align-items: center; gap: 0.4rem;">
+                                            <span>💬</span> Teacher Feedback
+                                        </span>
+                                        <span style="font-size: 0.72rem; color: var(--text-secondary);">${new Date(answeredObj.teacherRemarksDate).toLocaleDateString()} by ${answeredObj.teacherRemarksAdmin || 'Admin'}</span>
+                                    </div>
+                                    <p style="margin: 0; font-size: 0.9rem; line-height: 1.5; color: var(--text-primary); font-style: italic;">"${answeredObj.teacherRemarks}"</p>
+                                </div>
+                            `;
+                        }
+ 
+                        uploadCard.innerHTML = `
+                            <h3 style="margin-bottom: 0.5rem; color: var(--accent-gold-light);">${uploadTitle}</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">${uploadInstructions}</p>
+                            
+                            <div id="file-dropzone" class="dropzone">
+                                <span style="font-size: 2.5rem; display: block; margin-bottom: 0.8rem;">📁</span>
+                                <span style="color: var(--text-secondary); font-size: 0.95rem;">Drag & drop your file here, or <strong style="color: var(--accent-gold);">browse</strong></span>
+                                <input type="file" id="file-input" style="display: none;">
+                            </div>
+                            
+                            <div id="file-info" class="hidden" style="margin-top: 1rem; text-align: left; background: rgba(0,0,0,0.3); padding: 1.2rem; border-radius: 10px; border: 1px solid var(--glass-border); display: flex; flex-direction: column; align-items: center; gap: 0.8rem;">
+                                <div style="width: 100%;">
+                                    <p style="margin: 0; font-size: 0.95rem;"><strong>File:</strong> <span id="file-name" style="color: var(--accent-gold-light);"></span></p>
+                                    <p style="margin: 0.2rem 0 0; font-size: 0.85rem; color: var(--text-secondary);"><strong>Size:</strong> <span id="file-size"></span></p>
+                                </div>
+                                <div id="file-preview-render-info" style="width: 100%; display: flex; justify-content: center; overflow: hidden;"></div>
+                                <div id="file-warning-msg" style="color: #ef4444; font-size: 0.85rem; font-weight: 600; display: none; margin-top: 0.3rem;"></div>
+                                <button class="btn btn-primary" id="btn-upload" style="margin-top: 0.5rem; width: 100%; padding: 0.6rem 1.5rem; font-size: 0.9rem;" ${isPreview ? 'disabled style="opacity: 0.6; cursor: not-allowed;"' : ''}>
+                                    ${isPreview ? 'Upload File (Preview Mode)' : 'Upload File'}
+                                </button>
+                            </div>
+                            
+                            <div id="file-success" class="${uploadedFile ? '' : 'hidden'}" style="margin-top: 1.5rem; padding: 1.5rem; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); color: #4ade80; border-radius: 12px; font-weight: 500; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0.8rem;">
+                                <div>✓ File uploaded: <strong style="color: #fff;">${uploadedFile ? uploadedFile.name : ''}</strong> (${uploadedFile ? uploadedFile.size : ''})</div>
+                                <div id="file-preview-render-success" style="width: 100%; display: flex; justify-content: center; overflow: hidden;"></div>
+                            </div>
+                            ${remarksHtml}
+                        `;
+                        tasksContainer.appendChild(uploadCard);
+
+                        // Bind file events
+                        setTimeout(() => {
+                            const zone = document.getElementById('file-dropzone');
+                            const fileInput = document.getElementById('file-input');
+                            const fileInfo = document.getElementById('file-info');
+                            const fileName = document.getElementById('file-name');
+                            const fileSize = document.getElementById('file-size');
+                            const btnUpload = document.getElementById('btn-upload');
+                            const fileSuccess = document.getElementById('file-success');
+                            
+                            let selectedFile = null;
+
+                            function isImage(type, name) {
+                                if (type && type.startsWith('image/')) return true;
+                                const ext = name.split('.').pop().toLowerCase();
+                                return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'heic', 'tiff'].includes(ext);
+                            }
+
+                            function isVideo(type, name) {
+                                if (type && type.startsWith('video/')) return true;
+                                const ext = name.split('.').pop().toLowerCase();
+                                return ['mp4', 'webm', 'ogg', 'mov', 'quicktime', 'avi', 'mkv', '3gp', 'wmv'].includes(ext);
+                            }
+
+                            // Render initial success file preview if available
+                            if (uploadedFile && uploadedFile.url) {
+                                const renderContainer = document.getElementById('file-preview-render-success');
+                                renderContainer.innerHTML = '';
+                                if (isImage(uploadedFile.type, uploadedFile.name)) {
+                                    renderContainer.innerHTML = `<img src="${uploadedFile.url}" style="max-height: 180px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); object-fit: contain;">`;
+                                } else if (isVideo(uploadedFile.type, uploadedFile.name)) {
+                                    renderContainer.innerHTML = `<video src="${uploadedFile.url}" controls style="max-height: 240px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: #000;"></video>`;
+                                }
+                            }
+
+                            zone.addEventListener('dragover', (e) => {
+                                 e.preventDefault();
+                                 if (isPreview) return;
+                                 zone.classList.add('dragover');
+                            });
+
+                            zone.addEventListener('dragleave', () => {
+                                zone.classList.remove('dragover');
+                            });
+
+                            zone.addEventListener('drop', (e) => {
+                                e.preventDefault();
+                                zone.classList.remove('dragover');
+                                if (e.dataTransfer.files.length > 0) {
+                                    handleFileSelection(e.dataTransfer.files[0]);
+                                }
+                            });
+
+                             zone.addEventListener('click', () => {
+                                 if (isPreview) return;
+                                 fileInput.click();
+                             });
+                            fileInput.addEventListener('change', (e) => {
+                                if (e.target.files.length > 0) {
+                                    handleFileSelection(e.target.files[0]);
+                                }
+                            });
+
+                            function handleFileSelection(file) {
+                                selectedFile = file;
+                                fileName.innerText = file.name;
+                                fileSize.innerText = (file.size / 1024).toFixed(1) + ' KB';
+                                fileInfo.classList.remove('hidden');
+                                fileSuccess.classList.add('hidden');
+                                
+                                const warningMsg = document.getElementById('file-warning-msg');
+                                const renderContainer = document.getElementById('file-preview-render-info');
+                                
+                                renderContainer.innerHTML = '';
+                                warningMsg.style.display = 'none';
+                                btnUpload.disabled = isPreview;
+                                
+                                // Limit size to 2.5MB
+                                const maxSizeBytes = 2.5 * 1024 * 1024;
+                                if (file.size > maxSizeBytes) {
+                                    warningMsg.innerText = '⚠️ File exceeds 2.5MB limit. Please choose a smaller file to avoid storage quota issues.';
+                                    warningMsg.style.display = 'block';
+                                    btnUpload.disabled = true;
+                                    return;
+                                }
+                                
+                                // Read file to show preview
+                                if (isImage(file.type, file.name) || isVideo(file.type, file.name)) {
+                                    const reader = new FileReader();
+                                    reader.onload = (e) => {
+                                        const dataUrl = e.target.result;
+                                        // Save base64 data to temp property to be saved on upload
+                                        selectedFile.base64Data = dataUrl;
+                                        
+                                        if (isImage(file.type, file.name)) {
+                                            renderContainer.innerHTML = `<img src="${dataUrl}" style="max-height: 180px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); object-fit: contain;">`;
+                                        } else if (isVideo(file.type, file.name)) {
+                                            renderContainer.innerHTML = `<video src="${dataUrl}" controls style="max-height: 240px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: #000;"></video>`;
+                                        }
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                            }
+
+                             btnUpload.addEventListener('click', () => {
+                                 if (isPreview || !selectedFile) return;
+                                 
+                                 if (selectedFile.size > 2.5 * 1024 * 1024) {
+                                     showToast('File is too large (max 2.5MB)!');
+                                     return;
+                                 }
+
+                                 btnUpload.innerText = 'Uploading...';
+                                 btnUpload.disabled = true;
+
+                                 const saveAnswer = (base64Url = null) => {
+                                     const fileObj = {
+                                         name: selectedFile.name,
+                                         size: (selectedFile.size / 1024).toFixed(1) + ' KB',
+                                         type: selectedFile.type || '',
+                                         url: base64Url
+                                     };
+                                     
+                                     // Save file details to student answer index
+                                     const res = AuthAPI.submitAnswer(currentUser.id, moduleId, comp.title || 'File Upload Assignment', null, fileObj, index, { type: 'file_upload' });
+                                     btnUpload.innerText = 'Upload File';
+                                     btnUpload.disabled = false;
+                                     fileInfo.classList.add('hidden');
+                                     
+                                     fileSuccess.querySelector('strong').innerText = fileObj.name;
+                                     
+                                     // Update preview in success block
+                                     const renderSuccess = document.getElementById('file-preview-render-success');
+                                     renderSuccess.innerHTML = '';
+                                     if (base64Url) {
+                                         if (isImage(fileObj.type, fileObj.name)) {
+                                             renderSuccess.innerHTML = `<img src="${base64Url}" style="max-height: 180px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); object-fit: contain;">`;
+                                         } else if (isVideo(fileObj.type, fileObj.name)) {
+                                             renderSuccess.innerHTML = `<video src="${base64Url}" controls style="max-height: 240px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: #000;"></video>`;
+                                         }
+                                     }
+                                     
+                                     fileSuccess.classList.remove('hidden');
+                                     showToast('File uploaded successfully!');
+                                     setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+                                 };
+
+                                 if (selectedFile.base64Data) {
+                                     saveAnswer(selectedFile.base64Data);
+                                 } else if (isImage(selectedFile.type, selectedFile.name) || isVideo(selectedFile.type, selectedFile.name)) {
+                                     const reader = new FileReader();
+                                     reader.onload = (e) => {
+                                         saveAnswer(e.target.result);
+                                     };
+                                     reader.readAsDataURL(selectedFile);
+                                 } else {
+                                     saveAnswer(null);
+                                 }
+                             });
+
+                            function showToast(message) {
+                                const toast = document.createElement('div');
+                                toast.style.position = 'fixed';
+                                toast.style.bottom = '2rem';
+                                toast.style.right = '2rem';
+                                toast.style.background = 'rgba(34, 197, 94, 0.95)';
+                                toast.style.border = '1px solid #4ade80';
+                                toast.style.color = 'white';
+                                toast.style.padding = '1rem 1.5rem';
+                                toast.style.borderRadius = '8px';
+                                toast.style.zIndex = '3000';
+                                toast.innerText = '✓ ' + message;
+                                document.body.appendChild(toast);
+                                setTimeout(() => toast.remove(), 2500);
+                            }
+                        }, 0);
+                    }
+
+                    // ── FLIP CARD ────────────────────────────────────────────────────────
+                    else if (comp.type === 'flip_card') {
+                        const uid = 'fc_' + index;
+                        const wrap = document.createElement('div');
+                        wrap.className = 'interactive-block';
+                        wrap.innerHTML = `
+                            <div class="interactive-block-label">🃏 Flip Card — Click to Reveal</div>
+                            <div class="flip-card-scene" id="${uid}" tabindex="0" role="button" aria-label="Flip card. Press Enter or click to flip.">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front">
+                                        <span class="flip-card-front-icon">${comp.icon || '💡'}</span>
+                                        <span class="flip-card-front-text">${comp.front || 'Front of card'}</span>
+                                        <span class="flip-card-hint">↻ Click to flip</span>
+                                    </div>
+                                    <div class="flip-card-back">
+                                        <span class="flip-card-back-text">${comp.back || 'Back of card'}</span>
+                                        <span class="flip-card-hint">↺ Click to flip back</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        lessonContainer.appendChild(wrap);
+                        setTimeout(() => {
+                            const scene = document.getElementById(uid);
+                            const toggle = () => scene.classList.toggle('flipped');
+                            scene.addEventListener('click', toggle);
+                            scene.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+                        }, 0);
+                    }
+
+                    // ── MULTIPLE CHOICE ──────────────────────────────────────────────────
+                    else if (comp.type === 'multiple_choice') {
+                        const uid = 'mc_' + index;
+                        const letters = ['A','B','C','D','E','F'];
+                        const opts = comp.options || [];
+                        const optHtml = opts.map((o, i) => `
+                            <button class="mc-option" data-index="${i}" id="${uid}_opt${i}">
+                                <span class="mc-option-letter">${letters[i]}</span>
+                                <span>${o}</span>
+                            </button>`).join('');
+                        const wrap = document.createElement('div');
+                        wrap.className = 'interactive-block';
+                        wrap.innerHTML = `
+                            <div class="interactive-block-label">🧠 Knowledge Check</div>
+                            <div class="mc-block">
+                                <p class="mc-question">${comp.question || comp.content || 'Question'}</p>
+                                <div class="mc-options" id="${uid}_opts">${optHtml}</div>
+                                <div class="mc-explanation" id="${uid}_exp">
+                                    ${comp.explanation ? `<strong>${comp.correct_index !== undefined && opts[comp.correct_index] ? '✅ Correct answer: ' + opts[comp.correct_index] : ''}</strong><br>${comp.explanation}` : ''}
+                                </div>
+                            </div>
+                        `;
+                        lessonContainer.appendChild(wrap);
+                        setTimeout(() => {
+                            const container = document.getElementById(uid + '_opts');
+                            const exp = document.getElementById(uid + '_exp');
+                            const correctIdx = parseInt(comp.correct_index ?? 0);
+                            const answeredObj = studentAnswers.find(a => a.moduleId === moduleId && a.componentIndex === index);
+                            
+                            if (answeredObj) {
+                                const chosenVal = answeredObj.answer;
+                                const chosenIdx = opts.indexOf(chosenVal);
+                                container.querySelectorAll('.mc-option').forEach((b, i) => {
+                                    b.disabled = true;
+                                    if (i === correctIdx) {
+                                        b.classList.add('correct');
+                                        b.innerHTML += ' <span style="float: right; font-weight: bold; color: #15803d;">✓ Correct</span>';
+                                    } else if (i === chosenIdx) {
+                                        b.classList.add('wrong');
+                                        b.innerHTML += ' <span style="float: right; font-weight: bold; color: #b91c1c;">✗ Incorrect</span>';
+                                    } else {
+                                        b.classList.add('dimmed');
+                                    }
+                                });
+                                if (comp.explanation) exp.classList.add('visible');
+                            }
+                            
+                            container.querySelectorAll('.mc-option').forEach(btn => {
+                                btn.addEventListener('click', () => {
+                                    if (isPreview) return;
+                                    const chosen = parseInt(btn.dataset.index);
+                                    const isRight = (chosen === correctIdx);
+                                    container.querySelectorAll('.mc-option').forEach((b, i) => {
+                                        b.disabled = true;
+                                        if (i === correctIdx) {
+                                            b.classList.add('correct');
+                                            b.innerHTML += ' <span style="float: right; font-weight: bold; color: #15803d;">✓ Correct</span>';
+                                        } else if (i === chosen) {
+                                            b.classList.add('wrong');
+                                            b.innerHTML += ' <span style="float: right; font-weight: bold; color: #b91c1c;">✗ Incorrect</span>';
+                                        } else {
+                                            b.classList.add('dimmed');
+                                        }
+                                    });
+                                    if (comp.explanation) exp.classList.add('visible');
+                                    
+                                    if (currentUser) {
+                                        AuthAPI.submitAnswer(
+                                            currentUser.id,
+                                            moduleId,
+                                            comp.question || comp.content || 'Knowledge Check MCQ',
+                                            opts[chosen],
+                                            null,
+                                            index,
+                                            {
+                                                type: 'multiple_choice',
+                                                isCorrect: isRight,
+                                                score: isRight ? 1 : 0,
+                                                maxScore: 1
+                                            }
+                                        );
+                                    }
+                                });
+                            });
+                        }, 0);
+                    }
+
+                    // ── TRUE / FALSE ─────────────────────────────────────────────────────
+                    else if (comp.type === 'true_false') {
+                        const uid = 'tf_' + index;
+                        const wrap = document.createElement('div');
+                        wrap.className = 'interactive-block';
+                        wrap.innerHTML = `
+                            <div class="interactive-block-label">⚡ True or False</div>
+                            <div class="tf-block">
+                                <p class="tf-statement">${comp.statement || comp.content || 'Statement'}</p>
+                                <div class="tf-buttons">
+                                    <button class="tf-btn true-btn" id="${uid}_true">✔ TRUE</button>
+                                    <button class="tf-btn false-btn" id="${uid}_false">✖ FALSE</button>
+                                </div>
+                                <div class="tf-explanation" id="${uid}_exp">${comp.explanation || ''}</div>
+                            </div>
+                        `;
+                        lessonContainer.appendChild(wrap);
+                        setTimeout(() => {
+                            const trueBtn  = document.getElementById(uid + '_true');
+                            const falseBtn = document.getElementById(uid + '_false');
+                            const exp = document.getElementById(uid + '_exp');
+                            const correct = comp.correct === true || comp.correct === 'true';
+                            const answeredObj = studentAnswers.find(a => a.moduleId === moduleId && a.componentIndex === index);
+                            
+                            const handle = (chosen, skipSave = false) => {
+                                trueBtn.disabled = falseBtn.disabled = true;
+                                const isRight = chosen === correct;
+                                const chosenBtn  = chosen ? trueBtn : falseBtn;
+                                const revealBtn  = chosen ? falseBtn : trueBtn;
+                                chosenBtn.classList.add(isRight ? 'selected-correct' : 'selected-wrong');
+                                if (!isRight) revealBtn.classList.add('reveal-answer');
+                                if (comp.explanation) exp.classList.add('visible');
+                                
+                                // Append explicit text feedback label
+                                if (isRight) {
+                                    chosenBtn.innerHTML += ' <span style="font-weight: bold; margin-left: 0.5rem; color: #16a34a;">(✓ Correct)</span>';
+                                } else {
+                                    chosenBtn.innerHTML += ' <span style="font-weight: bold; margin-left: 0.5rem; color: #dc2626;">(✗ Incorrect)</span>';
+                                    revealBtn.innerHTML += ' <span style="font-weight: bold; margin-left: 0.5rem; color: #16a34a;">(Correct Answer)</span>';
+                                }
+                                
+                                if (!skipSave && !isPreview && currentUser) {
+                                    AuthAPI.submitAnswer(
+                                        currentUser.id,
+                                        moduleId,
+                                        comp.statement || comp.content || 'True/False Statement',
+                                        chosen ? 'True' : 'False',
+                                        null,
+                                        index,
+                                        {
+                                            type: 'true_false',
+                                            isCorrect: isRight,
+                                            score: isRight ? 1 : 0,
+                                            maxScore: 1
+                                        }
+                                    );
+                                }
+                            };
+                            
+                            if (answeredObj) {
+                                const chosen = answeredObj.answer === 'True';
+                                handle(chosen, true);
+                            }
+                            
+                            trueBtn.addEventListener('click', () => handle(true));
+                            falseBtn.addEventListener('click', () => handle(false));
+                        }, 0);
+                    }
+
+                    // ── ACCORDION ────────────────────────────────────────────────────────
+                    else if (comp.type === 'accordion') {
+                        const uid = 'acc_' + index;
+                        const items = comp.items || [];
+                        const itemsHtml = items.map((item, i) => `
+                            <div class="accordion-item">
+                                <button class="accordion-trigger" id="${uid}_trig${i}" aria-expanded="false">
+                                    <span>${item.title || 'Section ' + (i+1)}</span>
+                                    <span class="accordion-arrow">▼</span>
+                                </button>
+                                <div class="accordion-body" id="${uid}_body${i}">${item.content || ''}</div>
+                            </div>`).join('');
+                        const wrap = document.createElement('div');
+                        wrap.className = 'interactive-block';
+                        wrap.innerHTML = `
+                            <div class="interactive-block-label">📂 Accordion — Click to Expand</div>
+                            <div class="accordion-block" id="${uid}">${itemsHtml}</div>
+                        `;
+                        lessonContainer.appendChild(wrap);
+                        setTimeout(() => {
+                            items.forEach((_, i) => {
+                                const trig = document.getElementById(`${uid}_trig${i}`);
+                                const body = document.getElementById(`${uid}_body${i}`);
+                                trig.addEventListener('click', () => {
+                                    const isOpen = trig.classList.contains('open');
+                                    trig.classList.toggle('open', !isOpen);
+                                    body.classList.toggle('open', !isOpen);
+                                    trig.setAttribute('aria-expanded', String(!isOpen));
+                                });
+                            });
+                        }, 0);
+                    }
+
+                    // ── MATCHING ─────────────────────────────────────────────────────────
+                    else if (comp.type === 'matching') {
+                        const uid = 'match_' + index;
+                        const pairs = comp.pairs || [];
+                        // Shuffle right column for challenge
+                        const rightShuffled = [...pairs.map((p,i) => ({text: p.right, pairIdx: i}))].sort(() => Math.random() - 0.5);
+                        const leftHtml  = pairs.map((p, i) => `<div class="matching-item left-item" data-pair="${i}" id="${uid}_L${i}">${p.left}</div>`).join('');
+                        const rightHtml = rightShuffled.map((r, i) => `<div class="matching-item right-item" data-pair="${r.pairIdx}" id="${uid}_R${i}">${r.text}</div>`).join('');
+                        const wrap = document.createElement('div');
+                        wrap.className = 'interactive-block';
+                        wrap.innerHTML = `
+                            <div class="interactive-block-label">🔗 Matching Exercise</div>
+                            <div class="matching-block">
+                                <p class="matching-prompt">Click an item on the left, then click its match on the right. Match all pairs to complete.</p>
+                                <div class="matching-grid">
+                                    <div>
+                                        <div class="matching-col-label">Concepts</div>
+                                        <div class="matching-items-left" id="${uid}_left">${leftHtml}</div>
+                                    </div>
+                                    <div>
+                                        <div class="matching-col-label">Definitions</div>
+                                        <div class="matching-items-right" id="${uid}_right">${rightHtml}</div>
+                                    </div>
+                                </div>
+                                <div class="matching-score" id="${uid}_score"></div>
+                                <button class="matching-reset" id="${uid}_reset">↺ Reset Exercise</button>
+                            </div>
+                        `;
+                        lessonContainer.appendChild(wrap);
+                        setTimeout(() => {
+                            let selectedLeft = null;
+                            let matched = 0;
+                            const total = pairs.length;
+                            const scoreEl = document.getElementById(uid + '_score');
+                            const resetBtn = document.getElementById(uid + '_reset');
+ 
+                            const leftItems  = document.querySelectorAll(`#${uid}_left  .left-item`);
+                            const rightItems = document.querySelectorAll(`#${uid}_right .right-item`);
+                            const answeredObj = studentAnswers.find(a => a.moduleId === moduleId && a.componentIndex === index);
+                            
+                            if (answeredObj) {
+                                leftItems.forEach(el => el.classList.add('matched-correct'));
+                                rightItems.forEach(el => el.classList.add('matched-correct'));
+                                scoreEl.innerHTML = `🎉 <strong>All ${total} pairs matched!</strong> Completed.`;
+                                scoreEl.classList.add('visible');
+                            }
+                            
+                            leftItems.forEach(el => {
+                                el.addEventListener('click', () => {
+                                    if (el.classList.contains('matched-correct') || el.classList.contains('disabled')) return;
+                                    leftItems.forEach(l => l.classList.remove('selected'));
+                                    el.classList.add('selected');
+                                    selectedLeft = el;
+                                });
+                            });
+ 
+                            rightItems.forEach(el => {
+                                el.addEventListener('click', () => {
+                                    if (!selectedLeft) return;
+                                    if (el.classList.contains('matched-correct') || el.classList.contains('disabled')) return;
+                                    const isMatch = selectedLeft.dataset.pair === el.dataset.pair;
+                                    if (isMatch) {
+                                        selectedLeft.classList.remove('selected');
+                                        selectedLeft.classList.add('matched-correct');
+                                        el.classList.add('matched-correct');
+                                        matched++;
+                                        if (matched === total) {
+                                            scoreEl.innerHTML = `🎉 <strong>All ${total} pairs matched!</strong> Excellent work.`;
+                                            scoreEl.classList.add('visible');
+                                            resetBtn.classList.add('visible');
+                                            
+                                            if (!isPreview && currentUser) {
+                                                AuthAPI.submitAnswer(
+                                                    currentUser.id,
+                                                    moduleId,
+                                                    'Matching Exercise: ' + (comp.title || 'Match definitions'),
+                                                    'Completed matching exercise',
+                                                    null,
+                                                    index,
+                                                    {
+                                                        type: 'matching',
+                                                        isCorrect: true,
+                                                        score: total,
+                                                        maxScore: total
+                                                    }
+                                                );
+                                            }
+                                        }
+                                    } else {
+                                        selectedLeft.classList.add('matched-wrong');
+                                        el.classList.add('matched-wrong');
+                                        setTimeout(() => {
+                                            selectedLeft.classList.remove('matched-wrong', 'selected');
+                                            el.classList.remove('matched-wrong');
+                                        }, 600);
+                                    }
+                                    selectedLeft = null;
+                                });
+                            });
+ 
+                            resetBtn.addEventListener('click', () => {
+                                matched = 0; selectedLeft = null;
+                                leftItems.forEach(el => el.className = 'matching-item left-item');
+                                rightItems.forEach(el => el.className = 'matching-item right-item');
+                                scoreEl.classList.remove('visible');
+                                resetBtn.classList.remove('visible');
+                            });
+                        }, 0);
+                    }
+
+                });
+
+                if (!hasInteractive) {
+                    // If there are no interactive components, display a completed module notice so they can read and finish it
+                    const noticeCard = document.createElement('div');
+                    noticeCard.className = 'glass-card';
+                    noticeCard.style.padding = '2rem';
+                    noticeCard.style.textAlign = 'center';
+                    noticeCard.style.marginTop = '2.5rem';
+                    
+                    const hasFinished = studentAnswers.some(a => a.moduleId === moduleId);
+                    
+                    noticeCard.innerHTML = `
+                        <h3 style="margin-bottom: 1rem; color: var(--accent-gold);">Study Completed</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">There are no active submissions required for this lesson. Click below to mark this study module as completed.</p>
+                        <button class="btn btn-primary" id="btn-complete-study" style="width: 100%;" ${isPreview ? 'disabled style="opacity: 0.6; cursor: not-allowed;"' : ''}>
+                            ${isPreview ? 'Complete Module (Preview Mode)' : (hasFinished ? 'Completed (Back to Dashboard)' : 'Complete Module')}
+                        </button>
+                    `;
+                    tasksContainer.appendChild(noticeCard);
+
+                    document.getElementById('btn-complete-study').onclick = () => {
+                        if (isPreview) return;
+                        if (hasFinished) {
+                            window.location.href = 'dashboard.html';
+                        } else {
+                            const res = AuthAPI.submitAnswer(currentUser.id, moduleId, 'Reading Study Content', 'Completed study text.');
+                            if (res.success) {
+                                window.location.href = 'dashboard.html';
+                            }
+                        }
+                    };
+                }
+            }
+
+            // ── Real-time synchronization ──────────────────────────────────
+            // Shared handler called by BOTH storage event and BroadcastChannel.
+            // The storage event fires only in OTHER tabs; BroadcastChannel also
+            // covers same-tab updates so admin previews are instant too.
+            function handleModuleSync(changeType) {
+                // Sync active user session from fresh DB
+                const currentUser = AuthAPI.getCurrentUser();
+                if (currentUser) {
+                    const students = AuthAPI.getAllStudents();
+                    const freshUser = students.find(s => s.id === currentUser.id);
+                    if (freshUser && freshUser.status === 'approved') {
+                        localStorage.setItem('jilgm_current_user', JSON.stringify(freshUser));
+                    } else {
+                        AuthAPI.logout();
+                        return;
+                    }
+                }
+
+                // If this module was deleted, redirect student to dashboard
+                if (changeType === 'delete') {
+                    const mods = AuthAPI.getModulesContent();
+                    if (!mods[moduleId]) {
+                        window.location.href = 'dashboard.html';
+                        return;
+                    }
+                }
+
+                // If module got locked, send student back to dashboard
+                if (!isPreview && !AuthAPI.isModuleUnlocked(moduleId)) {
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+
+                renderModuleUI();
+            }
+
+            // Cross-tab sync via storage event (fires only in OTHER tabs)
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'jilgm_modules_content' || e.key === 'jilgm_students' || e.key === 'jilgm_unlocked_modules') {
+                    handleModuleSync();
+                }
+            });
+
+            // Same-tab + cross-tab sync via BroadcastChannel
+            try {
+                const modChannel = new BroadcastChannel('jilgm_sync');
+                modChannel.onmessage = (e) => {
+                    const data = e.data || {};
+                    const type = data.type;
+                    if (type === 'module_updated' || type === 'unlock_changed' ||
+                        type === 'student_updated') {
+                        handleModuleSync();
+                    } else if (type === 'modules_changed') {
+                        handleModuleSync(data.payload && data.payload.action);
+                    }
+                };
+            } catch(err) { /* BroadcastChannel not supported – storage event is the fallback */ }
+
+            // Initial render
+            renderModuleUI();
+            } catch (err) {
+                console.error(err);
+                const errDiv = document.createElement('div');
+                errDiv.style.background = '#fef2f2';
+                errDiv.style.border = '2px solid #ef4444';
+                errDiv.style.color = '#b91c1c';
+                errDiv.style.padding = '1.5rem';
+                errDiv.style.margin = '2rem';
+                errDiv.style.borderRadius = '8px';
+                errDiv.style.fontFamily = 'monospace';
+                errDiv.style.zIndex = '9999';
+                errDiv.style.position = 'relative';
+                errDiv.innerHTML = `<h3>JavaScript Error Detected:</h3><p><strong>${err.message}</strong></p><pre style="white-space: pre-wrap;">${err.stack}</pre>`;
+                document.body.insertBefore(errDiv, document.body.firstChild);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - JILGM Masterclass</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="auth.js?v=2.1"></script>
+    <!-- html2pdf.js for PPT PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .builder-block-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        .builder-block-card:hover {
+            border-color: rgba(170, 132, 28, 0.4) !important;
+            box-shadow: 0 4px 15px rgba(11, 23, 44, 0.05) !important;
+        }
+        .builder-block-card.active-insert-target {
+            border-color: var(--accent-gold) !important;
+            box-shadow: 0 0 15px rgba(170, 132, 28, 0.2), inset 0 0 10px rgba(170, 132, 28, 0.05) !important;
+            background: rgba(170, 132, 28, 0.03) !important;
+        }
+        /* 2-column builder layout */
+        .builder-editor-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            align-items: start;
+        }
+        .builder-sidebar {
+            position: sticky;
+            top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .builder-sidebar-card {
+            background: rgba(11, 23, 44, 0.6);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 14px;
+            padding: 1.4rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .builder-sidebar-card h4 {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin: 0 0 0.2rem 0;
+        }
+        .builder-sidebar-card select,
+        .builder-sidebar-card .glass-input {
+            width: 100%;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            padding: 0.45rem 0.6rem;
+            cursor: pointer;
+        }
+        .builder-sidebar-card .btn {
+            width: 100%;
+            justify-content: center;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+        }
+        .builder-sidebar-divider {
+            border: none;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            margin: 0.2rem 0;
+        }
+        @media (max-width: 1000px) {
+            .builder-editor-layout {
+                grid-template-columns: 1fr;
+            }
+            .builder-sidebar {
+                position: static;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+        }
+        /* Contenteditable div styling */
+        .glass-input[contenteditable="true"] {
+            display: block;
+            width: 100%;
+            min-height: 4.5rem;
+            max-height: 25rem;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: rgba(255, 255, 255, 0.75);
+            border: 1px solid var(--glass-border);
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            text-align: left;
+        }
+        .glass-input[contenteditable="true"]:focus {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 8px rgba(170, 132, 28, 0.1);
+        }
+        .glass-input[contenteditable="true"]:empty::before {
+            content: attr(placeholder);
+            color: var(--text-secondary);
+            opacity: 0.6;
+            cursor: text;
+            display: block;
+        }
+    </style>
+</head>
+<body class="dashboard-layout">
+
+    <aside class="sidebar">
+        <a href="index.html" class="logo-sidebar-brand">
+            <img src="hero_logo.png" alt="JILGM Riyadh Logo" class="sidebar-logo">
+        </a>
+        <nav class="sidebar-nav">
+            <a href="#" id="nav-students" class="active">Student Management</a>
+            <a href="#" id="nav-builder">Course Builder</a>
+            <a href="#" id="nav-announcements">Announcements</a>
+            <a href="#" id="nav-resources">Resource Repository</a>
+            <a href="#" id="nav-instructors">Instructors</a>
+            <a href="#" id="nav-settings">Settings</a>
+            <a href="#" id="nav-logout" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); margin-top: auto;">Sign Out</a>
+            <a href="index.html">Return to Site</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-content">
+        <!-- 1. STUDENTS PANEL -->
+        <div id="panel-students">
+            <div class="dashboard-header">
+                <h1>Student Management</h1>
+                <button class="btn btn-primary" onclick="document.getElementById('addStudentForm').classList.toggle('hidden')">+ Add Student Manually</button>
+            </div>
+
+            <!-- Add Student Form (Manually) -->
+            <div id="addStudentForm" class="glass-card hidden" style="padding: 2rem; margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1.5rem; color: var(--accent-gold);">Add and Approve New Enrollee</h3>
+                <form id="adminAddForm" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">First Name</label>
+                        <input type="text" id="firstName" required class="glass-input" style="width: 100%;">
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Last Name</label>
+                        <input type="text" id="lastName" required class="glass-input" style="width: 100%;">
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Email Address</label>
+                        <input type="email" id="email" required class="glass-input" style="width: 100%;">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="height: 48px;">Add & Approve</button>
+                </form>
+            </div>
+
+            <!-- Success Modal for Credentials -->
+            <div id="credentialsModal" class="glass-card hidden" style="padding: 2rem; margin-bottom: 2rem; border-color: #4ade80;">
+                <h3 style="color: #4ade80; margin-bottom: 1rem;">Student Added & Approved Successfully!</h3>
+                <p>The student can now retrieve their credentials on the Login page. Here are their details for reference:</p>
+                <div style="background: rgba(0,0,0,0.5); padding: 1.5rem; border-radius: 8px; margin-top: 1rem;">
+                    <p><strong>Username:</strong> <span id="newUsername" style="color: var(--accent-gold);"></span></p>
+                    <p><strong>Password:</strong> <span id="newPassword" style="color: var(--accent-gold);"></span></p>
+                </div>
+                <button class="btn btn-secondary" style="margin-top: 1rem;" onclick="document.getElementById('credentialsModal').classList.add('hidden')">Close</button>
+            </div>
+
+            <!-- Section 1: Pending Applications -->
+            <div style="margin-bottom: 3rem;">
+                <h2 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent-gold); display: flex; align-items: center; gap: 0.5rem;">
+                    Pending Applications <span id="pendingBadge" class="badge" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">0</span>
+                </h2>
+                <div class="admin-table-container" style="margin-top: 0;">
+                    <table id="pendingTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email Address</th>
+                                <th>Registration Date</th>
+                                <th style="width: 180px; text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Section 2: Enrolled Students -->
+            <div>
+                <h2 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent-gold); display: flex; align-items: center; gap: 0.5rem;">
+                    Enrolled Cohort <span id="enrolledBadge" class="badge">0</span>
+                </h2>
+                <div class="admin-table-container" style="margin-top: 0;">
+                    <table id="studentsTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Username</th>
+                                <th>Password</th>
+                                <th style="width: 200px;">Progress</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. COURSE BUILDER PANEL -->
+        <div id="panel-builder" class="hidden">
+            <div class="dashboard-header">
+                <h1>Course Builder & Lesson Customizer</h1>
+            </div>
+
+            <!-- Lesson Access & Release Settings -->
+            <div style="margin-bottom: 3rem;">
+                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 1rem;">
+                     <h2 style="font-size: 1.5rem; margin: 0; color: var(--accent-gold);">
+                         Lesson Release Settings
+                     </h2>
+                     <button class="btn btn-primary" id="btn-add-module" style="font-family: var(--font-sans); display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; padding: 0.4rem 1.2rem;">
+                         <span>➕</span> Add New Module
+                     </button>
+                 </div>
+                <div class="glass-card" style="padding: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card);">
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+                        Control which curriculum modules are released to the enrollees. Students must still complete the prerequisite lessons to progress.
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;" id="moduleReleaseGrid">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Archived Modules Section -->
+                    <div id="archivedModulesSection" style="margin-top: 2.5rem; border-top: 1px dashed var(--glass-border); padding-top: 2rem; display: none;">
+                        <h3 style="font-size: 1.1rem; color: var(--accent-gold-light); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span>📦</span> Archived Modules (Restore Bin)
+                        </h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.2rem;">
+                            These modules were deleted and can be restored back to the active curriculum at any time.
+                        </p>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;" id="archivedModulesList">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Module Contents Builder -->
+            <div>
+                <h2 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent-gold);">
+                    Module Content Editor
+                </h2>
+
+                <div class="glass-card" style="padding: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card);">
+                    <!-- Top bar: Module Selector + Title/Subtitle -->
+                    <div style="margin-bottom: 1.8rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border);">
+                        <div style="margin-bottom: 1.2rem;">
+                            <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; font-weight: bold;">Select Module to Edit</label>
+                            <select id="builder-module-select" class="glass-input" style="width: 320px; font-family: var(--font-sans); cursor: pointer;">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; font-weight: 500;">Module Title</label>
+                                <input type="text" id="builder-module-title" class="glass-input" style="width: 100%; font-family: var(--font-sans);" placeholder="e.g. The Heart of a Leader">
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; font-weight: 500;">Subtitle / Description</label>
+                                <input type="text" id="builder-module-subtitle" class="glass-input" style="width: 100%; font-family: var(--font-sans);" placeholder="e.g. Foundations of character and humility">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2-Column Editor Layout -->
+                    <div class="builder-editor-layout">
+
+                        <!-- LEFT: Lesson Blocks -->
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--glass-border);">
+                                <h3 style="color: var(--accent-gold-light); font-size: 1.1rem; margin: 0;">Lesson Blocks</h3>
+                                <span style="font-size: 0.75rem; color: var(--text-secondary);">💡 HTML tags supported in text areas</span>
+                            </div>
+                            <div id="builder-components-container" style="display: flex; flex-direction: column; gap: 1.2rem;">
+                                <!-- Renders components dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- RIGHT: Sticky Sidebar -->
+                        <div class="builder-sidebar">
+
+                            <!-- Add Block Card -->
+                            <div class="builder-sidebar-card">
+                                <h4>➕ Add Block</h4>
+                                <div>
+                                    <label style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.3rem; display: block;">Block Type</label>
+                                    <select id="builder-add-type" class="glass-input">
+                                        <option value="header_h1">Heading 1 (Large Serif)</option>
+                                        <option value="header_h2">Heading 2 (Medium Sans)</option>
+                                        <option value="header_h3">Heading 3 (Small Gold)</option>
+                                        <option value="text">Paragraph / Rich Text</option>
+                                        <option value="quote">Blockquote Citation</option>
+                                        <option value="callout">Callout Box</option>
+                                        <option value="bullet_list">Bullet Point List</option>
+                                        <option value="toggle_list">Toggle List</option>
+                                        <option value="divider">Horizontal Divider</option>
+                                        <option value="image">Lesson Image</option>
+                                        <option value="question">Reflection Question</option>
+                                        <option value="file_upload">File Upload Bin</option>
+                                        <option value="flip_card">🃏 Flip Card (Click to Reveal)</option>
+                                        <option value="multiple_choice">🧠 Multiple Choice Quiz</option>
+                                        <option value="true_false">⚡ True / False</option>
+                                        <option value="accordion">📂 Accordion Sections</option>
+                                        <option value="matching">🔗 Matching Exercise</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.3rem; display: block;">Insert After</label>
+                                    <select id="builder-insert-pos" class="glass-input">
+                                        <option value="-1">End of Lesson</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-secondary" id="btn-add-comp" style="border-color: var(--accent-gold); color: var(--accent-gold-light); font-weight: bold; background: rgba(212, 175, 55, 0.07); display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                                    ➕ Add to Lesson
+                                </button>
+                            </div>
+
+                            <!-- Save & Preview Card -->
+                            <div class="builder-sidebar-card">
+                                <h4>📦 Actions</h4>
+                                <button class="btn btn-primary" id="btn-save-module" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                    💾 Save Module
+                                </button>
+                                <a href="module.html?id=module1&preview=true" id="btn-preview-module" target="_blank" class="btn btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; border-color: rgba(255,255,255,0.2); color: var(--text-primary);">
+                                    👁 Preview Lesson
+                                </a>
+                                <button class="btn btn-secondary" id="btn-ppt-module" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; border-color: var(--accent-gold); color: var(--accent-gold-light); margin-top: 0.5rem; font-weight: bold; background: rgba(212, 175, 55, 0.05);">
+                                    📊 Generate as PPT
+                                </button>
+                            </div>
+
+                            <!-- Click-to-select hint -->
+                            <div style="background: rgba(212,175,55,0.04); border: 1px dashed rgba(212,175,55,0.2); border-radius: 10px; padding: 0.9rem 1rem;">
+                                <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.6;">
+                                    💡 <strong style="color: var(--accent-gold-light);">Tip:</strong> Click any block on the left to select it as the insert position. New blocks will be added right after the selected one.
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. ANNOUNCEMENTS PANEL -->
+        <div id="panel-announcements" class="hidden">
+            <div class="dashboard-header">
+                <h1>Announcements Manager</h1>
+            </div>
+            
+            <div class="glass-card" style="padding: 2rem; margin-bottom: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card);">
+                <h3 style="margin-bottom: 1.5rem; color: var(--accent-gold);">Post New Announcement</h3>
+                <form id="adminPostAnnouncementForm" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Announcement Title</label>
+                        <input type="text" id="announceTitle" required class="glass-input" style="width: 100%;" placeholder="e.g. Masterclass Graduation Details">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Announcement Message (HTML tags allowed)</label>
+                        <textarea id="announceContent" required class="glass-input" rows="4" style="width: 100%; resize: vertical; line-height: 1.5;" placeholder="Enter details here..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="align-self: flex-start; padding: 0.8rem 2rem;">Post Announcement</button>
+                </form>
+            </div>
+
+            <div class="glass-card" style="padding: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card);">
+                <h3 style="margin-bottom: 1.5rem; color: var(--accent-gold);">Announcements History</h3>
+                <div class="admin-table-container" style="margin-top: 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Title</th>
+                                <th>Message Snippet</th>
+                                <th style="width: 120px; text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="announcementsTableBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. RESOURCES PANEL -->
+        <div id="panel-resources" class="hidden">
+            <div class="dashboard-header">
+                <h1>Resource Repository</h1>
+            </div>
+            
+            <div class="glass-card" style="padding: 2rem; margin-bottom: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card);">
+                <h3 style="margin-bottom: 1.5rem; color: var(--accent-gold);">Add Resource Link / File</h3>
+                <form id="adminAddResourceForm" style="display: flex; gap: 1rem; flex-direction: column;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Resource Name</label>
+                            <input type="text" id="resourceName" required class="glass-input" style="width: 100%;" placeholder="e.g. Leadership Masterclass PPT Deck">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Resource Type</label>
+                            <select id="resourceType" class="glass-input" style="width: 100%;">
+                                <option value="pdf">📄 PDF Document</option>
+                                <option value="ppt">📊 PowerPoint Presentation (PPT)</option>
+                                <option value="video">🎥 Video URL (YouTube/Vimeo/Drive)</option>
+                                <option value="docx">📝 Word Document (DOCX)</option>
+                                <option value="link">🔗 General Link</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Resource URL or Link (External link or hosted URL)</label>
+                        <input type="url" id="resourceUrl" required class="glass-input" style="width: 100%;" placeholder="https://example.com/file.pdf">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="align-self: flex-start; padding: 0.8rem 2rem;">Add Resource</button>
+                </form>
+            </div>
+
+            <div class="glass-card" style="padding: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card);">
+                <h3 style="margin-bottom: 1.5rem; color: var(--accent-gold);">Active Resources</h3>
+                <div class="admin-table-container" style="margin-top: 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Name</th>
+                                <th>URL</th>
+                                <th style="width: 120px; text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resourcesTableBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. SETTINGS PANEL -->
+        <div id="panel-settings" class="hidden">
+            <div class="dashboard-header">
+                <h1>Settings</h1>
+            </div>
+            <div class="glass-card" style="padding: 2.5rem; border-color: rgba(255,255,255,0.05); text-align: center;">
+                <h3 style="color: var(--accent-gold); margin-bottom: 1rem;">LMS Configuration Controls</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">You can reset the database and restore default student profiles and modules here.</p>
+                <button class="btn btn-secondary" onclick="if(confirm('Are you sure you want to reset all students, progress, and modules to default content?')){localStorage.clear(); location.reload();}" style="border-color: #ef4444; color: #ef4444;">Reset Local Database</button>
+            </div>
+            <div class="glass-card" style="padding: 2.5rem; border-color: rgba(255,255,255,0.05); margin-top: 2rem;">
+                <h3 style="color: var(--accent-gold); margin-bottom: 1rem; text-align: left;">Firebase Shared Cloud Database</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem; text-align: left;">Paste your Firebase Config JSON code below to activate real-time cross-user synchronization. Leave blank to run locally.</p>
+                <textarea id="firebaseConfigInput" class="glass-input" rows="8" style="width: 100%; font-family: monospace; font-size: 0.85rem; margin-bottom: 1.2rem;" placeholder='{
+  "apiKey": "...",
+  "authDomain": "...",
+  "projectId": "...",
+  "storageBucket": "...",
+  "messagingSenderId": "...",
+  "appId": "..."
+}'></textarea>
+                <div style="display: flex; gap: 1rem; justify-content: flex-start;">
+                    <button class="btn btn-primary" id="btn-save-firebase" style="padding: 0.8rem 2rem;">Save Firebase Config</button>
+                    <button class="btn btn-secondary" id="btn-clear-firebase" style="border-color: #ef4444; color: #ef4444;">Disconnect Firebase</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. INSTRUCTORS PANEL -->
+        <div id="panel-instructors" class="hidden">
+            <div class="dashboard-header">
+                <h1>Instructors Management</h1>
+                <button class="btn btn-primary" onclick="document.getElementById('addInstructorForm').classList.toggle('hidden')">+ Add New Instructor</button>
+            </div>
+            
+            <!-- Add Instructor Inline Form -->
+            <div id="addInstructorForm" class="glass-card hidden" style="padding: 2rem; margin-bottom: 2rem; border-color: rgba(212, 175, 55, 0.25);">
+                <h3 style="color: var(--accent-gold); margin-bottom: 1.5rem;">Register Instructor Account</h3>
+                <form id="instructorRegisterForm" style="display: flex; flex-direction: column; gap: 1.2rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; text-align: left;">Full Name</label>
+                            <input type="text" id="newInstructorName" required class="glass-input" style="width: 100%;" placeholder="e.g. Pastor John Doe">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; text-align: left;">Login Username</label>
+                            <input type="text" id="newInstructorUsername" required class="glass-input" style="width: 100%;" placeholder="e.g. johndoe">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; text-align: left;">Password</label>
+                            <input type="password" id="newInstructorPassword" required class="glass-input" style="width: 100%;" placeholder="••••••••">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="submit" class="btn btn-primary" style="padding: 0.8rem 2rem;">Save Account</button>
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('addInstructorForm').classList.add('hidden')" style="border-color: rgba(255,255,255,0.15);">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Instructors Grid/List -->
+            <div class="glass-card" style="padding: 2rem; border-color: rgba(255,255,255,0.05);">
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1.5px solid var(--accent-gold); font-size: 0.9rem; color: var(--accent-gold-light);">
+                                <th style="padding: 0.8rem 1rem;">Instructor Name</th>
+                                <th style="padding: 0.8rem 1rem;">Username</th>
+                                <th style="padding: 0.8rem 1rem;">Password Key</th>
+                                <th style="padding: 0.8rem 1rem;">Date Created</th>
+                                <th style="padding: 0.8rem 1rem; text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="instructorsTableBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reflection Answers Modal -->
+        <div id="answersModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem;">
+            <div class="glass-card" style="max-width: 700px; width: 100%; padding: 2.5rem; border-color: rgba(212, 175, 55, 0.4); max-height: 90vh; overflow-y: auto;">
+                <h2 style="margin-bottom: 0.5rem; font-size: 1.6rem; color: var(--accent-gold);" id="modalStudentName">Student Name</h2>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Submitted Reflections, File Uploads, & Graded Checks</p>
+                
+                <div id="modalAnswersContainer" style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
+                    <!-- Populated dynamically -->
+                </div>
+                
+                <div style="text-align: right;">
+                    <button class="btn btn-secondary" onclick="closeAnswersModal()">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Toast Notification -->
+        <div id="toast" style="position: fixed; bottom: 2rem; right: 2rem; background: rgba(34, 197, 94, 0.95); border: 1px solid #4ade80; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transform: translateY(150%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 3000; display: flex; align-items: center; gap: 0.8rem; font-weight: 500;">
+            <span style="font-size: 1.2rem;">✓</span>
+            <span id="toastMsg">Student Approved!</span>
+        </div>
+    </main>
+
+    <script>
+        function getFormattingToolbarMarkup(index, fieldName) {
+            return `
+                <div class="formatting-toolbar" style="display: inline-flex; gap: 0.3rem; margin-bottom: 0.4rem; flex-wrap: wrap; background: rgba(0,0,0,0.3); padding: 0.25rem 0.4rem; border-radius: 6px; border: 1px solid rgba(212,175,55,0.2); align-items: center; justify-content: flex-start; max-width: 100%;">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="formatFieldText(${index}, '${fieldName}', 'bold')" style="padding: 0.15rem 0.4rem; font-weight: bold; font-size: 0.72rem; border-color: rgba(255,255,255,0.1); height: auto; line-height: 1; font-family: var(--font-sans); background: rgba(255,255,255,0.05); min-width: 24px;">B</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="formatFieldText(${index}, '${fieldName}', 'italic')" style="padding: 0.15rem 0.4rem; font-style: italic; font-size: 0.72rem; border-color: rgba(255,255,255,0.1); height: auto; line-height: 1; font-family: var(--font-sans); background: rgba(255,255,255,0.05); min-width: 24px;">I</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="formatFieldText(${index}, '${fieldName}', 'underline')" style="padding: 0.15rem 0.4rem; text-decoration: underline; font-size: 0.72rem; border-color: rgba(255,255,255,0.1); height: auto; line-height: 1; font-family: var(--font-sans); background: rgba(255,255,255,0.05); min-width: 24px;">U</button>
+                    
+                    <span style="width: 1px; height: 12px; background: rgba(255,255,255,0.15); margin: 0 0.1rem;"></span>
+
+                    <select onchange="formatFieldText(${index}, '${fieldName}', 'size', this.value); this.selectedIndex = 0;" style="padding: 0.1rem 0.25rem; font-size: 0.68rem; background: #0b172c; color: #fff; border: 1px solid rgba(212,175,55,0.25); border-radius: 4px; cursor: pointer; font-family: var(--font-sans); height: auto; line-height: 1;">
+                        <option value="" disabled selected>Size</option>
+                        <option value="0.8em">Small</option>
+                        <option value="1em">Normal</option>
+                        <option value="1.25em">Medium</option>
+                        <option value="1.5em">Large</option>
+                        <option value="2em">XL</option>
+                    </select>
+
+                    <select onchange="formatFieldText(${index}, '${fieldName}', 'color', this.value); this.selectedIndex = 0;" style="padding: 0.1rem 0.25rem; font-size: 0.68rem; background: #0b172c; color: #fff; border: 1px solid rgba(212,175,55,0.25); border-radius: 4px; cursor: pointer; font-family: var(--font-sans); height: auto; line-height: 1;">
+                        <option value="" disabled selected>Color</option>
+                        <option value="#ffffff">White</option>
+                        <option value="var(--accent-gold-light)">Gold (Light)</option>
+                        <option value="#aa841c">Gold (Deep)</option>
+                        <option value="#facc15">Yellow</option>
+                        <option value="#f87171">Red (Light)</option>
+                        <option value="#ef4444">Red (Medium)</option>
+                        <option value="#b91c1c">Red (Deep)</option>
+                        <option value="#38bdf8">Blue (Sky)</option>
+                        <option value="#3b82f6">Blue (Royal)</option>
+                        <option value="#1e3a8a">Blue (Navy)</option>
+                        <option value="#4ade80">Green (Light)</option>
+                        <option value="#10b981">Green (Deep)</option>
+                        <option value="#a855f7">Purple</option>
+                        <option value="#fb923c">Orange</option>
+                        <option value="#94a3b8">Gray</option>
+                    </select>
+
+                    <select onchange="formatFieldText(${index}, '${fieldName}', 'highlight', this.value); this.selectedIndex = 0;" style="padding: 0.1rem 0.25rem; font-size: 0.68rem; background: #0b172c; color: #fff; border: 1px solid rgba(212,175,55,0.25); border-radius: 4px; cursor: pointer; font-family: var(--font-sans); height: auto; line-height: 1;">
+                        <option value="" disabled selected>Highlight</option>
+                        <option value="rgba(212, 175, 55, 0.25)">Gold (Light)</option>
+                        <option value="rgba(170, 132, 28, 0.35)">Gold (Deep)</option>
+                        <option value="rgba(254, 240, 138, 0.5)">Yellow (Soft)</option>
+                        <option value="rgba(250, 204, 21, 0.35)">Yellow (Bright)</option>
+                        <option value="rgba(248, 113, 113, 0.25)">Red (Light)</option>
+                        <option value="rgba(239, 68, 68, 0.3)">Red (Deep)</option>
+                        <option value="rgba(56, 189, 248, 0.25)">Blue (Sky)</option>
+                        <option value="rgba(59, 130, 246, 0.25)">Blue (Royal)</option>
+                        <option value="rgba(74, 222, 128, 0.25)">Green (Light)</option>
+                        <option value="rgba(16, 185, 129, 0.25)">Green (Deep)</option>
+                        <option value="rgba(139, 92, 246, 0.25)">Purple</option>
+                        <option value="rgba(251, 146, 60, 0.25)">Orange</option>
+                        <option value="rgba(255, 255, 255, 0.15)">White (Soft)</option>
+                    </select>
+                </div>
+            `;
+        }
+
+        let savedRange = null;
+        let activeEditable = null;
+
+        document.addEventListener('selectionchange', () => {
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0);
+                let node = range.commonAncestorContainer;
+                if (node.nodeType !== 1) {
+                    node = node.parentNode;
+                }
+                const editable = node ? node.closest('[contenteditable="true"]') : null;
+                if (editable) {
+                    savedRange = range.cloneRange();
+                    activeEditable = editable;
+                }
+            }
+        });
+
+        function applySpanStyle(styleName, styleValue) {
+            const sel = window.getSelection();
+            if (!sel.rangeCount) return;
+            const range = sel.getRangeAt(0);
+            
+            const span = document.createElement('span');
+            span.style[styleName] = styleValue;
+            
+            try {
+                if (range.collapsed) {
+                    span.innerHTML = '&#8203;'; // Zero-width space to hold cursor inside
+                    range.insertNode(span);
+                    range.setStart(span.firstChild, 1);
+                    range.setEnd(span.firstChild, 1);
+                } else {
+                    range.surroundContents(span);
+                }
+            } catch (e) {
+                const content = range.extractContents();
+                span.appendChild(content);
+                range.insertNode(span);
+            }
+            
+            sel.removeAllRanges();
+            const newRange = document.createRange();
+            if (span.firstChild) {
+                newRange.selectNodeContents(span);
+            } else {
+                newRange.selectNode(span);
+            }
+            sel.addRange(newRange);
+        }
+
+        window.formatFieldText = (blockIndex, fieldName, type, value) => {
+            let selector = "";
+            if (fieldName === 'content') {
+                selector = `.block-content-textarea[data-index="${blockIndex}"]`;
+            } else {
+                selector = `.block-field-input[data-index="${blockIndex}"][data-field="${fieldName}"]`;
+            }
+            const targetElement = document.querySelector(selector);
+            if (!targetElement) return;
+
+            const isContentEditable = targetElement.tagName === 'DIV' && targetElement.contentEditable === 'true';
+
+            if (isContentEditable) {
+                if (activeEditable === targetElement && savedRange) {
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(savedRange);
+                } else {
+                    targetElement.focus();
+                }
+
+                if (type === 'bold') {
+                    document.execCommand('bold', false, null);
+                } else if (type === 'italic') {
+                    document.execCommand('italic', false, null);
+                } else if (type === 'underline') {
+                    document.execCommand('underline', false, null);
+                } else if (type === 'size') {
+                    applySpanStyle('fontSize', value);
+                } else if (type === 'color') {
+                    applySpanStyle('color', value);
+                } else if (type === 'highlight') {
+                    applySpanStyle('backgroundColor', value);
+                }
+
+                // Update range after styling
+                const sel = window.getSelection();
+                if (sel.rangeCount > 0) {
+                    savedRange = sel.getRangeAt(0).cloneRange();
+                }
+
+                if (typeof window.syncTextareasGlobal === 'function') {
+                    window.syncTextareasGlobal();
+                }
+            } else {
+                // Fallback for standard text inputs (if any)
+                const start = targetElement.selectionStart;
+                const end = targetElement.selectionEnd;
+                const text = targetElement.value;
+                const selectedText = text.substring(start, end);
+
+                let replacement = "";
+                if (type === 'bold') {
+                    replacement = `<strong>${selectedText}</strong>`;
+                } else if (type === 'italic') {
+                    replacement = `<em>${selectedText}</em>`;
+                } else if (type === 'underline') {
+                    replacement = `<u>${selectedText}</u>`;
+                } else if (type === 'size') {
+                    replacement = `<span style="font-size: ${value};">${selectedText}</span>`;
+                } else if (type === 'color') {
+                    replacement = `<span style="color: ${value};">${selectedText}</span>`;
+                } else if (type === 'highlight') {
+                    replacement = `<span style="background-color: ${value};">${selectedText}</span>`;
+                }
+
+                targetElement.value = text.substring(0, start) + replacement + text.substring(end);
+                targetElement.focus();
+                targetElement.selectionStart = start;
+                targetElement.selectionEnd = start + replacement.length;
+
+                if (typeof window.syncTextareasGlobal === 'function') {
+                    window.syncTextareasGlobal();
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                // Secure page with admin credentials check immediately
+                AuthAPI.requireAdminAuth();
+
+                // Wait for the background cloud sync promise to complete if active (non-blocking)
+                (async () => {
+                    if (window.syncPromise) {
+                        try { await window.syncPromise; } catch(err) { console.warn(err); }
+                    }
+                    if (window.firebaseSyncPromise) {
+                        try { await window.firebaseSyncPromise; } catch(err) { console.warn(err); }
+                    }
+                    renderDashboard();
+                })();
+
+                const form = document.getElementById('adminAddForm');
+            const pendingTableBody = document.getElementById('pendingTableBody');
+            const studentsTableBody = document.getElementById('studentsTableBody');
+            const credentialsModal = document.getElementById('credentialsModal');
+            const pendingBadge = document.getElementById('pendingBadge');
+            const enrolledBadge = document.getElementById('enrolledBadge');
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+
+            // --- Navigation ---
+            const navStudents = document.getElementById('nav-students');
+            const navBuilder = document.getElementById('nav-builder');
+            const navAnnouncements = document.getElementById('nav-announcements');
+            const navResources = document.getElementById('nav-resources');
+            const navInstructors = document.getElementById('nav-instructors');
+            const navSettings = document.getElementById('nav-settings');
+            const navLogout = document.getElementById('nav-logout');
+
+            if (navLogout) {
+                navLogout.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    AuthAPI.logoutAdmin();
+                });
+            }
+            
+            const panelStudents = document.getElementById('panel-students');
+            const panelBuilder = document.getElementById('panel-builder');
+            const panelAnnouncements = document.getElementById('panel-announcements');
+            const panelResources = document.getElementById('panel-resources');
+            const panelInstructors = document.getElementById('panel-instructors');
+            const panelSettings = document.getElementById('panel-settings');
+            
+            function clearAllTabs() {
+                navStudents.classList.remove('active');
+                navBuilder.classList.remove('active');
+                navAnnouncements.classList.remove('active');
+                navResources.classList.remove('active');
+                if (navInstructors) navInstructors.classList.remove('active');
+                navSettings.classList.remove('active');
+
+                panelStudents.classList.add('hidden');
+                panelBuilder.classList.add('hidden');
+                panelAnnouncements.classList.add('hidden');
+                panelResources.classList.add('hidden');
+                if (panelInstructors) panelInstructors.classList.add('hidden');
+                panelSettings.classList.add('hidden');
+            }
+
+            navStudents.addEventListener('click', (e) => {
+                e.preventDefault();
+                clearAllTabs();
+                navStudents.classList.add('active');
+                panelStudents.classList.remove('hidden');
+            });
+            
+            navBuilder.addEventListener('click', (e) => {
+                e.preventDefault();
+                clearAllTabs();
+                navBuilder.classList.add('active');
+                panelBuilder.classList.remove('hidden');
+                loadBuilderModule();
+            });
+
+            navAnnouncements.addEventListener('click', (e) => {
+                e.preventDefault();
+                clearAllTabs();
+                navAnnouncements.classList.add('active');
+                panelAnnouncements.classList.remove('hidden');
+                renderAnnouncementsAdmin();
+            });
+
+            navResources.addEventListener('click', (e) => {
+                e.preventDefault();
+                clearAllTabs();
+                navResources.classList.add('active');
+                panelResources.classList.remove('hidden');
+                renderResourcesAdmin();
+            });
+
+            if (navInstructors) {
+                navInstructors.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    clearAllTabs();
+                    navInstructors.classList.add('active');
+                    panelInstructors.classList.remove('hidden');
+                    renderInstructorsAdmin();
+                });
+            }
+            
+            navSettings.addEventListener('click', (e) => {
+                e.preventDefault();
+                clearAllTabs();
+                navSettings.classList.add('active');
+                panelSettings.classList.remove('hidden');
+            });
+
+            // --- Toast Notification ---
+            function showToast(message) {
+                toastMsg.innerText = message;
+                toast.style.transform = 'translateY(0)';
+                setTimeout(() => {
+                    toast.style.transform = 'translateY(150%)';
+                }, 3000);
+            }
+
+            // Expose approve function globally for inline checkbox events
+            window.handleApprove = (id) => {
+                const approved = AuthAPI.approveStudent(id);
+                if (approved) {
+                    showToast(`Approved ${approved.firstName} ${approved.lastName}!`);
+                    renderDashboard();
+                }
+            };
+
+            window.handleReject = (id) => {
+                const rejected = AuthAPI.rejectStudent(id);
+                if (rejected) {
+                    showToast(`Rejected ${rejected.firstName} ${rejected.lastName}!`);
+                    renderDashboard();
+                }
+            };
+
+            let activeModalStudentId = null;
+
+             // Expose view answers function globally
+            window.viewStudentAnswers = (id) => {
+                activeModalStudentId = id;
+                const students = AuthAPI.getAllStudents();
+                const student = students.find(s => s.id === id);
+                if (student) {
+                    document.getElementById('modalStudentName').innerText = `${student.firstName} ${student.lastName}`;
+                    const container = document.getElementById('modalAnswersContainer');
+                    container.innerHTML = '';
+                    
+                    const answers = student.answers || [];
+                    if (answers.length === 0) {
+                        container.innerHTML = '<div style="text-align:center;color:var(--text-secondary);padding:2rem;">No submissions found for this student.</div>';
+                    } else {
+                        const modsContent = AuthAPI.getModulesContent();
+                        
+                        // Group answers by moduleId
+                        const grouped = {};
+                        answers.forEach(ans => {
+                            if (!grouped[ans.moduleId]) {
+                                grouped[ans.moduleId] = [];
+                            }
+                            grouped[ans.moduleId].push(ans);
+                        });
+                        
+                        Object.keys(grouped).forEach(modId => {
+                            const mod = modsContent[modId] || { title: 'Unknown Module', subtitle: '' };
+                            
+                            // Create a section container for the module
+                            const modSection = document.createElement('div');
+                            modSection.style.border = '1.5px solid rgba(212, 175, 55, 0.45)';
+                            modSection.style.borderRadius = '12px';
+                            modSection.style.padding = '1.5rem';
+                            modSection.style.background = '#0c1a30'; // Premium dark navy block
+                            modSection.style.marginBottom = '1.5rem';
+                            modSection.style.color = '#f1f5f9';
+                            modSection.style.boxShadow = '0 8px 30px rgba(0,0,0,0.5)';
+                            
+                            const header = document.createElement('div');
+                            header.style.borderBottom = '2px solid rgba(212, 175, 55, 0.3)';
+                            header.style.paddingBottom = '0.6rem';
+                            header.style.marginBottom = '1rem';
+                            header.innerHTML = `
+                                <h3 style="margin: 0; font-size: 1.25rem; color: #f5d97e; font-family: var(--font-serif);">${mod.title}</h3>
+                                ${mod.subtitle ? `<p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: #8a9bb0;">${mod.subtitle}</p>` : ''}
+                            `;
+                            modSection.appendChild(header);
+                            
+                            const itemsContainer = document.createElement('div');
+                            itemsContainer.style.display = 'flex';
+                            itemsContainer.style.flexDirection = 'column';
+                            itemsContainer.style.gap = '1.2rem';
+                            
+                            grouped[modId].forEach((ans) => {
+                                const card = document.createElement('div');
+                                card.style.background = 'rgba(255,255,255,0.04)';
+                                card.style.padding = '1.2rem';
+                                card.style.borderRadius = '8px';
+                                card.style.border = '1px solid rgba(255,255,255,0.08)';
+                                
+                                let typeLabel = ans.type ? ans.type.replace('_', ' ').toUpperCase() : 'REFLECTION';
+                                let contentHtml = '';
+                                let gradeHtml = '';
+                                let remarkFormHtml = '';
+                                
+                                if (ans.answer) {
+                                    contentHtml = `<p style="margin: 0.5rem 0; color: #e2e8f0; line-height: 1.5; font-size: 0.92rem;"><strong>Response:</strong> <span style="font-style: italic; color: #ffffff;">"${ans.answer}"</span></p>`;
+                                } else if (ans.file) {
+                                    let previewHtml = '';
+                                    if (ans.file.url) {
+                                        const ext = ans.file.name.split('.').pop().toLowerCase();
+                                        const isImg = ['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(ext);
+                                        const isVid = ['mp4', 'webm', 'mov'].includes(ext);
+                                        if (isImg) {
+                                            previewHtml = `<div style="margin-top:0.5rem;"><img src="${ans.file.url}" style="max-height: 180px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212,175,55,0.3); object-fit: contain;"></div>`;
+                                        } else if (isVid) {
+                                            previewHtml = `<div style="margin-top:0.5rem;"><video src="${ans.file.url}" controls style="max-height: 200px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212,175,55,0.3); background:#000;"></video></div>`;
+                                        }
+                                    }
+                                    contentHtml = `
+                                        <div style="margin: 0.5rem 0; font-size: 0.92rem; color: #e2e8f0;">
+                                            <strong>Attached File:</strong> <span style="font-family: monospace; font-size: 0.85rem; color: #f5d97e;">${ans.file.name} (${ans.file.size})</span>
+                                            ${previewHtml}
+                                        </div>
+                                    `;
+                                }
+                                
+                                if (ans.score !== null) {
+                                    gradeHtml = `
+                                        <div style="font-size: 0.85rem; font-weight: bold; color: ${ans.isCorrect ? '#4ade80' : '#f87171'}; margin-top: 0.4rem;">
+                                            Auto-Graded Result: ${ans.score} / ${ans.maxScore} (${ans.isCorrect ? 'CORRECT' : 'INCORRECT'})
+                                        </div>
+                                    `;
+                                }
+                                
+                                // Let reflection and file upload have a remark form
+                                if (ans.type === 'reflection' || ans.type === 'file_upload' || !ans.type) {
+                                    const currentRemark = ans.teacherRemarks || '';
+                                    remarkFormHtml = `
+                                        <div style="margin-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.12); padding-top: 1rem;">
+                                            <label style="display: block; font-size: 0.8rem; color: #f5d97e; font-weight: bold; margin-bottom: 0.4rem;">INSTRUCTOR REMARKS / COMMENTS</label>
+                                            <div style="display: flex; gap: 0.6rem;">
+                                                <textarea id="remark_input_${ans.moduleId}_${ans.componentIndex || ''}" class="glass-input" rows="2" style="flex: 1; font-size: 0.85rem; padding: 0.5rem; line-height: 1.4; color: #fff; background: rgba(0,0,0,0.4);" placeholder="Type your comment/remarks here...">${currentRemark}</textarea>
+                                                <button class="btn btn-primary" style="font-size: 0.8rem; padding: 0.5rem 1rem;" onclick="saveRemarks('${id}', '${ans.moduleId}', ${ans.componentIndex !== null ? ans.componentIndex : 'null'})">Save</button>
+                                            </div>
+                                            ${ans.teacherRemarksDate ? `<span style="font-size: 0.7rem; color: #8a9bb0; margin-top: 0.4rem; display: block;">Last comment saved on ${new Date(ans.teacherRemarksDate).toLocaleString()} by ${ans.teacherRemarksAdmin || 'Admin'}</span>` : ''}
+                                        </div>
+                                    `;
+                                }
+                                
+                                card.innerHTML = `
+                                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.4rem; margin-bottom: 0.6rem;">
+                                        <span style="font-weight: bold; font-size: 0.92rem; color: #ffffff;">${ans.question}</span>
+                                        <span class="badge" style="background: rgba(212,175,55,0.15); color: #f5d97e; border: 1px solid rgba(212,175,55,0.3); font-size: 0.65rem;">${typeLabel}</span>
+                                    </div>
+                                    ${contentHtml}
+                                    ${gradeHtml}
+                                    ${remarkFormHtml}
+                                `;
+                                itemsContainer.appendChild(card);
+                            });
+                            
+                            modSection.appendChild(itemsContainer);
+                            container.appendChild(modSection);
+                        });
+                    }
+                    
+                    document.getElementById('answersModal').style.display = 'flex';
+                }
+            };
+ 
+            window.saveRemarks = (studentId, moduleId, componentIndex) => {
+                const searchIdx = componentIndex !== null ? componentIndex : '';
+                const textarea = document.getElementById(`remark_input_${moduleId}_${searchIdx}`);
+                if (!textarea) return;
+                const remarkText = textarea.value.trim();
+                
+                const currentAdmin = AuthAPI.getCurrentAdmin();
+                const adminName = currentAdmin ? currentAdmin.username : 'Instructor';
+                
+                const res = AuthAPI.saveTeacherRemark(studentId, moduleId, componentIndex, remarkText, adminName);
+                if (res.success) {
+                    showToast('Remarks saved and student notified!');
+                    // Re-render modal list to show timestamp updates
+                    window.viewStudentAnswers(studentId);
+                } else {
+                    alert('Error saving remarks: ' + (res.error || 'unknown error'));
+                }
+            };
+ 
+            window.closeAnswersModal = () => {
+                document.getElementById('answersModal').style.display = 'none';
+                activeModalStudentId = null;
+            };
+
+            // Expose toggleModule globally
+            window.toggleModule = (moduleId, makeUnlocked) => {
+                AuthAPI.setModuleUnlocked(moduleId, makeUnlocked);
+                renderDashboard();
+                showToast(`Module access updated!`);
+            };
+
+            // --- Course Builder Logics ---
+            const modsContentInitial = AuthAPI.getModulesContent();
+            let currentModuleId = Object.keys(modsContentInitial)[0] || '';
+            let currentComponents = [];
+            let activeInsertIndex = -1; // -1 means End of Lesson
+            const insertPosSelect = document.getElementById('builder-insert-pos');
+
+            function updateInsertPosDropdown() {
+                if (!insertPosSelect) return;
+                const currentVal = activeInsertIndex;
+                insertPosSelect.innerHTML = '';
+                
+                // Add End of Lesson option
+                const endOpt = document.createElement('option');
+                endOpt.value = '-1';
+                endOpt.innerText = 'End of Lesson';
+                insertPosSelect.appendChild(endOpt);
+                
+                currentComponents.forEach((comp, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = idx.toString();
+                    const label = comp.type.toUpperCase().replace('_', ' ');
+                    const rawContent = comp.content || '';
+                    const previewText = rawContent.replace(/<[^>]*>/g, '').substring(0, 30);
+                    opt.innerText = `Block ${idx + 1}: ${label} ${previewText ? ' - ' + previewText + '...' : ''}`;
+                    insertPosSelect.appendChild(opt);
+                });
+                
+                if (currentVal >= -1 && currentVal < currentComponents.length) {
+                    insertPosSelect.value = currentVal.toString();
+                } else {
+                    activeInsertIndex = -1;
+                    insertPosSelect.value = '-1';
+                }
+            }
+
+            function highlightActiveInsertTarget() {
+                const blockCards = document.querySelectorAll('#builder-components-container .builder-block-card');
+                blockCards.forEach((card, idx) => {
+                    if (idx === activeInsertIndex) {
+                        card.classList.add('active-insert-target');
+                        const badgeContainer = card.querySelector('.target-badge-container');
+                        if (badgeContainer) {
+                            badgeContainer.innerHTML = '🎯 <span style="font-size: 0.75rem; font-weight: bold; color: var(--accent-gold); letter-spacing: 1px; margin-left: 0.3rem;">Active Insert Target</span>';
+                        }
+                    } else {
+                        card.classList.remove('active-insert-target');
+                        const badgeContainer = card.querySelector('.target-badge-container');
+                        if (badgeContainer) {
+                            badgeContainer.innerHTML = '';
+                        }
+                    }
+                });
+            }
+
+            if (insertPosSelect) {
+                insertPosSelect.addEventListener('change', () => {
+                    activeInsertIndex = parseInt(insertPosSelect.value);
+                    highlightActiveInsertTarget();
+                });
+            }
+            
+            // PowerPoint PDF Presentation Generator
+            window.generateModulePPT = function(moduleId) {
+                const mod = AuthAPI.getModule(moduleId);
+                if (!mod) {
+                    alert('Module not found!');
+                    return;
+                }
+
+                showToast('Generating Presentation slides, please wait...');
+
+                const title = mod.title || 'Untitled Module';
+                const subtitle = mod.subtitle || '';
+                const comps = mod.components || [];
+
+                // Create a temporary slides container element
+                const container = document.createElement('div');
+                container.style.position = 'absolute';
+                container.style.left = '-9999px';
+                container.style.top = '-9999px';
+                container.style.width = '1120px';
+                document.body.appendChild(container);
+
+                // CSS styles to inject inside the temp container
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    .ppt-slide {
+                        width: 1120px;
+                        height: 630px; /* 16:9 Aspect Ratio */
+                        box-sizing: border-box;
+                        background: #050e1e; /* Luxury deep dark blue */
+                        color: #ffffff;
+                        padding: 3rem;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        font-family: 'Outfit', sans-serif;
+                        position: relative;
+                        overflow: hidden;
+                        page-break-after: always;
+                    }
+                    .ppt-slide-title-page {
+                        background: radial-gradient(circle at center, #0b172c 0%, #050e1e 100%);
+                        justify-content: center;
+                        align-items: center;
+                        text-align: center;
+                    }
+                    .ppt-slide-border {
+                        position: absolute;
+                        top: 20px;
+                        left: 20px;
+                        right: 20px;
+                        bottom: 20px;
+                        border: 2px solid rgba(212, 175, 55, 0.2);
+                        pointer-events: none;
+                        border-radius: 8px;
+                    }
+                    .ppt-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-bottom: 2px solid rgba(212, 175, 55, 0.25);
+                        padding-bottom: 0.8rem;
+                        margin-bottom: 1.5rem;
+                    }
+                    .ppt-header-title {
+                        font-size: 0.9rem;
+                        text-transform: uppercase;
+                        color: #d4af37; /* Accent Gold */
+                        font-weight: 700;
+                        letter-spacing: 0.1em;
+                    }
+                    .ppt-header-slide-num {
+                        font-size: 0.85rem;
+                        color: rgba(255, 255, 255, 0.5);
+                    }
+                    .ppt-footer {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        font-size: 0.8rem;
+                        color: rgba(255, 255, 255, 0.4);
+                        border-top: 1px solid rgba(255, 255, 255, 0.08);
+                        padding-top: 0.8rem;
+                        margin-top: auto;
+                    }
+                    .ppt-content {
+                        flex: 1;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: flex-start;
+                        gap: 1rem;
+                    }
+                    .ppt-title {
+                        font-family: 'Playfair Display', serif;
+                        color: #fff4d0;
+                        margin: 0 0 1rem 0;
+                        line-height: 1.2;
+                    }
+                    .ppt-p {
+                        font-size: 1.15rem;
+                        line-height: 1.6;
+                        color: rgba(255, 255, 255, 0.85);
+                        margin: 0;
+                    }
+                    .ppt-blockquote {
+                        border-left: 4px solid #d4af37;
+                        padding-left: 1.5rem;
+                        margin: 0.5rem 0;
+                        font-style: italic;
+                        color: #fff4d0;
+                        font-size: 1.2rem;
+                        background: rgba(212, 175, 55, 0.03);
+                        padding-top: 0.5rem;
+                        padding-bottom: 0.5rem;
+                        border-radius: 0 8px 8px 0;
+                    }
+                    .ppt-callout {
+                        background: rgba(170, 132, 28, 0.08);
+                        border: 1px solid rgba(170, 132, 28, 0.25);
+                        padding: 1.2rem;
+                        border-radius: 12px;
+                        display: flex;
+                        gap: 1rem;
+                        align-items: flex-start;
+                        margin-bottom: 0.5rem;
+                        text-align: left;
+                    }
+                    .ppt-callout-emoji {
+                        font-size: 1.5rem;
+                        line-height: 1;
+                    }
+                    .ppt-callout-text {
+                        font-size: 1.05rem;
+                        line-height: 1.5;
+                        color: #ffffff;
+                    }
+                    .ppt-list {
+                        padding-left: 2rem;
+                        margin: 0;
+                        color: rgba(255, 255, 255, 0.9);
+                        text-align: left;
+                    }
+                    .ppt-list li {
+                        margin-bottom: 0.5rem;
+                        font-size: 1.1rem;
+                        line-height: 1.5;
+                    }
+                    .ppt-list li::marker {
+                        color: #d4af37;
+                    }
+                    .ppt-image {
+                        max-height: 250px;
+                        object-fit: contain;
+                        border-radius: 8px;
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        align-self: center;
+                    }
+                    .ppt-question-card {
+                        background: rgba(255, 255, 255, 0.03);
+                        border: 1px solid rgba(255, 255, 255, 0.08);
+                        border-radius: 12px;
+                        padding: 1.5rem;
+                        margin-top: 0.5rem;
+                        text-align: left;
+                    }
+                `;
+                container.appendChild(style);
+
+                // --- Generate Title Slide ---
+                const titleSlide = document.createElement('div');
+                titleSlide.className = 'ppt-slide ppt-slide-title-page';
+                titleSlide.innerHTML = `
+                    <div class="ppt-slide-border"></div>
+                    <div style="font-size: 1.3rem; color: #d4af37; letter-spacing: 0.25em; text-transform: uppercase; font-weight: 700; margin-bottom: 1rem;">
+                        JILGM Leadership Masterclass
+                    </div>
+                    <h1 style="font-family: 'Playfair Display', serif; font-size: 3.6rem; color: #fff4d0; margin: 0 0 1.5rem 0; font-style: italic; line-height: 1.2; text-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+                        ${title}
+                    </h1>
+                    <div style="width: 120px; height: 3px; background: linear-gradient(90deg, transparent, #d4af37, transparent); margin: 0 auto 1.5rem;"></div>
+                    <p style="font-size: 1.35rem; color: rgba(255,255,255,0.75); max-width: 800px; line-height: 1.6; font-weight: 300; margin: 0;">
+                        ${subtitle}
+                    </p>
+                    <div style="position: absolute; bottom: 3rem; left: 3rem; right: 3rem; border-top: 1px solid rgba(212,175,55,0.2); padding-top: 1.5rem; display: flex; justify-content: space-between; font-size: 0.9rem; color: rgba(255,255,255,0.4);">
+                        <span>Jesus Is Lord Global Ministry</span>
+                        <span>Riyadh Coordination Team</span>
+                    </div>
+                `;
+                container.appendChild(titleSlide);
+
+                // --- Helper function to create content slide ---
+                let slideIndex = 1;
+                function createContentSlide(slideTitle) {
+                    slideIndex++;
+                    const s = document.createElement('div');
+                    s.className = 'ppt-slide';
+                    s.innerHTML = `
+                        <div class="ppt-slide-border"></div>
+                        <div class="ppt-header">
+                            <span class="ppt-header-title">${title}</span>
+                            <span class="ppt-header-slide-num">Slide ${slideIndex}</span>
+                        </div>
+                        <div class="ppt-content">
+                            <h2 class="ppt-title" style="font-size: 2.2rem; font-weight: 700; text-align: left;">${slideTitle}</h2>
+                            <div class="ppt-body-area" style="display: flex; flex-direction: column; gap: 1rem; flex: 1; justify-content: center;"></div>
+                        </div>
+                        <div class="ppt-footer">
+                            <span>JILGM Riyadh Masterclass</span>
+                            <span>Empowering Spiritual & Organizational Excellence</span>
+                        </div>
+                    `;
+                    container.appendChild(s);
+                    return s.querySelector('.ppt-body-area');
+                }
+
+                // Process components into slides
+                let currentSlideBody = null;
+                let currentSlideTitle = title;
+                let elementsOnSlide = 0;
+
+                comps.forEach((comp) => {
+                    if (!comp || !comp.type) return;
+
+                    // Header component forces a new slide
+                    if (comp.type === 'header_h1' || comp.type === 'header_h2' || comp.type === 'header') {
+                        currentSlideTitle = comp.content;
+                        currentSlideBody = createContentSlide(currentSlideTitle);
+                        elementsOnSlide = 0;
+                        return;
+                    }
+
+                    // If we don't have a slide yet, create one
+                    if (!currentSlideBody) {
+                        currentSlideBody = createContentSlide(currentSlideTitle);
+                        elementsOnSlide = 0;
+                    }
+
+                    // If too many elements on this slide, overflow to new slide
+                    if (elementsOnSlide >= 3 || comp.type === 'divider') {
+                        currentSlideBody = createContentSlide(currentSlideTitle);
+                        elementsOnSlide = 0;
+                        if (comp.type === 'divider') return;
+                    }
+
+                    let blockHTML = '';
+                    if (comp.type === 'text') {
+                        blockHTML = `<p class="ppt-p" style="text-align: left;">${comp.content}</p>`;
+                        elementsOnSlide++;
+                    } else if (comp.type === 'quote') {
+                        blockHTML = `<blockquote class="ppt-blockquote">${comp.content}</blockquote>`;
+                        elementsOnSlide += 1.5;
+                    } else if (comp.type === 'image') {
+                        blockHTML = `<img src="${comp.content}" class="ppt-image" alt="Slide Image">`;
+                        elementsOnSlide += 2;
+                    } else if (comp.type === 'callout') {
+                        blockHTML = `
+                            <div class="ppt-callout">
+                                <span class="ppt-callout-emoji">${comp.emoji || '💡'}</span>
+                                <div class="ppt-callout-text">${comp.content}</div>
+                            </div>
+                        `;
+                        elementsOnSlide += 1.5;
+                    } else if (comp.type === 'bullet_list') {
+                        const lines = comp.content.split('\n').filter(l => l.trim());
+                        let liHTML = '';
+                        lines.forEach(line => {
+                            liHTML += `<li>${line.trim().replace(/^-\s*/, '')}</li>`;
+                        });
+                        blockHTML = `<ul class="ppt-list">${liHTML}</ul>`;
+                        elementsOnSlide += 1.5;
+                    } else if (comp.type === 'toggle_list') {
+                        blockHTML = `
+                            <div style="border-left: 3px solid #d4af37; padding-left: 1rem; margin-top: 0.5rem; text-align: left;">
+                                <h4 style="color: #fff4d0; margin: 0 0 0.5rem 0; font-size: 1.25rem;">${comp.title || 'Overview'}</h4>
+                                <p class="ppt-p" style="font-size: 1.05rem;">${comp.content}</p>
+                            </div>
+                        `;
+                        elementsOnSlide += 1.5;
+                    } else if (comp.type === 'question') {
+                        blockHTML = `
+                            <div class="ppt-question-card">
+                                <h4 style="color: #fff4d0; margin: 0 0 0.5rem 0; font-size: 1.2rem;">Discussion / Reflection Question:</h4>
+                                <p class="ppt-p" style="font-size: 1.15rem; font-style: italic;">${comp.content}</p>
+                            </div>
+                        `;
+                        elementsOnSlide += 2;
+                    } else if (comp.type === 'interactive_quiz_tf') {
+                        blockHTML = `
+                            <div class="ppt-question-card">
+                                <h4 style="color: #fff4d0; margin: 0 0 0.5rem 0; font-size: 1.2rem;">True or False Activity:</h4>
+                                <p class="ppt-p" style="font-size: 1.15rem; font-weight: 500; margin-bottom: 0.8rem;">${comp.question}</p>
+                                <div style="display: flex; gap: 1rem;">
+                                    <div style="flex: 1; border: 1px solid rgba(255,255,255,0.15); padding: 0.5rem; text-align: center; border-radius: 6px; font-weight: bold; background: rgba(255,255,255,0.02);">True</div>
+                                    <div style="flex: 1; border: 1px solid rgba(255,255,255,0.15); padding: 0.5rem; text-align: center; border-radius: 6px; font-weight: bold; background: rgba(255,255,255,0.02);">False</div>
+                                </div>
+                            </div>
+                        `;
+                        elementsOnSlide += 2;
+                    } else if (comp.type === 'interactive_quiz_mc') {
+                        let optHTML = '';
+                        const choices = comp.choices || [];
+                        choices.forEach((choice, cidx) => {
+                            const label = String.fromCharCode(65 + cidx); // A, B, C, D
+                            optHTML += `
+                                <div style="border: 1px solid rgba(255,255,255,0.12); padding: 0.5rem 1rem; border-radius: 6px; background: rgba(255,255,255,0.02); font-size: 0.95rem;">
+                                    <strong>${label}.</strong> ${choice}
+                                </div>
+                            `;
+                        });
+                        blockHTML = `
+                            <div class="ppt-question-card">
+                                <h4 style="color: #fff4d0; margin: 0 0 0.5rem 0; font-size: 1.2rem;">Multiple Choice Quiz:</h4>
+                                <p class="ppt-p" style="font-size: 1.1rem; font-weight: 500; margin-bottom: 0.8rem;">${comp.question}</p>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
+                                    ${optHTML}
+                                </div>
+                            </div>
+                        `;
+                        elementsOnSlide += 2;
+                    } else if (comp.type === 'interactive_quiz_matching') {
+                        let pairsHTML = '';
+                        const pairs = comp.pairs || [];
+                        pairs.forEach((pair, pidx) => {
+                            pairsHTML += `
+                                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; padding: 0.4rem 0.8rem; border-bottom: 1px dashed rgba(255,255,255,0.1);">
+                                    <span style="color: #fff4d0;">${pair.term}</span>
+                                    <span style="color: rgba(255,255,255,0.6);">[ Match Choice ]</span>
+                                </div>
+                            `;
+                        });
+                        blockHTML = `
+                            <div class="ppt-question-card">
+                                <h4 style="color: #fff4d0; margin: 0 0 0.5rem 0; font-size: 1.2rem;">Matching Exercise:</h4>
+                                <p class="ppt-p" style="font-size: 1.1rem; font-weight: 500; margin-bottom: 0.8rem;">Match terms with their correct definitions:</p>
+                                <div style="display: flex; flex-direction: column; gap: 0.4rem; background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 8px;">
+                                    ${pairsHTML}
+                                </div>
+                            </div>
+                        `;
+                        elementsOnSlide += 2;
+                    }
+
+                    if (blockHTML) {
+                        const wrapper = document.createElement('div');
+                        wrapper.innerHTML = blockHTML;
+                        currentSlideBody.appendChild(wrapper.firstElementChild);
+                    }
+                });
+
+                // Configure html2pdf options
+                const opt = {
+                    margin: 0,
+                    filename: `${title.replace(/[^a-z0-9]/gi, '_')}_Presentation.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'px', format: [1120, 630], orientation: 'landscape' }
+                };
+
+                // Generate and download
+                html2pdf().from(container).set(opt).save().then(() => {
+                    document.body.removeChild(container);
+                    showToast('Presentation PDF generated successfully!');
+                }).catch(err => {
+                    console.error("PPT Generation Error", err);
+                    alert("An error occurred during PPT generation: " + err.message);
+                    if (container.parentNode) {
+                        document.body.removeChild(container);
+                    }
+                });
+            };
+
+            const selectModule = document.getElementById('builder-module-select');
+            const btnPptModule = document.getElementById('btn-ppt-module');
+            if (btnPptModule) {
+                btnPptModule.addEventListener('click', () => {
+                    if (currentModuleId) {
+                        generateModulePPT(currentModuleId);
+                    } else {
+                        alert('No active module selected.');
+                    }
+                });
+            }
+            const titleInput = document.getElementById('builder-module-title');
+            const subtitleInput = document.getElementById('builder-module-subtitle');
+            const compContainer = document.getElementById('builder-components-container');
+            const btnAddComp = document.getElementById('btn-add-comp');
+            const addTypeSelect = document.getElementById('builder-add-type');
+            const btnSaveModule = document.getElementById('btn-save-module');
+            
+            function populateModuleSelect() {
+                if (!selectModule) return;
+                const modsContent = AuthAPI.getModulesContent();
+                const selectedVal = selectModule.value || currentModuleId;
+                
+                selectModule.innerHTML = '';
+                Object.keys(modsContent).forEach((id, idx) => {
+                    const option = document.createElement('option');
+                    option.value = id;
+                    option.innerText = `Module ${idx + 1}: ${modsContent[id].title || id}`;
+                    selectModule.appendChild(option);
+                });
+                
+                if (modsContent[selectedVal]) {
+                    selectModule.value = selectedVal;
+                } else if (selectModule.options.length > 0) {
+                    selectModule.selectedIndex = 0;
+                    currentModuleId = selectModule.value;
+                } else {
+                    currentModuleId = '';
+                }
+            }
+            
+            selectModule.addEventListener('change', () => {
+                currentModuleId = selectModule.value;
+                loadBuilderModule();
+            });
+
+            // Bind Add Module Button
+            const btnAddModule = document.getElementById('btn-add-module');
+            if (btnAddModule) {
+                btnAddModule.addEventListener('click', () => {
+                    const title = prompt('Enter the title for the new module:');
+                    if (title === null) return;
+                    const trimmedTitle = title.trim();
+                    if (!trimmedTitle) {
+                        alert('Module title cannot be empty.');
+                        return;
+                    }
+                    const subtitle = prompt('Enter the subtitle/description for the new module:') || '';
+                    const newId = AuthAPI.addModule(trimmedTitle, subtitle.trim());
+                    if (newId) {
+                        showToast(`Created Module: ${trimmedTitle}`);
+                        currentModuleId = newId;
+                        populateModuleSelect();
+                        renderDashboard();
+                        loadBuilderModule();
+                    }
+                });
+            }
+
+            // Bind Delete Module Global function
+            window.handleDeleteModule = (id) => {
+                if (confirm('Are you sure you want to delete this module? This will remove all its content permanently.')) {
+                    const deleted = AuthAPI.deleteModule(id);
+                    if (deleted) {
+                        showToast('Module deleted successfully.');
+                        
+                        const modsContent = AuthAPI.getModulesContent();
+                        const modIds = Object.keys(modsContent);
+                        if (currentModuleId === id) {
+                            currentModuleId = modIds[0] || '';
+                        }
+                        
+                        populateModuleSelect();
+                        renderDashboard();
+                        loadBuilderModule();
+                    }
+                }
+            };
+
+            // Bind Rename Module Global function
+            window.handleRenameModule = (id) => {
+                const mod = AuthAPI.getModule(id);
+                if (mod) {
+                    const newTitle = prompt('Enter a new title for this module:', mod.title);
+                    if (newTitle === null) return;
+                    const trimmedTitle = newTitle.trim();
+                    if (!trimmedTitle) {
+                        alert('Module title cannot be empty.');
+                        return;
+                    }
+                    AuthAPI.saveModule(id, trimmedTitle, mod.subtitle || '', mod.components || []);
+                    showToast('Module title updated successfully.');
+                    populateModuleSelect();
+                    renderDashboard();
+                    if (currentModuleId === id) {
+                        loadBuilderModule();
+                    }
+                }
+            };
+
+            // Bind Restore Module Global function
+            window.handleRestoreModule = (id) => {
+                if (confirm('Do you want to restore this module back to active curriculum?')) {
+                    const restored = AuthAPI.restoreModule(id);
+                    if (restored) {
+                        showToast('Module restored successfully!');
+                        
+                        if (!currentModuleId) {
+                            currentModuleId = id;
+                        }
+                        
+                        populateModuleSelect();
+                        renderDashboard();
+                        loadBuilderModule();
+                    }
+                }
+            };
+            
+            function renderBuilderComponents() {
+                compContainer.innerHTML = '';
+                if (currentComponents.length === 0) {
+                    compContainer.innerHTML = '<p style="color: var(--text-secondary); font-style: italic; text-align: center; padding: 2rem;">No blocks added yet. Click "+ Add Component" to start building this lesson.</p>';
+                    updateInsertPosDropdown();
+                    return;
+                }
+                
+                currentComponents.forEach((comp, index) => {
+                    if (!comp || !comp.type) return;
+                    const blockCard = document.createElement('div');
+                    blockCard.className = 'glass-card builder-block-card';
+                    blockCard.style.padding = '1.5rem';
+                    blockCard.style.borderColor = 'rgba(255,255,255,0.06)';
+                    blockCard.style.background = 'rgba(0,0,0,0.2)';
+                    
+                    const label = comp.type.toUpperCase().replace('_', ' ');
+                    
+                    // Set defaults if undefined
+                    if (!comp.color) comp.color = 'default';
+                    if (!comp.bg) comp.bg = 'none';
+                    if (!comp.emoji) comp.emoji = '💡';
+                    if (!comp.title) {
+                        comp.title = comp.type === 'file_upload' ? 'Submit Assignment File' :
+                                     comp.type === 'toggle_list' ? 'Click to expand details' : '';
+                    }
+                    
+                    blockCard.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 0.5rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 0.8rem; font-weight: bold; color: var(--accent-gold); letter-spacing: 1px;">BLOCK ${index + 1}: ${label}</span>
+                                <span class="target-badge-container" style="display: inline-flex; align-items: center;"></span>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="button" class="btn btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; font-family: var(--font-sans);" onclick="moveBlock(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲ Up</button>
+                                <button type="button" class="btn btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; font-family: var(--font-sans);" onclick="moveBlock(${index}, 1)" ${index === currentComponents.length - 1 ? 'disabled' : ''}>▼ Down</button>
+                                <button type="button" class="btn btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; border-color: #ef4444; color: #ef4444; font-family: var(--font-sans);" onclick="deleteBlock(${index})">Delete</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Block Style Toolbar -->
+                        <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 0.3rem;">
+                                <span style="font-size: 0.75rem; color: var(--text-secondary);">Text Color:</span>
+                                <select class="glass-input block-color-select" data-index="${index}" style="padding: 0.25rem; font-size: 0.75rem; width: 100px; cursor: pointer;">
+                                    <option value="default" ${comp.color === 'default' ? 'selected' : ''}>Default</option>
+                                    <option value="navy" ${comp.color === 'navy' ? 'selected' : ''}>Navy</option>
+                                    <option value="gold" ${comp.color === 'gold' ? 'selected' : ''}>Gold</option>
+                                    <option value="red" ${comp.color === 'red' ? 'selected' : ''}>Red</option>
+                                    <option value="green" ${comp.color === 'green' ? 'selected' : ''}>Green</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.3rem;">
+                                <span style="font-size: 0.75rem; color: var(--text-secondary);">Highlight:</span>
+                                <select class="glass-input block-bg-select" data-index="${index}" style="padding: 0.25rem; font-size: 0.75rem; width: 110px; cursor: pointer;">
+                                    <option value="none" ${comp.bg === 'none' ? 'selected' : ''}>None</option>
+                                    <option value="soft-gold" ${comp.bg === 'soft-gold' ? 'selected' : ''}>Soft Gold</option>
+                                    <option value="soft-navy" ${comp.bg === 'soft-navy' ? 'selected' : ''}>Soft Navy</option>
+                                    <option value="soft-red" ${comp.bg === 'soft-red' ? 'selected' : ''}>Soft Red</option>
+                                    <option value="soft-green" ${comp.bg === 'soft-green' ? 'selected' : ''}>Soft Green</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.3rem;">
+                                <span style="font-size: 0.75rem; color: var(--text-secondary);">Font:</span>
+                                <select class="glass-input block-font-select" data-index="${index}" style="padding: 0.25rem; font-size: 0.75rem; width: 120px; cursor: pointer;">
+                                    <option value="default" ${comp.font === 'default' || !comp.font ? 'selected' : ''}>Default (Sans)</option>
+                                    <option value="serif" ${comp.font === 'serif' ? 'selected' : ''}>Serif (Playfair)</option>
+                                    <option value="monospace" ${comp.font === 'monospace' ? 'selected' : ''}>Monospace</option>
+                                </select>
+                            </div>
+                            ${comp.type === 'callout' ? `
+                            <div style="display: flex; align-items: center; gap: 0.3rem;">
+                                <span style="font-size: 0.75rem; color: var(--text-secondary);">Icon:</span>
+                                <input type="text" class="glass-input block-emoji-input" data-index="${index}" value="${comp.emoji || '💡'}" style="padding: 0.25rem; font-size: 0.75rem; width: 50px; text-align: center;">
+                            </div>
+                            ` : ''}
+                            ${comp.type === 'toggle_list' || comp.type === 'file_upload' ? `
+                            <div style="display: flex; align-items: center; gap: 0.3rem; flex: 1;">
+                                <span style="font-size: 0.75rem; color: var(--text-secondary);">${comp.type === 'file_upload' ? 'Upload Title:' : 'Toggle Header:'}</span>
+                                <input type="text" class="glass-input block-title-input" data-index="${index}" value="${comp.title || (comp.type === 'file_upload' ? 'Submit Assignment File' : 'Click to toggle')}" style="padding: 0.25rem; font-size: 0.75rem; flex: 1;" placeholder="${comp.type === 'file_upload' ? 'Upload Title...' : 'Toggle Title...'}">
+                            </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div>
+                            ${comp.type === 'divider' ?
+                               `<p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0; font-style: italic;">Horizontal divider line. No text configurations needed.</p>` :
+                               comp.type === 'file_upload' ?
+                               `<div>
+                                   ${getFormattingToolbarMarkup(index, 'content')}
+                                   <div class="glass-input block-content-textarea" contenteditable="true" data-index="${index}" style="width: 100%; font-family: var(--font-sans); line-height: 1.5; min-height: 4.5rem; overflow-y: auto;" placeholder="Enter upload instructions/description...">${comp.content || ''}</div>
+                               </div>` :
+                               comp.type === 'flip_card' ?
+                               `<div>
+                                   <label style="display:block;font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.3rem;">Front Text (Concept)</label>
+                                   ${getFormattingToolbarMarkup(index, 'front')}
+                                   <div class="glass-input block-field-input" contenteditable="true" data-index="${index}" data-field="front" style="width:100%;font-family:var(--font-sans);font-size:0.85rem;min-height:3.5rem;overflow-y:auto;" placeholder="Enter concept (Front)...">${comp.front || ''}</div>
+                                   <label style="display:block;font-size:0.8rem;color:var(--text-secondary);margin-top:0.7rem;margin-bottom:0.3rem;">Back Text (Explanation)</label>
+                                   ${getFormattingToolbarMarkup(index, 'back')}
+                                   <div class="glass-input block-field-input" contenteditable="true" data-index="${index}" data-field="back" style="width:100%;font-family:var(--font-sans);font-size:0.85rem;min-height:4.5rem;overflow-y:auto;" placeholder="Enter explanation (Back)...">${comp.back || ''}</div>
+                                   <label style="display:block;font-size:0.8rem;color:var(--text-secondary);margin-top:0.7rem;margin-bottom:0.3rem;">Icon (emoji)</label>
+                                   <input class="glass-input block-field-input" style="width:80px;" data-index="${index}" data-field="icon" value="${comp.icon || '💡'}">
+                                </div>` :
+                               comp.type === 'multiple_choice' ?
+                               (() => {
+                                   const opts = comp.options || ['', '', '', ''];
+                                   return `<div>
+                                   <label style="display:block;font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.3rem;">Question</label>
+                                   ${getFormattingToolbarMarkup(index, 'question')}
+                                   <div class="glass-input block-field-input" contenteditable="true" data-index="${index}" data-field="question" style="width:100%;font-family:var(--font-sans);font-size:0.85rem;min-height:3.5rem;overflow-y:auto;" placeholder="Enter MCQ Question...">${comp.question || ''}</div>
+                                   ${['A','B','C','D'].map((l,i) => `
+                                   <label style="display:block;font-size:0.8rem;color:var(--text-secondary);margin-top:0.6rem;margin-bottom:0.2rem;">Option ${l}</label>
+                                   <input class="glass-input block-field-input" style="width:100%;" data-index="${index}" data-field="options.${i}" value="${(comp.options||[])[i]||''}">`).join('')}
+                                   <label style="display:block;font-size:0.8rem;color:var(--text-secondary);margin-top:0.7rem;margin-bottom:0.3rem;">Correct Answer (0=A, 1=B, 2=C, 3=D)</label>
+                                   <input class="glass-input block-field-input" style="width:80px;" type="number" min="0" max="3" data-index="${index}" data-field="correct_index" value="${comp.correct_index ?? 0}">
+                                   <label style="display:block;font-size:0.8rem;color:var(--text-secondary);margin-top:0.7rem;margin-bottom:0.3rem;">Explanation (shown after answer)</label>
+                                   ${getFormattingToolbarMarkup(index, 'explanation')}
+                                   <div class="glass-input block-field-input" contenteditable="true" data-index="${index}" data-field="explanation" style="width:100%;font-family:var(--font-sans);font-size:0.85rem;min-height:3.5rem;overflow-y:auto;" placeholder="Enter explanation for correct answer...">${comp.explanation || ''}</div>
+                                   </div>`;
+                               })() :
+                               comp.type === 'true_false' ?
+                               `<div>
+                                   <label style="display:block;font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.3rem;">Statement</label>
+                                   ${getFormattingToolbarMarkup(index, 'statement')}
+                                   <div class="glass-input block-field-input" contenteditable="true" data-index="${index}" data-field="statement" style="width:100%;font-family:var(--font-sans);font-size:0.85rem;min-height:3.5rem;overflow-y:auto;" placeholder="Enter statement...">${comp.statement || ''}</div>
+                                   <label style="display:block;font-size:0.8rem;color:var(--text-secondary);margin-top:0.7rem;margin-bottom:0.3rem;">Correct Answer</label>
+                                   <select class="glass-input block-field-input" style="width:100%;" data-index="${index}" data-field="correct">
+                                       <option value="true" ${comp.correct===true||comp.correct==='true'?'selected':''}>TRUE</option>
+                                       <option value="false" ${comp.correct===false||comp.correct==='false'?'selected':''}>FALSE</option>
+                                   </select>
+                                   <label style="display:block;font-size:0.8rem;color:var(--text-secondary);margin-top:0.7rem;margin-bottom:0.3rem;">Explanation</label>
+                                   ${getFormattingToolbarMarkup(index, 'explanation')}
+                                   <div class="glass-input block-field-input" contenteditable="true" data-index="${index}" data-field="explanation" style="width:100%;font-family:var(--font-sans);font-size:0.85rem;min-height:3.5rem;overflow-y:auto;" placeholder="Enter explanation...">${comp.explanation || ''}</div>
+                               </div>` :
+                               comp.type === 'accordion' ?
+                               (() => {
+                                   const items = comp.items || [{title:'',content:''}];
+                                   return `<div>${items.map((it,i) => `
+                                   <div style="margin-bottom:0.6rem;padding:0.7rem;background:rgba(0,0,0,0.03);border-radius:8px;">
+                                       <label style="display:block;font-size:0.75rem;color:var(--text-secondary);margin-bottom:0.2rem;">Section ${i+1} Title</label>
+                                       <input class="glass-input block-field-input" style="width:100%;margin-bottom:0.4rem;" data-index="${index}" data-field="items.${i}.title" value="${it.title||''}">
+                                       <label style="display:block;font-size:0.75rem;color:var(--text-secondary);margin-bottom:0.2rem;">Section ${i+1} Content</label>
+                                       ${getFormattingToolbarMarkup(index, `items.${i}.content`)}
+                                       <div class="glass-input block-field-input" contenteditable="true" style="width:100%;font-family:var(--font-sans);font-size:0.82rem;min-height:3.5rem;overflow-y:auto;" data-index="${index}" data-field="items.${i}.content" placeholder="Enter accordion content...">${it.content||''}</div>
+                                   </div>`).join('')}</div>`;
+                               })() :
+                               comp.type === 'matching' ?
+                               (() => {
+                                   const pairs = comp.pairs || [{left:'',right:''}];
+                                   return `<div>${pairs.map((p,i) => `
+                                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;margin-bottom:0.5rem;align-items:center;">
+                                       <input class="glass-input block-field-input" style="width:100%;font-size:0.82rem;" placeholder="Left (concept)" data-index="${index}" data-field="pairs.${i}.left" value="${p.left||''}">
+                                       <input class="glass-input block-field-input" style="width:100%;font-size:0.82rem;" placeholder="Right (match)" data-index="${index}" data-field="pairs.${i}.right" value="${p.right||''}">
+                                   </div>`).join('')}</div>`;
+                               })() :
+                               `<div>
+                                   ${getFormattingToolbarMarkup(index, 'content')}
+                                   <div class="glass-input block-content-textarea" contenteditable="true" data-index="${index}" style="width: 100%; font-family: var(--font-sans); line-height: 1.5; min-height: ${comp.type === 'text' ? '9rem' : '4.5rem'}; overflow-y: auto;" placeholder="Enter ${comp.type} content...">${comp.content || ''}</div>
+                               </div>`
+                            }
+                        </div>
+                    `;
+                    
+                    blockCard.addEventListener('click', (e) => {
+                        if (['INPUT', 'TEXTAREA', 'BUTTON', 'SELECT', 'OPTION'].includes(e.target.tagName) || e.target.contentEditable === 'true' || e.target.closest('[contenteditable="true"]')) {
+                            return;
+                        }
+                        syncTextareas();
+                        activeInsertIndex = index;
+                        insertPosSelect.value = index.toString();
+                        highlightActiveInsertTarget();
+                    });
+                    
+                    compContainer.appendChild(blockCard);
+                });
+                
+                updateInsertPosDropdown();
+                highlightActiveInsertTarget();
+            }
+
+            function loadBuilderModule() {
+                const mod = AuthAPI.getModule(currentModuleId);
+                if (mod) {
+                    titleInput.value = mod.title || '';
+                    subtitleInput.value = mod.subtitle || '';
+                    currentComponents = mod.components ? [...mod.components] : [];
+                    activeInsertIndex = -1;
+                    renderBuilderComponents();
+                    
+                    // Update preview button href
+                    const previewBtn = document.getElementById('btn-preview-module');
+                    if (previewBtn) {
+                        previewBtn.href = `module.html?id=${currentModuleId}&preview=true`;
+                    }
+                }
+            }
+            
+            // Expose builder functions globally for inline events
+            window.moveBlock = (index, dir) => {
+                syncTextareas();
+                const targetIndex = index + dir;
+                if (targetIndex >= 0 && targetIndex < currentComponents.length) {
+                    const temp = currentComponents[index];
+                    currentComponents[index] = currentComponents[targetIndex];
+                    currentComponents[targetIndex] = temp;
+                    
+                    // Track insert target selection
+                    if (activeInsertIndex === index) {
+                        activeInsertIndex = targetIndex;
+                    } else if (activeInsertIndex === targetIndex) {
+                        activeInsertIndex = index;
+                    }
+                    
+                    renderBuilderComponents();
+                }
+            };
+            
+            window.deleteBlock = (index) => {
+                syncTextareas();
+                currentComponents.splice(index, 1);
+                if (activeInsertIndex === index) {
+                    activeInsertIndex = -1; // Reset to End of Lesson
+                } else if (activeInsertIndex > index) {
+                    activeInsertIndex--;
+                }
+                renderBuilderComponents();
+            };
+            
+            function syncTextareas() {
+                window.syncTextareasGlobal = syncTextareas;
+                const textareas = document.querySelectorAll('.block-content-textarea');
+                textareas.forEach(ta => {
+                    const index = parseInt(ta.getAttribute('data-index'));
+                    if (currentComponents[index]) {
+                        const val = (ta.tagName === 'DIV' || ta.contentEditable === 'true') ? ta.innerHTML : ta.value;
+                        currentComponents[index].content = val;
+                    }
+                });
+                
+                const colorSelects = document.querySelectorAll('.block-color-select');
+                colorSelects.forEach(select => {
+                    const index = parseInt(select.getAttribute('data-index'));
+                    if (currentComponents[index]) {
+                        currentComponents[index].color = select.value;
+                    }
+                });
+                
+                const bgSelects = document.querySelectorAll('.block-bg-select');
+                bgSelects.forEach(select => {
+                    const index = parseInt(select.getAttribute('data-index'));
+                    if (currentComponents[index]) {
+                        currentComponents[index].bg = select.value;
+                    }
+                });
+
+                const fontSelects = document.querySelectorAll('.block-font-select');
+                fontSelects.forEach(select => {
+                    const index = parseInt(select.getAttribute('data-index'));
+                    if (currentComponents[index]) {
+                        currentComponents[index].font = select.value;
+                    }
+                });
+                
+                const emojiInputs = document.querySelectorAll('.block-emoji-input');
+                emojiInputs.forEach(input => {
+                    const index = parseInt(input.getAttribute('data-index'));
+                    if (currentComponents[index]) {
+                        currentComponents[index].emoji = input.value;
+                    }
+                });
+                
+                const titleInputs = document.querySelectorAll('.block-title-input');
+                titleInputs.forEach(input => {
+                    const index = parseInt(input.getAttribute('data-index'));
+                    if (currentComponents[index]) {
+                        currentComponents[index].title = input.value;
+                    }
+                });
+
+                // Sync rich block field inputs (dot-notation data-field)
+                const fieldInputs = document.querySelectorAll('.block-field-input');
+                fieldInputs.forEach(input => {
+                    const index = parseInt(input.getAttribute('data-index'));
+                    const field = input.getAttribute('data-field');
+                    if (!field || !currentComponents[index]) return;
+                    const parts = field.split('.');
+                    let obj = currentComponents[index];
+                    for (let i = 0; i < parts.length - 1; i++) {
+                        const key = isNaN(parts[i]) ? parts[i] : parseInt(parts[i]);
+                        if (obj[key] === undefined || obj[key] === null) {
+                            obj[key] = isNaN(parts[i+1]) ? {} : [];
+                        }
+                        obj = obj[key];
+                    }
+                    const lastKey = isNaN(parts[parts.length-1]) ? parts[parts.length-1] : parseInt(parts[parts.length-1]);
+                    const val = (input.tagName === 'DIV' || input.contentEditable === 'true') ? input.innerHTML : input.value;
+                    obj[lastKey] = val;
+                });
+            }
+            
+            btnAddComp.addEventListener('click', () => {
+                syncTextareas();
+                const type = addTypeSelect.value;
+                let newComp;
+                if (type === 'flip_card') {
+                    newComp = { type: 'flip_card', front: '', back: '', icon: '💡', color: 'default', bg: 'none' };
+                } else if (type === 'multiple_choice') {
+                    newComp = { type: 'multiple_choice', question: '', options: ['', '', '', ''], correct_index: 0, explanation: '', color: 'default', bg: 'none' };
+                } else if (type === 'true_false') {
+                    newComp = { type: 'true_false', statement: '', correct: true, explanation: '', color: 'default', bg: 'none' };
+                } else if (type === 'accordion') {
+                    newComp = { type: 'accordion', items: [{title: '', content: ''}, {title: '', content: ''}], color: 'default', bg: 'none' };
+                } else if (type === 'matching') {
+                    newComp = { type: 'matching', pairs: [{left: '', right: ''}, {left: '', right: ''}, {left: '', right: ''}], color: 'default', bg: 'none' };
+                } else {
+                    newComp = {
+                        type: type,
+                        content: type === 'file_upload' ? 'Upload files required for this module (e.g. PDF, DOCX, ZIP).' : '',
+                        color: 'default',
+                        bg: 'none',
+                        emoji: type === 'callout' ? '💡' : '',
+                        title: type === 'file_upload' ? 'Submit Assignment File' :
+                               type === 'toggle_list' ? 'Click to expand details' : ''
+                    };
+                }
+                
+                if (activeInsertIndex === -1) {
+                    currentComponents.push(newComp);
+                    activeInsertIndex = currentComponents.length - 1;
+                } else {
+                    const insertPos = activeInsertIndex + 1;
+                    currentComponents.splice(insertPos, 0, newComp);
+                    activeInsertIndex = insertPos; // Auto-select the newly added block
+                }
+                
+                renderBuilderComponents();
+            });
+            
+            btnSaveModule.addEventListener('click', () => {
+                syncTextareas();
+                const title = titleInput.value.trim();
+                const subtitle = subtitleInput.value.trim();
+                
+                if (!title) {
+                    alert('Please enter a module title.');
+                    return;
+                }
+                
+                AuthAPI.saveModule(currentModuleId, title, subtitle, currentComponents);
+                showToast(`Saved Module Content!`);
+                populateModuleSelect();
+                renderDashboard();
+            });
+
+            // --- Render Dashboard Lists ---
+            function renderDashboard() {
+                const students = AuthAPI.getAllStudents();
+                
+                const pendingList = students.filter(s => s.status === 'pending');
+                const enrolledList = students.filter(s => s.status === 'approved');
+
+                pendingBadge.innerText = pendingList.length;
+                enrolledBadge.innerText = enrolledList.length;
+
+                // 3. Render Lesson Access Grid (in Course Builder panel)
+                const unlockedModules = AuthAPI.getUnlockedModules();
+                const modsContent = AuthAPI.getModulesContent();
+                const modulesList = Object.keys(modsContent).map((id, index) => ({
+                    id: id,
+                    name: `Module ${index + 1}: ${modsContent[id].title || id}`
+                }));
+                
+                const grid = document.getElementById('moduleReleaseGrid');
+                if (grid) {
+                    grid.innerHTML = '';
+                    modulesList.forEach(mod => {
+                        const isUnlocked = unlockedModules.includes(mod.id);
+                        const card = document.createElement('div');
+                        card.className = 'glass-card';
+                        card.style.padding = '1.5rem';
+                        card.style.display = 'flex';
+                        card.style.flexDirection = 'column';
+                        card.style.justifyContent = 'space-between';
+                        card.style.gap = '1rem';
+                        card.style.border = isUnlocked ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid var(--glass-border)';
+                        card.style.background = isUnlocked ? 'rgba(212, 175, 55, 0.03)' : 'var(--bg-card)';
+                        card.style.transition = 'transform 0.3s ease, border-color 0.3s ease';
+                        
+                        card.innerHTML = `
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 0.5rem;">
+                                    <span class="badge" style="${isUnlocked ? 'background: rgba(34, 197, 94, 0.1); color: #4ade80; border-color: rgba(34, 197, 94, 0.3);' : 'background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);'}">
+                                        ${isUnlocked ? 'Released' : 'Locked'}
+                                    </span>
+                                    <div style="display: flex; gap: 0.3rem; align-items: center;">
+                                        <button class="btn btn-secondary" onclick="handleRenameModule('${mod.id}')" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; border-color: var(--accent-gold); color: var(--accent-gold-light); background: transparent; min-width: auto; height: auto; line-height: 1; border-radius: 4px;">Rename</button>
+                                        <button class="btn btn-secondary" onclick="handleDeleteModule('${mod.id}')" style="padding: 0; font-size: 0.8rem; border-color: #ef4444; color: #ef4444; background: transparent; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; line-height: 1; font-weight: bold;" title="Delete Module">✕</button>
+                                    </div>
+                                </div>
+                                <h4 style="margin-top: 0.8rem; font-size: 1.05rem; color: ${isUnlocked ? 'var(--accent-gold-light)' : 'var(--text-secondary)'};">${mod.name}</h4>
+                            </div>
+                            <button class="btn ${isUnlocked ? 'btn-secondary' : 'btn-primary'}" onclick="toggleModule('${mod.id}', ${!isUnlocked})" style="padding: 0.5rem 1rem; font-size: 0.85rem; width: 100%; font-family: var(--font-sans);">
+                                ${isUnlocked ? 'Lock Module' : 'Release Module'}
+                            </button>
+                            <button class="btn btn-secondary" onclick="generateModulePPT('${mod.id}')" style="padding: 0.5rem 1rem; font-size: 0.85rem; width: 100%; font-family: var(--font-sans); margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem; border-color: var(--accent-gold); color: var(--accent-gold-light); background: rgba(212,175,55,0.02);">
+                                📊 Generate as PPT
+                            </button>
+                        `;
+                        grid.appendChild(card);
+                    });
+                }
+
+                // Render Archived Modules list
+                const archivedList = AuthAPI.getArchivedModules();
+                const archiveSection = document.getElementById('archivedModulesSection');
+                const archiveGrid = document.getElementById('archivedModulesList');
+                
+                if (archiveSection && archiveGrid) {
+                    if (archivedList.length === 0) {
+                        archiveSection.style.display = 'none';
+                    } else {
+                        archiveSection.style.display = 'block';
+                        archiveGrid.innerHTML = '';
+                        archivedList.forEach(mod => {
+                            const badge = document.createElement('div');
+                            badge.className = 'glass-card';
+                            badge.style.padding = '0.8rem 1.2rem';
+                            badge.style.display = 'flex';
+                            badge.style.alignItems = 'center';
+                            badge.style.gap = '1.2rem';
+                            badge.style.background = 'rgba(255,255,255,0.02)';
+                            badge.style.borderColor = 'var(--glass-border)';
+                            
+                            badge.innerHTML = `
+                                <div style="text-align: left;">
+                                    <h5 style="margin: 0; font-size: 0.95rem; color: var(--text-primary); font-weight: 600;">${mod.title || mod.id}</h5>
+                                    <span style="font-size: 0.75rem; color: var(--text-secondary);">Archived: ${new Date(mod.archivedAt).toLocaleDateString()}</span>
+                                </div>
+                                <button class="btn btn-primary" onclick="handleRestoreModule('${mod.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; font-family: var(--font-sans); border-radius: 4px;">
+                                    Restore
+                                </button>
+                            `;
+                            archiveGrid.appendChild(badge);
+                        });
+                    }
+                }
+
+                // 1. Render Pending Table
+                pendingTableBody.innerHTML = '';
+                if (pendingList.length === 0) {
+                    pendingTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No pending registrations.</td></tr>';
+                } else {
+                    pendingList.forEach(student => {
+                        const tr = document.createElement('tr');
+                        const dateFormatted = student.dateAdded ? new Date(student.dateAdded).toLocaleDateString() : 'N/A';
+                        tr.innerHTML = `
+                            <td><strong>${student.firstName} ${student.lastName}</strong></td>
+                            <td style="color: var(--text-secondary);">${student.email}</td>
+                            <td style="color: var(--text-secondary);">${dateFormatted}</td>
+                            <td style="text-align: center; white-space: nowrap; display: flex; gap: 0.5rem; justify-content: center; align-items: center; border-bottom: none; height: 100%;">
+                                <button class="btn btn-primary" onclick="handleApprove('${student.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; font-family: var(--font-sans);">Approve</button>
+                                <button class="btn btn-secondary" onclick="handleReject('${student.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; font-family: var(--font-sans); border-color: #ef4444; color: #ef4444;">Reject</button>
+                            </td>
+                        `;
+                        pendingTableBody.appendChild(tr);
+                    });
+                }
+
+                // 2. Render Enrolled Table
+                studentsTableBody.innerHTML = '';
+                if (enrolledList.length === 0) {
+                    studentsTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No enrolled students yet.</td></tr>';
+                } else {
+                    enrolledList.forEach(student => {
+                        const tr = document.createElement('tr');
+                        
+                        // Progress bar calculations
+                        const progress = student.progress || 0;
+                        const progressHtml = `
+                            <div style="display: flex; align-items: center; gap: 0.8rem;">
+                                <div style="flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                                    <div style="width: ${progress}%; height: 100%; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); border-radius: 3px;"></div>
+                                </div>
+                                <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-gold); min-width: 35px;">${progress}%</span>
+                            </div>
+                        `;
+
+                        // Answers button logic
+                        let actionHtml = '';
+                        if (student.answers && student.answers.length > 0) {
+                            actionHtml = `<button class="btn btn-secondary" onclick="viewStudentAnswers('${student.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; border-color: rgba(212, 175, 55, 0.4); font-family: var(--font-sans);">View Submissions</button>`;
+                        } else {
+                            actionHtml = `<span style="color: var(--text-secondary); font-size: 0.85rem; font-style: italic;">No submissions yet</span>`;
+                        }
+
+                        tr.innerHTML = `
+                            <td><strong>${student.firstName} ${student.lastName}</strong></td>
+                            <td style="color: var(--text-secondary); font-size: 0.9rem;">${student.email}</td>
+                            <td><span style="font-family: monospace; background: rgba(255,255,255,0.07); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9rem;">${student.username}</span></td>
+                            <td><span style="font-family: monospace; background: rgba(255,255,255,0.07); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9rem;">${student.password}</span></td>
+                            <td>${progressHtml}</td>
+                            <td>${actionHtml}</td>
+                        `;
+                        studentsTableBody.appendChild(tr);
+                    });
+                }
+            }
+
+            // Form handler for manual adding
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const firstName = document.getElementById('firstName').value;
+                const lastName = document.getElementById('lastName').value;
+                const email = document.getElementById('email').value;
+
+                // Register student (adds as pending)
+                const regRes = AuthAPI.registerStudent(firstName, lastName, email);
+                if (regRes.success) {
+                    // Approve student instantly
+                    const approvedStudent = AuthAPI.approveStudent(regRes.student.id);
+                    if (approvedStudent) {
+                        document.getElementById('newUsername').innerText = approvedStudent.username;
+                        document.getElementById('newPassword').innerText = approvedStudent.password;
+                        credentialsModal.classList.remove('hidden');
+                        showToast(`Registered & Approved ${firstName}!`);
+                    }
+                } else {
+                    alert(regRes.error || 'Failed to add student.');
+                }
+                
+                form.reset();
+                document.getElementById('addStudentForm').classList.add('hidden');
+                renderDashboard();
+            });
+
+            // --- Announcements Admin Panels ---
+            const announcementsTableBody = document.getElementById('announcementsTableBody');
+            const postAnnForm = document.getElementById('adminPostAnnouncementForm');
+            
+            function renderAnnouncementsAdmin() {
+                if (!announcementsTableBody) return;
+                const list = AuthAPI.getAnnouncements();
+                announcementsTableBody.innerHTML = '';
+                
+                if (list.length === 0) {
+                    announcementsTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No announcements posted yet.</td></tr>';
+                } else {
+                    list.forEach(ann => {
+                        const tr = document.createElement('tr');
+                        const snippet = ann.content.replace(/<[^>]*>/g, '').substring(0, 50) + (ann.content.length > 50 ? '...' : '');
+                        tr.innerHTML = `
+                            <td><span style="font-size: 0.85rem; color: var(--text-secondary);">${new Date(ann.date).toLocaleDateString()}</span></td>
+                            <td><strong>${ann.title}</strong></td>
+                            <td style="color: var(--text-secondary); font-size: 0.9rem;">${snippet}</td>
+                            <td style="text-align: center;">
+                                <button class="btn btn-secondary" onclick="handleDeleteAnn('${ann.id}')" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-color: #ef4444; color: #ef4444; font-family: var(--font-sans);">Delete</button>
+                            </td>
+                        `;
+                        announcementsTableBody.appendChild(tr);
+                    });
+                }
+            }
+
+            if (postAnnForm) {
+                postAnnForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const title = document.getElementById('announceTitle').value;
+                    const content = document.getElementById('announceContent').value;
+                    AuthAPI.addAnnouncement(title, content);
+                    postAnnForm.reset();
+                    showToast('Announcement posted successfully!');
+                    renderAnnouncementsAdmin();
+                });
+            }
+
+            window.handleDeleteAnn = (id) => {
+                if (confirm('Are you sure you want to delete this announcement?')) {
+                    AuthAPI.deleteAnnouncement(id);
+                    showToast('Announcement deleted.');
+                    renderAnnouncementsAdmin();
+                }
+            };
+
+            // --- Resources Admin Panels ---
+            const resourcesTableBody = document.getElementById('resourcesTableBody');
+            const addResForm = document.getElementById('adminAddResourceForm');
+
+            function renderResourcesAdmin() {
+                if (!resourcesTableBody) return;
+                const list = AuthAPI.getResources();
+                resourcesTableBody.innerHTML = '';
+
+                if (list.length === 0) {
+                    resourcesTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No resources added yet.</td></tr>';
+                } else {
+                    list.forEach(res => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><span class="badge" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">${res.type.toUpperCase()}</span></td>
+                            <td><strong>${res.name}</strong></td>
+                            <td><a href="${res.url}" target="_blank" style="color: var(--accent-gold-light); font-size: 0.85rem; word-break: break-all;">${res.url}</a></td>
+                            <td style="text-align: center;">
+                                <button class="btn btn-secondary" onclick="handleDeleteRes('${res.id}')" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-color: #ef4444; color: #ef4444; font-family: var(--font-sans);">Delete</button>
+                            </td>
+                        `;
+                        resourcesTableBody.appendChild(tr);
+                    });
+                }
+            }
+
+            if (addResForm) {
+                addResForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('resourceName').value;
+                    const type = document.getElementById('resourceType').value;
+                    const url = document.getElementById('resourceUrl').value;
+                    AuthAPI.addResource(name, type, url);
+                    addResForm.reset();
+                    showToast('Resource added successfully!');
+                    renderResourcesAdmin();
+                });
+            }
+
+            window.handleDeleteRes = (id) => {
+                if (confirm('Are you sure you want to delete this resource?')) {
+                    AuthAPI.deleteResource(id);
+                    showToast('Resource deleted.');
+                    renderResourcesAdmin();
+                }
+            };
+
+             // Real-time synchronization event listener
+             window.addEventListener('storage', (e) => {
+                 if (e.key === 'jilgm_students' || e.key === 'jilgm_unlocked_modules') {
+                     renderDashboard();
+                     // If the answers modal is open for a student, refresh it in place
+                     if (activeModalStudentId) {
+                         const students = AuthAPI.getAllStudents();
+                         const student = students.find(s => s.id === activeModalStudentId);
+                         if (student && student.answers && student.answers.length > 0) {
+                             window.viewStudentAnswers(activeModalStudentId);
+                         } else {
+                             window.closeAnswersModal();
+                         }
+                     }
+                 } else if (e.key === 'jilgm_modules_content') {
+                     // Reload modules content in Course Builder if admin is not currently typing in textareas, inputs, or contenteditables
+                     const focused = document.activeElement;
+                     const isTyping = focused && (focused.tagName === 'INPUT' || focused.tagName === 'TEXTAREA' || focused.contentEditable === 'true');
+                     if (!isTyping) {
+                         populateModuleSelect();
+                         renderDashboard();
+                         loadBuilderModule();
+                     }
+                 } else if (e.key === 'jilgm_admins') {
+                     if (typeof renderAdminsList === 'function') {
+                         renderAdminsList();
+                     }
+                 }
+             });
+
+            // Firebase configuration handlers
+            const btnSaveFirebase = document.getElementById('btn-save-firebase');
+            const btnClearFirebase = document.getElementById('btn-clear-firebase');
+            const firebaseConfigInput = document.getElementById('firebaseConfigInput');
+
+            if (firebaseConfigInput) {
+                firebaseConfigInput.value = localStorage.getItem('jilgm_firebase_config') || '';
+            }
+
+            if (btnSaveFirebase) {
+                btnSaveFirebase.addEventListener('click', async () => {
+                    const val = firebaseConfigInput.value.trim();
+                    if (!val) {
+                        alert("Please enter a valid JSON configuration.");
+                        return;
+                    }
+                    try {
+                        const parsed = JSON.parse(val);
+                        btnSaveFirebase.innerText = "Saving & Syncing...";
+                        await AuthAPI.saveFirebaseConfig(parsed);
+                        alert("Firebase Configuration Saved & Shared! Re-loading portal...");
+                        location.reload();
+                    } catch(e) {
+                        alert("Invalid JSON format. Please paste the exact config JSON object from Firebase Console.");
+                    }
+                });
+            }
+
+            if (btnClearFirebase) {
+                btnClearFirebase.addEventListener('click', async () => {
+                    if (confirm("Are you sure you want to disconnect from Firebase and fall back to your local mock database? This will disconnect other devices as well.")) {
+                        btnClearFirebase.innerText = "Disconnecting...";
+                        await AuthAPI.clearFirebaseConfig();
+                        location.reload();
+                    }
+                });
+            }
+
+
+
+            // --- Instructors Manager Logic ---
+            const instructorRegisterForm = document.getElementById('instructorRegisterForm');
+            const instructorsTableBody = document.getElementById('instructorsTableBody');
+
+            function renderInstructorsAdmin() {
+                if (!instructorsTableBody) return;
+                const list = AuthAPI.getInstructors();
+                instructorsTableBody.innerHTML = '';
+                if (list.length === 0) {
+                    instructorsTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-secondary); font-style: italic;">
+                                No instructors registered. Use the button above to add one.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                list.forEach(inst => {
+                    const row = document.createElement('tr');
+                    row.style.borderBottom = '1px solid rgba(255,255,255,0.03)';
+                    row.style.fontSize = '0.9rem';
+                    
+                    const dateStr = inst.dateAdded ? new Date(inst.dateAdded).toLocaleDateString() : 'N/A';
+                    
+                    row.innerHTML = `
+                        <td style="padding: 1rem; color: #fff; font-weight: 500;">${inst.name}</td>
+                        <td style="padding: 1rem; color: var(--accent-gold-light);">${inst.username}</td>
+                        <td style="padding: 1rem; color: var(--text-secondary); font-family: monospace;">${inst.password}</td>
+                        <td style="padding: 1rem; color: var(--text-secondary);">${dateStr}</td>
+                        <td style="padding: 1rem; text-align: right;">
+                            <button class="btn btn-secondary" onclick="handleDeleteInstructor('${inst.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.75rem; border-color: #ef4444; color: #ef4444; background: transparent; height: auto;">Delete</button>
+                        </td>
+                    `;
+                    instructorsTableBody.appendChild(row);
+                });
+            }
+
+            if (instructorRegisterForm) {
+                instructorRegisterForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('newInstructorName').value.trim();
+                    const username = document.getElementById('newInstructorUsername').value.trim();
+                    const password = document.getElementById('newInstructorPassword').value;
+
+                    const res = AuthAPI.addInstructor(name, username, password);
+                    if (res.success) {
+                        showToast(`Instructor account for "${name}" created!`);
+                        instructorRegisterForm.reset();
+                        document.getElementById('addInstructorForm').classList.add('hidden');
+                        renderInstructorsAdmin();
+                    } else {
+                        alert(res.error || "Failed to create instructor account.");
+                    }
+                });
+            }
+
+            window.handleDeleteInstructor = (id) => {
+                if (confirm("Are you sure you want to delete this instructor account? They will lose access immediately.")) {
+                    AuthAPI.deleteInstructor(id);
+                    showToast("Instructor account deleted.");
+                    renderInstructorsAdmin();
+                }
+            };
+
+            // Initial render
+            populateModuleSelect();
+            renderDashboard();
+            loadBuilderModule();
+            } catch (err) {
+                console.error(err);
+                const errDiv = document.createElement('div');
+                errDiv.style.background = '#fef2f2';
+                errDiv.style.border = '2px solid #ef4444';
+                errDiv.style.color = '#b91c1c';
+                errDiv.style.padding = '1.5rem';
+                errDiv.style.margin = '2rem';
+                errDiv.style.borderRadius = '8px';
+                errDiv.style.fontFamily = 'monospace';
+                errDiv.style.zIndex = '9999';
+                errDiv.style.position = 'relative';
+                errDiv.innerHTML = `<h3>JavaScript Error Detected:</h3><p><strong>${err.message}</strong></p><pre style="white-space: pre-wrap;">${err.stack}</pre>`;
+                document.body.insertBefore(errDiv, document.body.firstChild);
+            }
+        });
+    </script>
+</body>
+</html>

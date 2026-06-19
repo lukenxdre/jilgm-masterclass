@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Sign In - JILGM Masterclass</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="auth.js?v=2.1"></script>
+    <script src="transitions.js" defer></script>
+</head>
+<body class="auth-page page-loading">
+
+    <div class="glass-card auth-card" style="max-width: 450px; width: 100%; border-color: rgba(212, 175, 55, 0.35);">
+        <a href="index.html" class="logo-auth-brand">
+            <img src="logo.png?v=2.0" alt="JILGM Riyadh Logo" class="auth-logo" style="filter: drop-shadow(0 4px 10px rgba(212, 175, 55, 0.15));">
+        </a>
+        
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <span style="font-size: 2.2rem; filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.3));">🛡️</span>
+            <h2 style="margin-top: 0.8rem; margin-bottom: 0.5rem; font-size: 1.6rem; color: var(--accent-gold-light);">Admin Portal</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Sign in to access your administrative dashboard</p>
+        </div>
+
+        <div id="loginError" class="auth-error">
+            Invalid admin credentials. Please try again.
+        </div>
+
+        <form id="adminLoginForm" class="auth-form" style="margin-top: 1rem;">
+            <div style="text-align: left;">
+                <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Admin Username</label>
+                <input type="text" id="adminUsername" required class="glass-input" placeholder="e.g. JILGM RiyadhRC">
+            </div>
+            
+            <div style="text-align: left;">
+                <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Security Password</label>
+                <input type="password" id="adminPassword" required class="glass-input" placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.2rem; font-weight: bold; background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark)); border-color: var(--accent-gold);">Access Dashboard</button>
+        </form>
+        
+        <div style="margin-top: 2rem; font-size: 0.85rem; color: var(--text-secondary);">
+            <p><a href="index.html" style="color: var(--text-secondary); text-decoration: none;">← Return to Main Site</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Redirect to admin portal if already authenticated
+            if (AuthAPI.getCurrentAdmin()) {
+                window.location.href = 'admin.html';
+            }
+
+            const form = document.getElementById('adminLoginForm');
+            const errorMsg = document.getElementById('loginError');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                errorMsg.classList.remove('show');
+                
+                const btn = form.querySelector('button');
+                const originalText = btn.innerText;
+                btn.innerText = 'Verifying...';
+                
+                const username = document.getElementById('adminUsername').value.trim();
+                const password = document.getElementById('adminPassword').value;
+
+                // Wait for the background cloud sync promise to complete if active
+                if (window.syncPromise) {
+                    try { await window.syncPromise; } catch(err) { console.warn(err); }
+                }
+                if (window.firebaseSyncPromise) {
+                    try { await window.firebaseSyncPromise; } catch(err) { console.warn(err); }
+                }
+
+                setTimeout(() => {
+                    const success = AuthAPI.loginAdmin(username, password);
+                    btn.innerText = originalText;
+                    
+                    if (success) {
+                        window.location.href = 'admin.html';
+                    } else {
+                        errorMsg.classList.add('show');
+                    }
+                }, 400);
+            });
+        });
+    </script>
+</body>
+</html>

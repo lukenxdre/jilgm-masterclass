@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JILGM Leadership Masterclass</title>
+    <meta name="description" content="Elevate your ministry and leadership skills with the JILGM Leadership Masterclass. Premium training for the next generation of spiritual leaders.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo-brand">
+                <img src="logo.png?v=2.0" alt="JILGM Riyadh Logo" class="navbar-logo">
+            </a>
+            <div class="nav-links">
+                <a href="#about">About</a>
+                <a href="#curriculum">Curriculum</a>
+                <a href="#instructors">Instructors</a>
+                <a href="register.html" style="color: var(--accent-gold); font-weight: bold;">Register</a>
+                <a href="login.html" class="btn btn-primary nav-btn">Student Login</a>
+            </div>
+            <!-- Mobile Menu Toggle -->
+            <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="#about" class="mobile-link">About</a>
+        <a href="#curriculum" class="mobile-link">Curriculum</a>
+        <a href="#instructors" class="mobile-link">Instructors</a>
+        <a href="register.html" class="mobile-link" style="color: var(--accent-gold);">Register</a>
+        <a href="login.html" class="btn btn-primary mobile-btn">Student Login</a>
+    </div>
+
+    <!-- Hero Section -->
+    <header class="hero" id="home">
+        <!-- Abstract gradient or subtle image overlay could go here via CSS -->
+        <div class="hero-bg-glow"></div>
+        <div class="hero-glow-orb orb-1"></div>
+        <div class="hero-glow-orb orb-2"></div>
+        <div class="hero-glow-orb orb-3"></div>
+        
+        <div class="container hero-content">
+            <div class="hero-logo-container reveal-up">
+                <div class="hero-logo-wrapper">
+                    <!-- Glowing Gold Rays Behind the Logo -->
+                    <div class="hero-logo-glow-rays"></div>
+                    
+                    <!-- Concentric Astrolabe Rings -->
+                    <div class="hero-logo-ring-outer"></div>
+                    <div class="hero-logo-ring-inner"></div>
+                    
+                    <!-- Logo Image -->
+                    <img src="hero_logo.png?v=2.0" alt="JILGM Riyadh Masterclass Logo" class="hero-logo">
+                    
+                    <!-- Elegant SVG Golden Frame & Laurels Overlay -->
+                    <svg class="hero-logo-svg-frame" viewBox="0 0 705 483" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#fff4d0" />
+                                <stop offset="30%" stop-color="#d4af37" />
+                                <stop offset="70%" stop-color="#aa841c" />
+                                <stop offset="100%" stop-color="#f3e5ab" />
+                            </linearGradient>
+                            <filter id="gold-glow" x="-10%" y="-10%" width="120%" height="120%">
+                                <drop-shadow dx="0" dy="4" stdDeviation="8" flood-color="#aa841c" flood-opacity="0.35" />
+                                <drop-shadow dx="0" dy="0" stdDeviation="12" flood-color="#d4af37" flood-opacity="0.2" />
+                            </filter>
+                        </defs>
+                        
+                        <!-- 1. The outer gold ring overlays and completes the circular JILGM seal (cx=385, cy=185, r=196) -->
+                        <circle cx="385" cy="185" r="196" stroke="url(#gold-grad)" stroke-width="3.5" filter="url(#gold-glow)" />
+                        <circle cx="385" cy="185" r="191" stroke="url(#gold-grad)" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.8" />
+                        
+                        <!-- 2. Elegant Laurels/Wings framing the circle -->
+                        <!-- Left Laurel -->
+                        <path d="M 180 185 C 150 140, 160 80, 210 50 C 190 75, 180 110, 185 145 Z" fill="url(#gold-grad)" filter="url(#gold-glow)" opacity="0.9" />
+                        <path d="M 160 140 C 130 110, 145 60, 190 40 C 170 60, 165 95, 170 120 Z" fill="url(#gold-grad)" filter="url(#gold-glow)" opacity="0.85" />
+                        
+                        <!-- Right Laurel -->
+                        <path d="M 590 185 C 620 140, 610 80, 560 50 C 580 75, 590 110, 585 145 Z" fill="url(#gold-grad)" filter="url(#gold-glow)" opacity="0.9" />
+                        <path d="M 610 140 C 640 110, 625 60, 580 40 C 600 60, 605 95, 600 120 Z" fill="url(#gold-grad)" filter="url(#gold-glow)" opacity="0.85" />
+                        
+                        <!-- 3. Bottom Card Border framing the skyline -->
+                        <path d="M 54 250 C 54 360, 120 470, 352.5 480 C 585 470, 651 360, 651 250" stroke="url(#gold-grad)" stroke-width="2.5" filter="url(#gold-glow)" fill="none" />
+                        
+                        <!-- Decorative diamond at the bottom center of the frame -->
+                        <path d="M 352.5 474 L 358.5 480 L 352.5 486 L 346.5 480 Z" fill="url(#gold-grad)" filter="url(#gold-glow)" />
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="hero-badge reveal-up">Exclusive Ministry Training</div>
+            
+            <div class="hero-text-card reveal-up delay-1">
+                <h1 class="hero-title">
+                    Lead with <span class="text-gradient">Purpose.</span><br>
+                    Serve with <span class="text-gradient">Power.</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Join the definitive Jesus Is Lord Global Ministry Leadership Masterclass. Equip yourself with spiritual wisdom, practical strategy, and profound insight to lead effectively in today's world.
+                </p>
+                <div class="hero-actions">
+                    <a href="register.html" class="btn btn-primary btn-large">Register Now</a>
+                    <a href="login.html" class="btn btn-secondary btn-large">Student Login</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- About Section -->
+    <section class="about section" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-text reveal-left">
+                    <h2 class="section-title">A Higher Calling</h2>
+                    <p>The JILGM Leadership Masterclass is not just an educational program; it is a transformative experience designed for those called to lead in ministry, marketplace, and beyond.</p>
+                    <p>Rooted in sound biblical doctrine and proven leadership principles, our curriculum bridges the gap between spiritual fervency and organizational excellence.</p>
+                    
+                    <ul class="feature-list">
+                        <li>
+                            <div class="feature-icon">✨</div>
+                            <div>
+                                <h3>Biblical Foundation</h3>
+                                <p>Unwavering commitment to Scriptural truths as the bedrock of leadership.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="feature-icon">🌍</div>
+                            <div>
+                                <h3>Global Perspective</h3>
+                                <p>Learn to navigate and lead effectively across diverse cultures and contexts.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="about-visual reveal-right">
+                    <div class="glass-card visual-card">
+                        <div class="stat-circle">
+                            <span class="stat-number">16</span>
+                            <span class="stat-label">Core Modules</span>
+                        </div>
+                        <div class="visual-accent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Curriculum Section -->
+    <section class="curriculum section" id="curriculum">
+        <div class="container">
+            <div class="section-header text-center reveal-up">
+                <h2 class="section-title">The Curriculum</h2>
+                <p class="section-subtitle">A comprehensive, step-by-step roadmap to mastering ministry leadership.</p>
+            </div>
+
+            <div class="curriculum-timeline">
+                <!-- Module 1 -->
+                <div class="module-card glass-card reveal-up">
+                    <div class="module-number">01</div>
+                    <div class="module-content">
+                        <h3>The Heart of a Leader</h3>
+                        <p>Discovering your spiritual identity, character formation, and leading from a place of authenticity and integrity.</p>
+                        <div class="module-tags">
+                            <span>Character</span>
+                            <span>Identity</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Module 2 -->
+                <div class="module-card glass-card reveal-up">
+                    <div class="module-number">02</div>
+                    <div class="module-content">
+                        <h3>Vision Casting & Strategy</h3>
+                        <p>How to hear from God, articulate a compelling vision, and build actionable strategies to mobilize your congregation.</p>
+                        <div class="module-tags">
+                            <span>Vision</span>
+                            <span>Planning</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Module 3 -->
+                <div class="module-card glass-card reveal-up">
+                    <div class="module-number">03</div>
+                    <div class="module-content">
+                        <h3>Conflict Resolution in Ministry</h3>
+                        <p>Biblical approaches to handling disputes, fostering unity, and maintaining peace within the church body.</p>
+                        <div class="module-tags">
+                            <span>Mediation</span>
+                            <span>Unity</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Module 4 -->
+                <div class="module-card glass-card reveal-up">
+                    <div class="module-number">04</div>
+                    <div class="module-content">
+                        <h3>Next-Generation Empowerment</h3>
+                        <p>Strategies for mentoring youth, passing the baton, and ensuring the longevity of the ministry's mission.</p>
+                        <div class="module-tags">
+                            <span>Mentorship</span>
+                            <span>Legacy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Instructors Section -->
+    <section class="instructors section" id="instructors">
+        <div class="container">
+            <div class="section-header text-center reveal-up">
+                <h2 class="section-title">Masterclass Instructors</h2>
+                <p class="section-subtitle">Learn directly from our JILGM Riyadh regional leadership coordinators.</p>
+            </div>
+
+            <div class="instructor-grid" style="max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2.5rem; justify-content: center;">
+                <!-- Instructor 1 -->
+                <div class="instructor-card glass-card reveal-up" style="background: linear-gradient(135deg, #0b172c 0%, #050e1e 100%); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 24px; padding: 3rem 2rem 2.5rem; box-shadow: 0 12px 40px rgba(0,0,0,0.15), inset 0 0 20px rgba(255,255,255,0.02); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.4s ease; cursor: default; position: relative; overflow: hidden; text-align: center;">
+                    <!-- Luxury background radial glow -->
+                    <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.08) 0%, transparent 60%); pointer-events: none;"></div>
+                    
+                    <div class="instructor-avatar" style="width: 130px; height: 130px; border-radius: 50%; padding: 4px; background: linear-gradient(135deg, #fff4d0, #aa841c); margin: 0 auto 1.8rem; box-shadow: 0 8px 25px rgba(212, 175, 55, 0.25);">
+                        <div class="avatar-placeholder" style="background: #050e1e; font-size: 2.2rem; color: #fff4d0; font-family: var(--font-serif); font-weight: 700; width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center;">DD</div>
+                    </div>
+                    <h3 style="font-family: var(--font-serif); font-size: 1.7rem; color: #fff4d0; margin-bottom: 0.5rem; font-style: italic;">Pastor Dondon De Leon</h3>
+                    <p class="instructor-title" style="color: #d4af37; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(212, 175, 55, 0.15); padding-bottom: 1rem;">JILGM Riyadh Regional Coordinator</p>
+                    <p class="instructor-bio" style="color: rgba(255,255,255,0.75); font-size: 1rem; line-height: 1.6; margin: 0;">Leading the Riyadh region with spiritual wisdom, structural direction, and a heart dedicated to nurturing faith-driven leaders.</p>
+                </div>
+                
+                <!-- Instructor 2 -->
+                <div class="instructor-card glass-card reveal-up delay-1" style="background: linear-gradient(135deg, #0b172c 0%, #050e1e 100%); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 24px; padding: 3rem 2rem 2.5rem; box-shadow: 0 12px 40px rgba(0,0,0,0.15), inset 0 0 20px rgba(255,255,255,0.02); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.4s ease; cursor: default; position: relative; overflow: hidden; text-align: center;">
+                    <!-- Luxury background radial glow -->
+                    <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.08) 0%, transparent 60%); pointer-events: none;"></div>
+                    
+                    <div class="instructor-avatar" style="width: 130px; height: 130px; border-radius: 50%; padding: 4px; background: linear-gradient(135deg, #fff4d0, #aa841c); margin: 0 auto 1.8rem; box-shadow: 0 8px 25px rgba(212, 175, 55, 0.25);">
+                        <div class="avatar-placeholder" style="background: #050e1e; font-size: 2.2rem; color: #fff4d0; font-family: var(--font-serif); font-weight: 700; width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center;">AV</div>
+                    </div>
+                    <h3 style="font-family: var(--font-serif); font-size: 1.7rem; color: #fff4d0; margin-bottom: 0.5rem; font-style: italic;">Pastor Arnel Valentin</h3>
+                    <p class="instructor-title" style="color: #d4af37; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(212, 175, 55, 0.15); padding-bottom: 1rem;">JILGM Riyadh Assistant Regional Coordinator</p>
+                    <p class="instructor-bio" style="color: rgba(255,255,255,0.75); font-size: 1rem; line-height: 1.6; margin: 0;">Providing strategic oversight and dedicated pastoral care to strengthen ministries and foster unity across the region.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta section" id="login-cta">
+        <div class="cta-glow"></div>
+        <div class="container text-center reveal-up">
+            <h2 class="cta-title">Begin Your Leadership Journey</h2>
+            <p class="cta-subtitle">Equip yourself with spiritual wisdom, practical strategy, and profound insight. Register below to apply or sign in to your portal.</p>
+            <div class="mt-4" style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;">
+                <a href="register.html" class="btn btn-primary btn-large">Register Now</a>
+                <a href="login.html" class="btn btn-secondary btn-large">Student Login</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" style="background: var(--bg-dark); border-top: 1px solid rgba(212,175,55,0.15); padding: 4rem 0 2rem;">
+        <div class="container footer-content" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 2rem;">
+            <div class="footer-brand" style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.8rem;">
+                <a href="#" style="text-decoration: none;">
+                    <img src="logo.png?v=2.0" alt="JILGM Riyadh Logo" style="height: 55px; display: block; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));">
+                </a>
+                <p style="margin: 0; color: var(--text-secondary); font-size: 0.95rem; font-family: var(--font-sans);">Empowering global leaders for ministry excellence.</p>
+            </div>
+            <div class="footer-links" style="display: flex; gap: 2rem; align-items: center;">
+                <a href="#" style="color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; font-family: var(--font-sans); transition: color 0.3s ease;">Privacy Policy</a>
+                <a href="#" style="color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; font-family: var(--font-sans); transition: color 0.3s ease;">Terms of Service</a>
+                <a href="#" style="color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; font-family: var(--font-sans); transition: color 0.3s ease;">Contact Support</a>
+            </div>
+        </div>
+        <div class="footer-bottom" style="margin-top: 3rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 2rem; text-align: center; color: var(--text-secondary); font-size: 0.85rem; font-family: var(--font-sans);">
+            <p style="margin: 0;">&copy; 2026 Jesus Is Lord Global Ministry. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Custom JS -->
+    <script src="auth.js?v=2.1"></script>
+    <script src="script.js"></script>
+</body>
+</html>

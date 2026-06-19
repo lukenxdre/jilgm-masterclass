@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login - JILGM Masterclass</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="auth.js?v=2.1"></script>
+    <script src="transitions.js" defer></script>
+</head>
+<body class="auth-page page-loading">
+
+    <div class="glass-card auth-card" style="max-width: 450px; width: 100%;">
+        <a href="index.html" class="logo-auth-brand">
+            <img src="logo.png?v=2.0" alt="JILGM Riyadh Logo" class="auth-logo">
+        </a>
+        
+        <div class="auth-tabs" style="display: flex; border-bottom: 1px solid var(--glass-border); margin-bottom: 2rem; border-radius: 8px 8px 0 0;">
+            <button id="tab-login" class="auth-tab active" style="flex: 1; padding: 1rem; background: none; border: none; border-bottom: 2px solid var(--accent-gold); color: var(--text-primary); font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: var(--font-sans);">Sign In</button>
+            <button id="tab-status" class="auth-tab" style="flex: 1; padding: 1rem; background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: var(--font-sans);">Check Status</button>
+        </div>
+
+        <!-- LOGIN PANEL -->
+        <div id="panel-login">
+            <h2 style="margin-bottom: 0.5rem; font-size: 1.5rem;">Welcome Back</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.9rem;">Sign in to your student dashboard</p>
+
+            <div id="loginError" class="auth-error">
+                Invalid username or password. Please try again.
+            </div>
+
+            <form id="loginForm" class="auth-form" style="margin-top: 1rem;">
+                <div style="text-align: left;">
+                    <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Username</label>
+                    <input type="text" id="username" required class="glass-input" placeholder="e.g., jsmith">
+                </div>
+                
+                <div style="text-align: left;">
+                    <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Password</label>
+                    <input type="password" id="password" required class="glass-input" placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sign In</button>
+            </form>
+        </div>
+
+        <!-- STATUS CHECK PANEL -->
+        <div id="panel-status" class="hidden">
+            <h2 style="margin-bottom: 0.5rem; font-size: 1.5rem;">Check Application Status</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.9rem;">Retrieve your login credentials once approved</p>
+
+            <div id="statusResult" class="auth-error" style="display: none; text-align: left; margin-bottom: 1.5rem; line-height: 1.5;">
+                <!-- Dynamically filled status message -->
+            </div>
+
+            <form id="statusForm" class="auth-form" style="margin-top: 1rem;">
+                <div style="text-align: left;">
+                    <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Registered Email Address</label>
+                    <input type="email" id="statusEmail" required class="glass-input" placeholder="you@example.com">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Check Status</button>
+            </form>
+        </div>
+        
+        <div style="margin-top: 2rem; font-size: 0.85rem; color: var(--text-secondary);">
+            <p id="auth-footer-text">Not registered yet? <a href="register.html" style="color: var(--accent-gold); text-decoration: none;">Submit registration application.</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Redirect to dashboard if already logged in
+            if (AuthAPI.getCurrentUser()) {
+                window.location.href = 'dashboard.html';
+            }
+
+            const tabLogin = document.getElementById('tab-login');
+            const tabStatus = document.getElementById('tab-status');
+            const panelLogin = document.getElementById('panel-login');
+            const panelStatus = document.getElementById('panel-status');
+            const footerText = document.getElementById('auth-footer-text');
+
+            // Tab toggling
+            tabLogin.addEventListener('click', () => {
+                tabLogin.classList.add('active');
+                tabLogin.style.borderBottomColor = 'var(--accent-gold)';
+                tabLogin.style.color = 'var(--text-primary)';
+                
+                tabStatus.classList.remove('active');
+                tabStatus.style.borderBottomColor = 'transparent';
+                tabStatus.style.color = 'var(--text-secondary)';
+                
+                panelLogin.classList.remove('hidden');
+                panelStatus.classList.add('hidden');
+                footerText.innerHTML = 'Not registered yet? <a href="register.html" style="color: var(--accent-gold); text-decoration: none;">Submit registration application.</a>';
+            });
+
+            tabStatus.addEventListener('click', () => {
+                tabStatus.classList.add('active');
+                tabStatus.style.borderBottomColor = 'var(--accent-gold)';
+                tabStatus.style.color = 'var(--text-primary)';
+                
+                tabLogin.classList.remove('active');
+                tabLogin.style.borderBottomColor = 'transparent';
+                tabLogin.style.color = 'var(--text-secondary)';
+                
+                panelStatus.classList.remove('hidden');
+                panelLogin.classList.add('hidden');
+                footerText.innerHTML = 'Awaiting approval? <a href="register.html" style="color: var(--accent-gold); text-decoration: none;">Register another account.</a>';
+            });
+
+            // Login submission
+            const loginForm = document.getElementById('loginForm');
+            const errorMsg = document.getElementById('loginError');
+
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                errorMsg.classList.remove('show');
+                
+                const btn = loginForm.querySelector('button');
+                btn.innerText = 'Authenticating...';
+                
+                const user = document.getElementById('username').value;
+                const pass = document.getElementById('password').value;
+
+                if (window.syncPromise) {
+                    try { await window.syncPromise; } catch(err) { console.warn(err); }
+                }
+
+                setTimeout(() => {
+                    const success = AuthAPI.login(user, pass);
+                    if (success) {
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        btn.innerText = 'Sign In';
+                        errorMsg.classList.add('show');
+                    }
+                }, 400);
+            });
+
+            // Status checking submission
+            const statusForm = document.getElementById('statusForm');
+            const statusResult = document.getElementById('statusResult');
+
+            statusForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                statusResult.style.display = 'none';
+                
+                const btn = statusForm.querySelector('button');
+                btn.innerText = 'Checking...';
+                
+                const email = document.getElementById('statusEmail').value;
+
+                if (window.syncPromise) {
+                    try { await window.syncPromise; } catch(err) { console.warn(err); }
+                }
+
+                setTimeout(() => {
+                    btn.innerText = 'Check Status';
+                    const student = AuthAPI.checkStatus(email);
+                    
+                    statusResult.style.display = 'block';
+                    if (!student) {
+                        statusResult.style.background = 'rgba(239, 68, 68, 0.1)';
+                        statusResult.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                        statusResult.style.color = '#ef4444';
+                        statusResult.innerHTML = `Email <strong>${email}</strong> not found. If you haven't applied yet, please <a href="register.html" style="color: var(--accent-gold); text-decoration: underline;">register here</a>.`;
+                    } else if (student.status === 'pending') {
+                        statusResult.style.background = 'rgba(245, 158, 11, 0.1)';
+                        statusResult.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+                        statusResult.style.color = '#f59e0b';
+                        statusResult.innerHTML = `Your registration application is still <strong>Pending Approval</strong>. Please check back later or contact your administrator.`;
+                    } else if (student.status === 'approved') {
+                        statusResult.style.background = 'rgba(34, 197, 94, 0.1)';
+                        statusResult.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+                        statusResult.style.color = '#4ade80';
+                        statusResult.innerHTML = `
+                            <p style="margin-bottom: 0.5rem; font-weight: bold;">Application Approved! Here are your credentials:</p>
+                            <div style="background: rgba(0,0,0,0.4); padding: 0.8rem; border-radius: 6px; margin-bottom: 0.8rem; border: 1px dashed rgba(255,255,255,0.1);">
+                                <p style="margin: 0; font-family: monospace;">Username: <span style="color: var(--accent-gold-light); font-weight: bold; user-select: all;">${student.username}</span></p>
+                                <p style="margin: 0; font-family: monospace;">Password: <span style="color: var(--accent-gold-light); font-weight: bold; user-select: all;">${student.password}</span></p>
+                            </div>
+                            <button type="button" class="btn btn-secondary" id="btn-copy-fill" style="width: 100%; padding: 0.5rem; font-size: 0.85rem; border-color: rgba(74, 222, 128, 0.4); color: #4ade80;">Use Credentials to Sign In</button>
+                        `;
+                        
+                        // Handler to auto-fill credentials and switch tab
+                        document.getElementById('btn-copy-fill').addEventListener('click', () => {
+                            document.getElementById('username').value = student.username;
+                            document.getElementById('password').value = student.password;
+                            tabLogin.click(); // Switch to login tab
+                        });
+                    }
+                }, 800);
+            });
+        });
+    </script>
+</body>
+</html>
