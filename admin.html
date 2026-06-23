@@ -605,7 +605,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
                     <div>
                         <h2 style="margin: 0; font-size: 1.6rem; color: var(--accent-gold);" id="modalStudentName">Student Name</h2>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.2rem;">Student Profile, Submissions & Counseling Portal</p>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.2rem;">Student Profile, Submissions & Private Messages</p>
                     </div>
                     <button class="btn btn-secondary" onclick="closeAnswersModal()" style="border-color: #ef4444; color: #ef4444; padding: 0.4rem 0.8rem; height: auto;">Close</button>
                 </div>
@@ -614,7 +614,7 @@
                 <div style="display: flex; border-bottom: 1px solid var(--glass-border); margin-bottom: 1.5rem; gap: 1rem;">
                     <button id="modal-tab-submissions" class="btn" style="background: none; border: none; border-bottom: 2px solid var(--accent-gold); color: #fff; font-weight: bold; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0;">Lesson Submissions</button>
                     <button id="modal-tab-qa" class="btn" style="background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0;">Lesson Q&A</button>
-                    <button id="modal-tab-chat" class="btn" style="background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0; display: flex; align-items: center; gap: 0.4rem;">Private Chat <span id="modal-chat-badge" class="badge" style="background:#ef4444; color:#fff; display:none; border:none; padding: 0.1rem 0.35rem; font-size:0.65rem;">0</span></button>
+                    <button id="modal-tab-chat" class="btn" style="background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0; display: flex; align-items: center; gap: 0.4rem;">Private Messages <span id="modal-chat-badge" class="badge" style="background:#ef4444; color:#fff; display:none; border:none; padding: 0.1rem 0.35rem; font-size:0.65rem;">0</span></button>
                 </div>
                 
                 <div id="modal-content-area" style="flex: 1; overflow-y: auto; padding-right: 0.5rem; margin-bottom: 1rem;">
@@ -1039,18 +1039,19 @@
                 questions.forEach(q => {
                     const mod = modsContent[q.moduleId] || { title: q.moduleId };
                     const card = document.createElement('div');
-                    card.style.background = 'rgba(255,255,255,0.03)';
-                    card.style.border = '1px solid rgba(255,255,255,0.08)';
+                    card.style.background = 'var(--bg-card, rgba(255, 255, 255, 0.85))';
+                    card.style.border = '1px solid var(--glass-border)';
                     card.style.borderRadius = '8px';
                     card.style.padding = '1.2rem';
                     card.style.marginBottom = '1rem';
+                    card.style.boxShadow = 'var(--glass-shadow)';
                     
                     let repliesHtml = '';
                     if (q.replies && q.replies.length > 0) {
                         repliesHtml = q.replies.map(r => `
-                            <div style="background: rgba(212,175,55,0.05); border-left: 2px solid var(--accent-gold); padding: 0.5rem 0.8rem; margin-top: 0.5rem; border-radius: 4px; text-align: left;">
-                                <span style="font-size: 0.75rem; color: var(--accent-gold-light); font-weight: bold;">${r.senderName} (${new Date(r.date).toLocaleString()}):</span>
-                                <p style="margin: 0.2rem 0 0; font-size: 0.88rem; color: #fff;">${r.message}</p>
+                            <div style="background: rgba(249,115,22,0.04); border-left: 2px solid var(--accent-gold); padding: 0.5rem 0.8rem; margin-top: 0.5rem; border-radius: 4px; text-align: left;">
+                                <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: bold;">${r.senderName} (${new Date(r.date).toLocaleString()}):</span>
+                                <p style="margin: 0.2rem 0 0; font-size: 0.88rem; color: var(--text-primary);">${r.message}</p>
                             </div>
                         `).join('');
                     } else {
@@ -1058,12 +1059,12 @@
                     }
                     
                     card.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.4rem; margin-bottom: 0.6rem;">
-                            <span style="font-weight: bold; color: var(--accent-gold-light); font-size: 0.9rem;">${mod.title}</span>
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.4rem; margin-bottom: 0.6rem;">
+                            <span style="font-weight: bold; color: var(--accent-gold); font-size: 0.9rem;">${mod.title}</span>
                             <span style="font-size: 0.72rem; color: var(--text-secondary);">${new Date(q.date).toLocaleString()}</span>
                         </div>
-                        <p style="margin: 0; font-size: 0.95rem; color: #fff; font-weight: 500; text-align: left;">Q: "${q.question}"</p>
-                        <div style="margin-top: 0.8rem; padding-left: 1rem; border-left: 1px dashed rgba(255,255,255,0.15);">
+                        <p style="margin: 0; font-size: 0.95rem; color: var(--text-primary); font-weight: 500; text-align: left;">Q: "${q.question}"</p>
+                        <div style="margin-top: 0.8rem; padding-left: 1rem; border-left: 1px dashed var(--glass-border);">
                             ${repliesHtml}
                         </div>
                         
@@ -1107,11 +1108,12 @@
                 const chatBox = document.createElement('div');
                 chatBox.style.display = 'flex';
                 chatBox.style.flexDirection = 'column';
-                chatBox.style.height = '420px';
-                chatBox.style.background = 'rgba(0,0,0,0.2)';
-                chatBox.style.borderRadius = '12px';
+                chatBox.style.height = '440px';
+                chatBox.style.background = 'var(--bg-card, rgba(255, 255, 255, 0.85))';
+                chatBox.style.borderRadius = '16px';
                 chatBox.style.border = '1px solid var(--glass-border)';
                 chatBox.style.overflow = 'hidden';
+                chatBox.style.boxShadow = 'var(--glass-shadow)';
                 
                 const msgsArea = document.createElement('div');
                 msgsArea.id = 'chat-messages-area';
@@ -1124,7 +1126,7 @@
                 
                 const messages = student.chatMessages || [];
                 if (messages.length === 0) {
-                    msgsArea.innerHTML = '<div style="text-align:center;color:var(--text-secondary);margin:auto;padding:2rem;">Start a private counseling chat for spiritual concerns.</div>';
+                    msgsArea.innerHTML = '<div style="text-align:center;color:var(--text-secondary);margin:auto;padding:2rem;">Start a private message thread.</div>';
                 } else {
                     messages.forEach(msg => {
                         const isMe = msg.senderId !== student.id;
@@ -1134,19 +1136,23 @@
                         
                         const bubble = document.createElement('div');
                         bubble.style.maxWidth = '70%';
-                        bubble.style.padding = '0.8rem 1rem';
-                        bubble.style.borderRadius = isMe ? '12px 12px 0 12px' : '12px 12px 12px 0';
-                        bubble.style.background = isMe ? 'linear-gradient(135deg, var(--accent-gold-dark), rgba(212,175,55,0.45))' : 'rgba(255,255,255,0.06)';
-                        bubble.style.border = isMe ? '1px solid rgba(212,175,55,0.3)' : '1px solid rgba(255,255,255,0.1)';
-                        bubble.style.color = '#fff';
+                        bubble.style.padding = '0.8rem 1.1rem';
+                        bubble.style.borderRadius = isMe ? '18px 18px 4px 18px' : '18px 18px 18px 4px';
+                        bubble.style.background = isMe ? 'linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark))' : 'rgba(255, 255, 255, 0.9)';
+                        bubble.style.border = isMe ? 'none' : '1px solid var(--glass-border)';
+                        bubble.style.color = isMe ? '#fff' : 'var(--text-primary)';
+                        bubble.style.boxShadow = isMe ? '0 4px 12px rgba(249, 115, 22, 0.15)' : '0 3px 10px rgba(0,0,0,0.03)';
                         bubble.style.textAlign = 'left';
+                        bubble.style.transition = 'transform 0.2s ease';
+                        bubble.onmouseover = () => bubble.style.transform = 'translateY(-1px)';
+                        bubble.onmouseout = () => bubble.style.transform = 'translateY(0)';
                         
                         bubble.innerHTML = `
-                            <div style="font-size: 0.72rem; color: ${isMe ? 'var(--accent-gold-light)' : 'var(--text-secondary)'}; font-weight: bold; margin-bottom: 0.25rem;">
+                            <div style="font-size: 0.72rem; color: ${isMe ? '#fcd34d' : 'var(--accent-gold)'}; font-weight: bold; margin-bottom: 0.25rem;">
                                 ${msg.senderName}
                             </div>
                             <div style="font-size: 0.9rem; line-height: 1.4; word-break: break-word;">${msg.message}</div>
-                            <div style="font-size: 0.65rem; color: rgba(255,255,255,0.4); text-align: right; margin-top: 0.3rem;">
+                            <div style="font-size: 0.65rem; color: ${isMe ? 'rgba(255,255,255,0.6)' : 'var(--text-secondary)'}; text-align: right; margin-top: 0.3rem;">
                                 ${new Date(msg.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                             </div>
                         `;
@@ -1156,15 +1162,15 @@
                 }
                 
                 const inputArea = document.createElement('div');
-                inputArea.style.padding = '1rem';
+                inputArea.style.padding = '1.2rem';
                 inputArea.style.borderTop = '1px solid var(--glass-border)';
-                inputArea.style.background = 'rgba(0,0,0,0.3)';
+                inputArea.style.background = 'var(--bg-darker, #f5eae0)';
                 inputArea.style.display = 'flex';
                 inputArea.style.gap = '0.8rem';
                 
                 inputArea.innerHTML = `
-                    <input type="text" id="chat-send-input" class="glass-input" style="flex: 1; padding: 0.6rem 1rem; font-size: 0.9rem;" placeholder="Type private message for spiritual concerns...">
-                    <button class="btn btn-primary" id="btn-chat-send" style="padding: 0.6rem 1.5rem; font-size: 0.9rem; height: auto;">Send</button>
+                    <input type="text" id="chat-send-input" class="glass-input" style="flex: 1; padding: 0.6rem 1.2rem; font-size: 0.9rem; border-radius: 24px;" placeholder="Type your message here...">
+                    <button class="btn btn-primary" id="btn-chat-send" style="padding: 0.6rem 1.6rem; font-size: 0.9rem; height: auto; border-radius: 24px;">Send</button>
                 `;
                 
                 chatBox.appendChild(msgsArea);

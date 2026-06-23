@@ -354,7 +354,7 @@
                     style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
             <a href="#" id="student-nav-grades">Grades & Remarks <span id="grades-badge" class="badge"
                     style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
-            <a href="#" id="student-nav-chat">Private Chat <span id="chat-badge" class="badge"
+            <a href="#" id="student-nav-chat">Private Messages <span id="chat-badge" class="badge"
                     style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
             <a href="#" onclick="AuthAPI.logout(); return false;" style="margin-top: auto; color: #ef4444;">Log Out</a>
         </nav>
@@ -489,10 +489,8 @@
 
         <!-- 5. PRIVATE CHAT PANEL -->
         <div id="panel-chat" class="hidden">
-            <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-primary);">Private Spiritual Chat
-            </h2>
-            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Communicate privately with your assigned
-                outreach instructor for spiritual concerns and mentoring.</p>
+            <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-primary);">Private Messages</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Communicate privately with your assigned outreach instructor.</p>
 
             <div id="studentChatContainer" style="max-width: 800px; width: 100%;">
                 <!-- Rendered by JS -->
@@ -989,11 +987,12 @@
                 const chatBox = document.createElement('div');
                 chatBox.style.display = 'flex';
                 chatBox.style.flexDirection = 'column';
-                chatBox.style.height = '480px';
-                chatBox.style.background = 'rgba(0,0,0,0.2)';
-                chatBox.style.borderRadius = '12px';
+                chatBox.style.height = '500px';
+                chatBox.style.background = 'var(--bg-card, rgba(255, 255, 255, 0.85))';
+                chatBox.style.borderRadius = '16px';
                 chatBox.style.border = '1px solid var(--glass-border)';
                 chatBox.style.overflow = 'hidden';
+                chatBox.style.boxShadow = 'var(--glass-shadow)';
 
                 const msgsArea = document.createElement('div');
                 msgsArea.id = 'student-chat-messages-area';
@@ -1006,7 +1005,7 @@
 
                 const messages = user.chatMessages || [];
                 if (messages.length === 0) {
-                    msgsArea.innerHTML = '<div style="text-align:center;color:var(--text-secondary);margin:auto;padding:2rem;">Start a private counseling chat for spiritual concerns with your instructor.</div>';
+                    msgsArea.innerHTML = '<div style="text-align:center;color:var(--text-secondary);margin:auto;padding:2rem;">Start a private message thread with your instructor.</div>';
                 } else {
                     messages.forEach(msg => {
                         const isMe = msg.senderId === user.id;
@@ -1016,19 +1015,23 @@
 
                         const bubble = document.createElement('div');
                         bubble.style.maxWidth = '70%';
-                        bubble.style.padding = '0.8rem 1rem';
-                        bubble.style.borderRadius = isMe ? '12px 12px 0 12px' : '12px 12px 12px 0';
-                        bubble.style.background = isMe ? 'linear-gradient(135deg, var(--accent-gold-dark), rgba(212,175,55,0.45))' : 'rgba(255,255,255,0.06)';
-                        bubble.style.border = isMe ? '1px solid rgba(212,175,55,0.3)' : '1px solid rgba(255,255,255,0.1)';
-                        bubble.style.color = '#fff';
+                        bubble.style.padding = '0.8rem 1.1rem';
+                        bubble.style.borderRadius = isMe ? '18px 18px 4px 18px' : '18px 18px 18px 4px';
+                        bubble.style.background = isMe ? 'linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark))' : 'rgba(255, 255, 255, 0.9)';
+                        bubble.style.border = isMe ? 'none' : '1px solid var(--glass-border)';
+                        bubble.style.color = isMe ? '#fff' : 'var(--text-primary)';
+                        bubble.style.boxShadow = isMe ? '0 4px 12px rgba(249, 115, 22, 0.15)' : '0 3px 10px rgba(0,0,0,0.03)';
                         bubble.style.textAlign = 'left';
+                        bubble.style.transition = 'transform 0.2s ease';
+                        bubble.onmouseover = () => bubble.style.transform = 'translateY(-1px)';
+                        bubble.onmouseout = () => bubble.style.transform = 'translateY(0)';
 
                         bubble.innerHTML = `
-                            <div style="font-size: 0.72rem; color: ${isMe ? 'var(--accent-gold-light)' : 'var(--text-secondary)'}; font-weight: bold; margin-bottom: 0.25rem;">
+                            <div style="font-size: 0.72rem; color: ${isMe ? '#fcd34d' : 'var(--accent-gold)'}; font-weight: bold; margin-bottom: 0.25rem;">
                                 ${msg.senderName}
                             </div>
                             <div style="font-size: 0.9rem; line-height: 1.4; word-break: break-word;">${msg.message}</div>
-                            <div style="font-size: 0.65rem; color: rgba(255,255,255,0.4); text-align: right; margin-top: 0.3rem;">
+                            <div style="font-size: 0.65rem; color: ${isMe ? 'rgba(255,255,255,0.6)' : 'var(--text-secondary)'}; text-align: right; margin-top: 0.3rem;">
                                 ${new Date(msg.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </div>
                         `;
@@ -1038,15 +1041,15 @@
                 }
 
                 const inputArea = document.createElement('div');
-                inputArea.style.padding = '1rem';
+                inputArea.style.padding = '1.2rem';
                 inputArea.style.borderTop = '1px solid var(--glass-border)';
-                inputArea.style.background = 'rgba(0,0,0,0.3)';
+                inputArea.style.background = 'var(--bg-darker, #f5eae0)';
                 inputArea.style.display = 'flex';
                 inputArea.style.gap = '0.8rem';
 
                 inputArea.innerHTML = `
-                    <input type="text" id="student-chat-send-input" class="glass-input" style="flex: 1; padding: 0.6rem 1rem; font-size: 0.9rem;" placeholder="Type private message for spiritual concerns...">
-                    <button class="btn btn-primary" id="btn-student-chat-send" style="padding: 0.6rem 1.5rem; font-size: 0.9rem; height: auto;">Send</button>
+                    <input type="text" id="student-chat-send-input" class="glass-input" style="flex: 1; padding: 0.6rem 1.2rem; font-size: 0.9rem; border-radius: 24px;" placeholder="Type your message here...">
+                    <button class="btn btn-primary" id="btn-student-chat-send" style="padding: 0.6rem 1.6rem; font-size: 0.9rem; height: auto; border-radius: 24px;">Send</button>
                 `;
 
                 chatBox.appendChild(msgsArea);
