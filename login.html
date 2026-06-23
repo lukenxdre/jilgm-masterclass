@@ -6,9 +6,13 @@
     <title>Student Login - JILGM Masterclass</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="auth.js?v=2.1"></script>
+    <!-- Firebase SDK Compat (Parallel Loading) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script type="module" src="auth.js?v=2.1"></script>
     <script src="transitions.js" defer></script>
 </head>
+
 <body class="auth-page page-loading">
 
     <div class="glass-card auth-card" style="max-width: 450px; width: 100%;">
@@ -129,8 +133,8 @@
                     try { await window.syncPromise; } catch(err) { console.warn(err); }
                 }
 
-                setTimeout(() => {
-                    const success = AuthAPI.login(user, pass);
+                setTimeout(async () => {
+                    const success = await AuthAPI.login(user, pass);
                     if (success) {
                         window.location.href = 'dashboard.html';
                     } else {
@@ -157,9 +161,9 @@
                     try { await window.syncPromise; } catch(err) { console.warn(err); }
                 }
 
-                setTimeout(() => {
+                setTimeout(async () => {
                     btn.innerText = 'Check Status';
-                    const student = AuthAPI.checkStatus(email);
+                    const student = await AuthAPI.checkStatus(email);
                     
                     statusResult.style.display = 'block';
                     if (!student) {
@@ -194,6 +198,7 @@
                     }
                 }, 800);
             });
+
         });
     </script>
 </body>

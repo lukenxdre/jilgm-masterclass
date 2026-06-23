@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Sign In - JILGM Masterclass</title>
+    <title>Instructor Sign In - JILGM Masterclass</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <!-- Firebase SDK Compat (Parallel Loading) -->
@@ -21,31 +21,31 @@
         </a>
         
         <div style="text-align: center; margin-bottom: 2rem;">
-            <span style="font-size: 2.2rem; filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.3));">🛡️</span>
-            <h2 style="margin-top: 0.8rem; margin-bottom: 0.5rem; font-size: 1.6rem; color: var(--accent-gold-light);">Admin Portal</h2>
-            <p style="color: var(--text-secondary); font-size: 0.9rem;">Sign in to access your administrative dashboard</p>
+            <span style="font-size: 2.2rem; filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.3));">👨‍🏫</span>
+            <h2 style="margin-top: 0.8rem; margin-bottom: 0.5rem; font-size: 1.6rem; color: var(--accent-gold-light);">Instructor Portal</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Sign in to access your spiritual oversight dashboard</p>
         </div>
 
         <div id="loginError" class="auth-error">
-            Invalid admin credentials. Please try again.
+            Invalid instructor credentials. Please try again.
         </div>
 
-        <form id="adminLoginForm" class="auth-form" style="margin-top: 1rem;">
+        <form id="instructorLoginForm" class="auth-form" style="margin-top: 1rem;">
             <div style="text-align: left;">
-                <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Admin Username</label>
-                <input type="text" id="adminUsername" required class="glass-input" placeholder="e.g. JILGM RiyadhRC">
+                <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Instructor Username</label>
+                <input type="text" id="instructorUsername" required class="glass-input" placeholder="e.g. pastor_john">
             </div>
             
             <div style="text-align: left;">
                 <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Security Password</label>
-                <input type="password" id="adminPassword" required class="glass-input" placeholder="••••••••">
+                <input type="password" id="instructorPassword" required class="glass-input" placeholder="••••••••">
             </div>
 
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.2rem; font-weight: bold; background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark)); border-color: var(--accent-gold);">Access Dashboard</button>
         </form>
         
         <div style="margin-top: 2rem; font-size: 0.85rem; color: var(--text-secondary);">
-            <p style="margin-bottom: 0.5rem;">Are you an instructor? <a href="instructor_login.html" style="color: var(--accent-gold); text-decoration: none; font-weight: 500;">Instructor Sign In →</a></p>
+            <p style="margin-bottom: 0.5rem;">Are you an administrator? <a href="admin_login.html" style="color: var(--accent-gold); text-decoration: none; font-weight: 500;">Admin Sign In →</a></p>
             <p><a href="index.html" style="color: var(--text-secondary); text-decoration: none;">← Return to Main Site</a></p>
         </div>
     </div>
@@ -57,7 +57,7 @@
                 window.location.href = 'admin.html';
             }
 
-            const form = document.getElementById('adminLoginForm');
+            const form = document.getElementById('instructorLoginForm');
             const errorMsg = document.getElementById('loginError');
 
             form.addEventListener('submit', async (e) => {
@@ -68,8 +68,8 @@
                 const originalText = btn.innerText;
                 btn.innerText = 'Verifying...';
                 
-                const username = document.getElementById('adminUsername').value.trim();
-                const password = document.getElementById('adminPassword').value;
+                const username = document.getElementById('instructorUsername').value.trim();
+                const password = document.getElementById('instructorPassword').value;
 
                 // Wait for the background cloud sync promise to complete if active
                 if (window.syncPromise) {
@@ -80,9 +80,9 @@
                 }
 
                 setTimeout(() => {
-                    const successAdmin = AuthAPI.loginAdmin(username, password);
+                    const successInst = AuthAPI.loginInstructor(username, password);
                     btn.innerText = originalText;
-                    if (successAdmin) {
+                    if (successInst) {
                         window.location.href = 'admin.html';
                     } else {
                         errorMsg.classList.add('show');

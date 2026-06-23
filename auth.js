@@ -1,4 +1,7 @@
+import { firebaseConfig } from "./firebase.js";
+
 // Simulated Backend using localStorage
+
 const DB_KEY = 'jilgm_students';
 const SESSION_KEY = 'jilgm_current_user';
 const UNLOCKED_KEY = 'jilgm_unlocked_modules';
@@ -1100,6 +1103,18 @@ async function saveToCloud(key, data) {
 let firebaseDb = null;
 let isFirebaseInitialized = false;
 
+function withTimeout(promise, timeoutMs = 8000, errorMessage = "Database request timed out. Please try again.") {
+    let timeoutId;
+    const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => {
+            reject(new Error(errorMessage));
+        }, timeoutMs);
+    });
+    return Promise.race([promise, timeoutPromise]).finally(() => {
+        clearTimeout(timeoutId);
+    });
+}
+
 function initFirestoreSync(onCollectionLoaded) {
     if (!firebaseDb) return;
 
@@ -1123,67 +1138,104 @@ function initFirestoreSync(onCollectionLoaded) {
         }
     };
 
+    const currentAdmin = AuthAPI.getCurrentAdmin();
+    const currentInstructor = AuthAPI.getCurrentInstructor();
+    const currentUser = AuthAPI.getCurrentUser();
+    const isTeacherOrAdmin = currentAdmin || currentInstructor;
+
     // 1. Sync students
-    firebaseDb.collection('students').onSnapshot(snapshot => {
-        const students = [];
-        snapshot.forEach(doc => {
-            students.push({ id: doc.id, ...doc.data() });
+    if (isTeacherOrAdmin) {
+        // Admins and instructors sync all students
+        firebaseDb.collection('students').onSnapshot(snapshot => {
+            const students = [];
+            snapshot.forEach(doc => {
+                students.push({ id: doc.id, ...doc.data() });
+            });
+            localStorage.setItem(DB_KEY, JSON.stringify(students));
+            triggerStorageSync(DB_KEY);
+            markLoaded('students');
+        }, err => {
+            console.error("Firestore sync students error", err);
+            markLoaded('students');
         });
-        localStorage.setItem(DB_KEY, JSON.stringify(students));
-        triggerStorageSync(DB_KEY);
+    } else if (currentUser && currentUser.id) {
+        // Students sync only their own document
+        firebaseDb.collection('students').doc(currentUser.id).onSnapshot(doc => {
+            if (doc.exists) {
+                const student = { id: doc.id, ...doc.data() };
+                localStorage.setItem(DB_KEY, JSON.stringify([student]));
+                localStorage.setItem(SESSION_KEY, JSON.stringify(student));
+                triggerStorageSync(DB_KEY);
+            }
+            markLoaded('students');
+        }, err => {
+            console.error("Firestore sync current student error", err);
+            markLoaded('students');
+        });
+    } else {
+        // Guest mode (login/register pages): skip syncing students
         markLoaded('students');
-    }, err => {
-        console.error("Firestore sync students error", err);
-        markLoaded('students');
-    });
+    }
 
     // 2. Sync announcements with local badge increment logic
-    let previousAnnouncementsLength = null;
-    firebaseDb.collection('announcements').orderBy('date', 'desc').onSnapshot(snapshot => {
-        const list = [];
-        snapshot.forEach(doc => {
-            list.push({ id: doc.id, ...doc.data() });
+    if (isTeacherOrAdmin || currentUser) {
+        let previousAnnouncementsLength = null;
+        firebaseDb.collection('announcements').orderBy('date', 'desc').onSnapshot(snapshot => {
+            const list = [];
+            snapshot.forEach(doc => {
+                list.push({ id: doc.id, ...doc.data() });
+            });
+            if (previousAnnouncementsLength !== null && list.length > previousAnnouncementsLength) {
+                const diff = list.length - previousAnnouncementsLength;
+                const currentBadge = parseInt(localStorage.getItem('jilgm_unread_announcements') || '0');
+                localStorage.setItem('jilgm_unread_announcements', (currentBadge + diff).toString());
+            }
+            previousAnnouncementsLength = list.length;
+            localStorage.setItem('jilgm_announcements', JSON.stringify(list));
+            triggerStorageSync('jilgm_announcements');
+            markLoaded('announcements');
+        }, err => {
+            console.error("Firestore sync announcements error", err);
+            markLoaded('announcements');
         });
-        if (previousAnnouncementsLength !== null && list.length > previousAnnouncementsLength) {
-            const diff = list.length - previousAnnouncementsLength;
-            const currentBadge = parseInt(localStorage.getItem('jilgm_unread_announcements') || '0');
-            localStorage.setItem('jilgm_unread_announcements', (currentBadge + diff).toString());
-        }
-        previousAnnouncementsLength = list.length;
-        localStorage.setItem('jilgm_announcements', JSON.stringify(list));
-        triggerStorageSync('jilgm_announcements');
+    } else {
         markLoaded('announcements');
-    }, err => {
-        console.error("Firestore sync announcements error", err);
-        markLoaded('announcements');
-    });
+    }
 
     // 3. Sync resources
-    firebaseDb.collection('resources').onSnapshot(snapshot => {
-        const list = [];
-        snapshot.forEach(doc => {
-            list.push({ id: doc.id, ...doc.data() });
+    if (isTeacherOrAdmin || currentUser) {
+        firebaseDb.collection('resources').onSnapshot(snapshot => {
+            const list = [];
+            snapshot.forEach(doc => {
+                list.push({ id: doc.id, ...doc.data() });
+            });
+            localStorage.setItem('jilgm_resources', JSON.stringify(list));
+            triggerStorageSync('jilgm_resources');
+            markLoaded('resources');
+        }, err => {
+            console.error("Firestore sync resources error", err);
+            markLoaded('resources');
         });
-        localStorage.setItem('jilgm_resources', JSON.stringify(list));
-        triggerStorageSync('jilgm_resources');
+    } else {
         markLoaded('resources');
-    }, err => {
-        console.error("Firestore sync resources error", err);
-        markLoaded('resources');
-    });
+    }
 
     // 4. Sync modules content
     firebaseDb.collection('modules_content').onSnapshot(snapshot => {
         if (snapshot.empty) {
-            // Seed defaults
-            const batch = firebaseDb.batch();
-            Object.keys(defaultModules).forEach(id => {
-                batch.set(firebaseDb.collection('modules_content').doc(id), defaultModules[id]);
-            });
-            batch.commit().then(() => markLoaded('modules_content')).catch(err => {
-                console.error("Firestore seeding modules error", err);
+            if (isTeacherOrAdmin) {
+                // Seed defaults
+                const batch = firebaseDb.batch();
+                Object.keys(defaultModules).forEach(id => {
+                    batch.set(firebaseDb.collection('modules_content').doc(id), defaultModules[id]);
+                });
+                batch.commit().then(() => markLoaded('modules_content')).catch(err => {
+                    console.error("Firestore seeding modules error", err);
+                    markLoaded('modules_content');
+                });
+            } else {
                 markLoaded('modules_content');
-            });
+            }
             return;
         }
         const mods = {};
@@ -1208,12 +1260,16 @@ function initFirestoreSync(onCollectionLoaded) {
             }
             markLoaded('unlocked_modules');
         } else {
-            firebaseDb.collection('settings').doc('unlocked_modules').set({ list: ['module1'] })
-                .then(() => markLoaded('unlocked_modules'))
-                .catch(err => {
-                    console.error("Firestore sync unlocked modules error", err);
-                    markLoaded('unlocked_modules');
-                });
+            if (isTeacherOrAdmin) {
+                firebaseDb.collection('settings').doc('unlocked_modules').set({ list: ['module1'] })
+                    .then(() => markLoaded('unlocked_modules'))
+                    .catch(err => {
+                        console.error("Firestore sync unlocked modules error", err);
+                        markLoaded('unlocked_modules');
+                    });
+            } else {
+                markLoaded('unlocked_modules');
+            }
         }
     }, err => {
         console.error("Firestore sync unlocked modules error", err);
@@ -1221,61 +1277,83 @@ function initFirestoreSync(onCollectionLoaded) {
     });
 
     // 6. Sync archived modules
-    firebaseDb.collection('archived_modules').onSnapshot(snapshot => {
-        const list = [];
-        snapshot.forEach(doc => {
-            list.push({ id: doc.id, ...doc.data() });
+    if (isTeacherOrAdmin) {
+        firebaseDb.collection('archived_modules').onSnapshot(snapshot => {
+            const list = [];
+            snapshot.forEach(doc => {
+                list.push({ id: doc.id, ...doc.data() });
+            });
+            localStorage.setItem(ARCHIVED_KEY, JSON.stringify(list));
+            triggerStorageSync(ARCHIVED_KEY);
+            markLoaded('archived_modules');
+        }, err => {
+            console.error("Firestore sync archived modules error", err);
+            markLoaded('archived_modules');
         });
-        localStorage.setItem(ARCHIVED_KEY, JSON.stringify(list));
-        triggerStorageSync(ARCHIVED_KEY);
+    } else {
         markLoaded('archived_modules');
-    }, err => {
-        console.error("Firestore sync archived modules error", err);
-        markLoaded('archived_modules');
-    });
+    }
 
     // 7. Sync admins
-    firebaseDb.collection('admins').onSnapshot(snapshot => {
-        let list = [];
-        snapshot.forEach(doc => {
-            if (doc.id !== 'JILGM RiyadhRC') {
-                // Purge any non-main admin document from Firestore
-                firebaseDb.collection('admins').doc(doc.id).delete().catch(e => console.error("Purging admin error", e));
-            } else {
-                list.push(doc.data());
+    if (isTeacherOrAdmin || !currentUser) {
+        firebaseDb.collection('admins').onSnapshot(snapshot => {
+            let list = [];
+            snapshot.forEach(doc => {
+                if (doc.id !== 'JILGM RiyadhRC') {
+                    // Purge any non-main admin document from Firestore
+                    firebaseDb.collection('admins').doc(doc.id).delete().catch(e => console.error("Purging admin error", e));
+                } else {
+                    list.push(doc.data());
+                }
+            });
+            // Ensure main admin is set
+            if (!list.some(a => a.username === 'JILGM RiyadhRC')) {
+                const newMain = {
+                    username: 'JILGM RiyadhRC',
+                    password: '061577D',
+                    isMain: true
+                };
+                list.push(newMain);
+                firebaseDb.collection('admins').doc('JILGM RiyadhRC').set(newMain).catch(e => console.error("Firestore set new admin error", e));
             }
+            localStorage.setItem('jilgm_admins', JSON.stringify(list));
+            triggerStorageSync('jilgm_admins');
+            markLoaded('admins');
+        }, err => {
+            console.error("Firestore sync admins error", err);
+            markLoaded('admins');
         });
-        // Ensure main admin is set
-        if (!list.some(a => a.username === 'JILGM RiyadhRC')) {
-            const newMain = {
-                username: 'JILGM RiyadhRC',
-                password: '061577D',
-                isMain: true
-            };
-            list.push(newMain);
-            firebaseDb.collection('admins').doc('JILGM RiyadhRC').set(newMain).catch(e => console.error("Firestore set new admin error", e));
-        }
-        localStorage.setItem('jilgm_admins', JSON.stringify(list));
-        triggerStorageSync('jilgm_admins');
+    } else {
         markLoaded('admins');
-    }, err => {
-        console.error("Firestore sync admins error", err);
-        markLoaded('admins');
-    });
+    }
 
     // 8. Sync instructors
-    firebaseDb.collection('instructors').onSnapshot(snapshot => {
-        const list = [];
-        snapshot.forEach(doc => {
-            list.push({ id: doc.id, ...doc.data() });
+    if (isTeacherOrAdmin || !currentUser) {
+        firebaseDb.collection('instructors').onSnapshot(snapshot => {
+            const list = [];
+            snapshot.forEach(doc => {
+                list.push({ id: doc.id, ...doc.data() });
+            });
+            localStorage.setItem('jilgm_instructors', JSON.stringify(list));
+            
+            // Sync current instructor session if they are logged in
+            const currentInst = AuthAPI.getCurrentInstructor();
+            if (currentInst) {
+                const freshInst = list.find(i => i.id === currentInst.id);
+                if (freshInst) {
+                    localStorage.setItem('jilgm_current_instructor', JSON.stringify(freshInst));
+                }
+            }
+            
+            triggerStorageSync('jilgm_instructors');
+            markLoaded('instructors');
+        }, err => {
+            console.error("Firestore sync instructors error", err);
+            markLoaded('instructors');
         });
-        localStorage.setItem('jilgm_instructors', JSON.stringify(list));
-        triggerStorageSync('jilgm_instructors');
+    } else {
         markLoaded('instructors');
-    }, err => {
-        console.error("Firestore sync instructors error", err);
-        markLoaded('instructors');
-    });
+    }
 }
 
 function toHex(str) {
@@ -1355,16 +1433,65 @@ window.syncPromise = (async () => {
     // Skip old KVdb cloud fetch completely since we are 100% Firebase
     // await syncFromCloud();
 
-    // 3. Load Firebase with hardcoded configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyDs2uHFnqORukE0o_DR91nXsuReF_2X7Ok",
-        authDomain: "jilgm-masterclass.firebaseapp.com",
-        projectId: "jilgm-masterclass",
-        storageBucket: "jilgm-masterclass.firebasestorage.app",
-        messagingSenderId: "41602432312",
-        appId: "1:41602432312:web:6ab3c5b7a11fc0598cd5cd",
-        measurementId: "G-GNTZNHWEP9"
+    // 3. Centralized Firebase configuration is imported from firebase.js
+
+
+    const initializeFirebaseWithConfig = () => {
+        return new Promise((resolve) => {
+            try {
+                let configToUse = firebaseConfig;
+                try {
+                    const stored = localStorage.getItem('jilgm_firebase_config');
+                    if (stored) {
+                        const parsed = JSON.parse(stored);
+                        if (parsed && parsed.apiKey && parsed.projectId) {
+                            configToUse = parsed;
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error reading config for initialization in auth.js:", err);
+                }
+                
+                // Avoid initializing app if already initialized
+                if (firebase.apps.length === 0) {
+                    firebase.initializeApp(configToUse);
+                }
+                firebaseDb = firebase.firestore();
+                isFirebaseInitialized = true;
+                console.log("Firebase initialized successfully");
+
+                let loadedCount = 0;
+                const totalToLoad = 8;
+                let resolved = false;
+
+                const triggerResolve = () => {
+                    if (!resolved) {
+                        resolved = true;
+                        resolve();
+                    }
+                };
+
+                // Fallback timeout to guarantee page load
+                setTimeout(triggerResolve, 1500);
+
+                initFirestoreSync(() => {
+                    loadedCount++;
+                    if (loadedCount >= totalToLoad) {
+                        triggerResolve();
+                    }
+                });
+            } catch (err) {
+                console.error("Firebase initializeApp or firestore failed:", err);
+                isFirebaseInitialized = false;
+                firebaseDb = null;
+                resolve(); // Resolve so window.syncPromise is not blocked
+            }
+        });
     };
+
+    if (typeof firebase !== 'undefined') {
+        return initializeFirebaseWithConfig();
+    }
 
     return new Promise((resolve) => {
         try {
@@ -1374,31 +1501,7 @@ window.syncPromise = (async () => {
                 const firestoreScript = document.createElement('script');
                 firestoreScript.src = "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js";
                 firestoreScript.onload = () => {
-                    firebase.initializeApp(firebaseConfig);
-                    firebaseDb = firebase.firestore();
-                    isFirebaseInitialized = true;
-                    console.log("Firebase initialized successfully");
-
-                    let loadedCount = 0;
-                    const totalToLoad = 8;
-                    let resolved = false;
-
-                    const triggerResolve = () => {
-                        if (!resolved) {
-                            resolved = true;
-                            resolve();
-                        }
-                    };
-
-                    // Fallback timeout to guarantee page load
-                    setTimeout(triggerResolve, 3000);
-
-                    initFirestoreSync(() => {
-                        loadedCount++;
-                        if (loadedCount >= totalToLoad) {
-                            triggerResolve();
-                        }
-                    });
+                    initializeFirebaseWithConfig().then(resolve);
                 };
                 document.head.appendChild(firestoreScript);
             };
@@ -1409,6 +1512,7 @@ window.syncPromise = (async () => {
         }
     });
 })();
+
 
 // Maintain backward compatibility for pages expecting window.firebaseSyncPromise
 window.firebaseSyncPromise = window.syncPromise;
@@ -1437,36 +1541,44 @@ const AuthAPI = {
     },
     
     // Step 1: Enrollee registers (Pending Status)
-    registerStudent: (firstName, lastName, email) => {
+    registerStudent: async (firstName, lastName, email, outreach = "") => {
         if (!isFirebaseInitialized || !firebaseDb) {
             alert('Database is offline or not configured. Operation blocked.');
             return { error: 'Database is offline or not configured. Operation blocked.' };
         }
-        const students = AuthAPI.getAllStudents();
-        if (students.find(s => s.email === email)) {
-            return { error: 'Email already registered.' };
-        }
-        
-        const newStudent = {
-            firstName,
-            lastName,
-            email,
-            status: 'pending',
-            username: null,
-            password: null,
-            progress: 0,
-            answers: [],
-            dateAdded: new Date().toISOString()
-        };
-        
-        const docRef = firebaseDb.collection('students').doc();
-        newStudent.id = docRef.id;
-        docRef.set(newStudent).catch(err => {
+        try {
+            const snapshotPromise = firebaseDb.collection('students')
+                .where('email', '==', email)
+                .get();
+            const snapshot = await withTimeout(snapshotPromise, 8000, "Registration check timed out. Please check your internet connection.");
+            
+            if (!snapshot.empty) {
+                return { error: 'Email already registered.' };
+            }
+            
+            const newStudent = {
+                firstName,
+                lastName,
+                email,
+                outreach,
+                status: 'pending',
+                username: null,
+                password: null,
+                progress: 0,
+                answers: [],
+                dateAdded: new Date().toISOString()
+            };
+            
+            const docRef = firebaseDb.collection('students').doc();
+            newStudent.id = docRef.id;
+            await withTimeout(docRef.set(newStudent), 8000, "Saving registration timed out. Please try again.");
+            return { success: true, student: newStudent };
+        } catch (err) {
             console.error("Firestore register error", err);
-            alert("Database Error: " + err.message);
-        });
-        return { success: true, student: newStudent };
+            return { error: "Database Error: " + err.message };
+        }
     },
+
     
     // Step 2: Admin approves and generates credentials
     approveStudent: (id) => {
@@ -1522,11 +1634,23 @@ const AuthAPI = {
         return null;
     },
 
-    // Step 3: Enrollee checks status to get credentials
-    checkStatus: (email) => {
-        const students = AuthAPI.getAllStudents();
-        return students.find(s => s.email === email) || null;
+    checkStatus: async (email) => {
+        if (!isFirebaseInitialized || !firebaseDb) return null;
+        try {
+            const snapshotPromise = firebaseDb.collection('students')
+                .where('email', '==', email)
+                .get();
+            const snapshot = await withTimeout(snapshotPromise, 8000, "Checking status timed out. Please try again.");
+            if (!snapshot.empty) {
+                const doc = snapshot.docs[0];
+                return { id: doc.id, ...doc.data() };
+            }
+        } catch(e) {
+            console.error("Firestore checkStatus error", e);
+        }
+        return null;
     },
+
     
     // Step 4: Answer submission and progress update (supports text, file uploads, and component index grading)
     submitAnswer: (userId, moduleId, question, answerText, fileData = null, componentIndex = null, extra = null) => {
@@ -1688,16 +1812,27 @@ const AuthAPI = {
             }
         }
     },
-    login: (username, password) => {
-        const students = AuthAPI.getAllStudents();
-        const user = students.find(s => s.username === username && s.password === password && s.status === 'approved');
-        
-        if (user) {
-            localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-            return true;
+    login: async (username, password) => {
+        if (!isFirebaseInitialized || !firebaseDb) return false;
+        try {
+            const snapshotPromise = firebaseDb.collection('students')
+                .where('username', '==', username)
+                .where('password', '==', password)
+                .where('status', '==', 'approved')
+                .get();
+            const snapshot = await withTimeout(snapshotPromise, 8000, "Login timed out. Please try again.");
+            if (!snapshot.empty) {
+                const doc = snapshot.docs[0];
+                const user = { id: doc.id, ...doc.data() };
+                localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+                return true;
+            }
+        } catch(e) {
+            console.error("Firestore login error", e);
         }
         return false;
     },
+
     
     logout: () => {
         localStorage.removeItem(SESSION_KEY);
@@ -2024,7 +2159,7 @@ const AuthAPI = {
         }
     },
 
-    addInstructor: (name, username, password) => {
+    addInstructor: (name, username, password, outreach = "") => {
         if (!isFirebaseInitialized || !firebaseDb) {
             alert('Database is offline or not configured. Operation blocked.');
             return { error: 'Database is offline or not configured. Operation blocked.' };
@@ -2038,6 +2173,7 @@ const AuthAPI = {
             name,
             username,
             password,
+            outreach,
             dateAdded: new Date().toISOString()
         };
         
@@ -2083,5 +2219,200 @@ const AuthAPI = {
         if (!inst) {
             window.location.href = 'instructor_login.html';
         }
+    },
+
+    requireAdminOrInstructorAuth: () => {
+        const admin = AuthAPI.getCurrentAdmin();
+        const inst = AuthAPI.getCurrentInstructor();
+        if (!admin && !inst) {
+            window.location.href = 'admin_login.html';
+        }
+    },
+
+    updateInstructorOutreach: async (id, outreach) => {
+        if (!isFirebaseInitialized || !firebaseDb) {
+            return { error: 'Database is offline or not configured. Operation blocked.' };
+        }
+        try {
+            await firebaseDb.collection('instructors').doc(id).update({ outreach });
+            return { success: true };
+        } catch(e) {
+            console.error("Firestore update instructor outreach error", e);
+            return { error: e.message };
+        }
+    },
+
+    updateStudentOutreach: async (id, outreach) => {
+        if (!isFirebaseInitialized || !firebaseDb) {
+            return { error: 'Database is offline or not configured. Operation blocked.' };
+        }
+        try {
+            await firebaseDb.collection('students').doc(id).update({ outreach });
+            
+            // Sync local student session if updating currently logged-in student
+            const currentUser = AuthAPI.getCurrentUser();
+            if (currentUser && currentUser.id === id) {
+                const students = AuthAPI.getAllStudents();
+                const freshUser = students.find(s => s.id === id);
+                if (freshUser) {
+                    localStorage.setItem('jilgm_current_user', JSON.stringify({ ...freshUser, outreach }));
+                }
+            }
+            return { success: true };
+        } catch(e) {
+            console.error("Firestore update student outreach error", e);
+            return { error: e.message };
+        }
+    },
+
+    askQuestion: async (studentId, moduleId, questionText) => {
+        if (!isFirebaseInitialized || !firebaseDb) return { error: 'Database is offline' };
+        try {
+            const students = AuthAPI.getAllStudents();
+            const index = students.findIndex(s => s.id === studentId);
+            if (index !== -1) {
+                const student = { ...students[index] };
+                if (!student.questions) student.questions = [];
+                
+                const newQuestion = {
+                    id: 'q_' + Date.now(),
+                    moduleId,
+                    question: questionText,
+                    date: new Date().toISOString(),
+                    replies: []
+                };
+                
+                student.questions.push(newQuestion);
+                
+                await firebaseDb.collection('students').doc(studentId).update({
+                    questions: student.questions
+                });
+                
+                // Update local session synchronously if current student
+                const currentUser = AuthAPI.getCurrentUser();
+                if (currentUser && currentUser.id === studentId) {
+                    localStorage.setItem(SESSION_KEY, JSON.stringify(student));
+                }
+                return { success: true, question: newQuestion };
+            }
+        } catch(e) {
+            console.error("Firestore askQuestion error", e);
+            return { error: e.message };
+        }
+        return { error: 'Student not found' };
+    },
+
+    replyToQuestion: async (studentId, questionId, replyText, replierName) => {
+        if (!isFirebaseInitialized || !firebaseDb) return { error: 'Database offline' };
+        try {
+            const students = AuthAPI.getAllStudents();
+            const index = students.findIndex(s => s.id === studentId);
+            if (index !== -1) {
+                const student = { ...students[index] };
+                if (!student.questions) student.questions = [];
+                
+                const qIndex = student.questions.findIndex(q => q.id === questionId);
+                if (qIndex !== -1) {
+                    const question = { ...student.questions[qIndex] };
+                    if (!question.replies) question.replies = [];
+                    
+                    question.replies.push({
+                        senderName: replierName,
+                        message: replyText,
+                        date: new Date().toISOString()
+                    });
+                    
+                    student.questions[qIndex] = question;
+                    
+                    await firebaseDb.collection('students').doc(studentId).update({
+                        questions: student.questions
+                    });
+                    return { success: true };
+                }
+            }
+        } catch(e) {
+            console.error("Firestore replyToQuestion error", e);
+            return { error: e.message };
+        }
+        return { error: 'Student or question not found' };
+    },
+
+    sendChatMessage: async (studentId, messageText, senderId, senderName) => {
+        if (!isFirebaseInitialized || !firebaseDb) return { error: 'Database offline' };
+        try {
+            const students = AuthAPI.getAllStudents();
+            const index = students.findIndex(s => s.id === studentId);
+            if (index !== -1) {
+                const student = { ...students[index] };
+                if (!student.chatMessages) student.chatMessages = [];
+                
+                const newMessage = {
+                    id: 'msg_' + Date.now(),
+                    senderId,
+                    senderName,
+                    message: messageText,
+                    date: new Date().toISOString(),
+                    readByStudent: senderId === studentId,
+                    readByInstructor: senderId !== studentId
+                };
+                
+                student.chatMessages.push(newMessage);
+                
+                await firebaseDb.collection('students').doc(studentId).update({
+                    chatMessages: student.chatMessages
+                });
+                
+                // Update local session synchronously if current student
+                const currentUser = AuthAPI.getCurrentUser();
+                if (currentUser && currentUser.id === studentId) {
+                    localStorage.setItem(SESSION_KEY, JSON.stringify(student));
+                }
+                return { success: true, message: newMessage };
+            }
+        } catch(e) {
+            console.error("Firestore sendChatMessage error", e);
+            return { error: e.message };
+        }
+        return { error: 'Student not found' };
+    },
+
+    markChatAsRead: async (studentId, role) => {
+        if (!isFirebaseInitialized || !firebaseDb) return;
+        try {
+            const students = AuthAPI.getAllStudents();
+            const index = students.findIndex(s => s.id === studentId);
+            if (index !== -1) {
+                const student = { ...students[index] };
+                if (student.chatMessages && student.chatMessages.length > 0) {
+                    let changed = false;
+                    student.chatMessages = student.chatMessages.map(msg => {
+                        if (role === 'student' && !msg.readByStudent) {
+                            msg.readByStudent = true;
+                            changed = true;
+                        } else if (role === 'instructor' && !msg.readByInstructor) {
+                            msg.readByInstructor = true;
+                            changed = true;
+                        }
+                        return msg;
+                    });
+                    
+                    if (changed) {
+                        await firebaseDb.collection('students').doc(studentId).update({
+                            chatMessages: student.chatMessages
+                        });
+                        
+                        const currentUser = AuthAPI.getCurrentUser();
+                        if (currentUser && currentUser.id === studentId) {
+                            localStorage.setItem(SESSION_KEY, JSON.stringify(student));
+                        }
+                    }
+                }
+            }
+        } catch(e) {
+            console.error("Firestore markChatAsRead error", e);
+        }
     }
 };
+
+window.AuthAPI = AuthAPI;
+

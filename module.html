@@ -6,11 +6,19 @@
     <title>Course Module - JILGM Masterclass</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="auth.js?v=2.1"></script>
+    <!-- Firebase SDK Compat (Parallel Loading) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script type="module" src="auth.js?v=2.1"></script>
+
     <style>
         .module-layout {
-            max-width: 960px;
+            display: grid;
+            grid-template-columns: 1.8fr 1.1fr;
+            gap: 2rem;
+            max-width: 1280px;
             margin: 2rem auto 0;
+            align-items: start;
         }
         
         .lesson-text p {
@@ -104,10 +112,25 @@
         </div>
 
         <div class="module-layout">
-            <!-- Single Column: Lesson Content and Embedded Activities -->
+            <!-- Left Column: Lesson Content and Embedded Activities -->
             <div class="glass-card" style="padding: 2.5rem; border-color: rgba(255,255,255,0.05); margin-bottom: 3rem;" id="lessonContentCard">
                 <div class="lesson-text" id="lessonTextContainer">
                     <!-- Populated dynamically by JS -->
+                </div>
+            </div>
+
+            <!-- Right Column: Q&A Sidebar Panel -->
+            <div id="moduleQASidebar" class="glass-card" style="padding: 2rem; border-color: rgba(212, 175, 55, 0.25); position: sticky; top: 2rem;">
+                <h3 style="margin-top: 0; margin-bottom: 0.5rem; color: var(--accent-gold-light); font-family: var(--font-serif); font-style: italic;">Module Q&A Board</h3>
+                <p id="qaOverseerText" style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 1.5rem;">Have questions about this lesson? Ask your outreach overseer here.</p>
+                
+                <div id="qaSidebarQuestions" style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+                    <!-- Questions list -->
+                </div>
+                
+                <div style="border-top: 1px dashed rgba(255,255,255,0.15); padding-top: 1rem;">
+                    <textarea id="qaSidebarInput" class="glass-input" rows="3" style="width: 100%; font-size: 0.88rem; padding: 0.6rem; color: #fff; background: rgba(0,0,0,0.4); margin-bottom: 0.8rem; resize: vertical;" placeholder="Type your question for the overseer..."></textarea>
+                    <button id="qaSidebarSubmit" class="btn btn-primary" style="width: 100%; font-size: 0.88rem; padding: 0.6rem 1rem;">Post Question</button>
                 </div>
             </div>
         </div>
@@ -116,6 +139,22 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             try {
+                const showToast = (message) => {
+                    const toast = document.createElement('div');
+                    toast.style.position = 'fixed';
+                    toast.style.bottom = '2rem';
+                    toast.style.right = '2rem';
+                    toast.style.background = 'rgba(34, 197, 94, 0.95)';
+                    toast.style.border = '1px solid #4ade80';
+                    toast.style.color = 'white';
+                    toast.style.padding = '1rem 1.5rem';
+                    toast.style.borderRadius = '8px';
+                    toast.style.zIndex = '3000';
+                    toast.innerText = '✓ ' + message;
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 2500);
+                };
+
                 const urlParams = new URLSearchParams(window.location.search);
             const moduleId = urlParams.get('id') || 'module1';
             const isPreview = urlParams.get('preview') === 'true';
@@ -288,13 +327,13 @@
                             applyCustomStyling(blockEl, comp);
                             lessonContainer.appendChild(blockEl);
                         }
-                    } else if (comp.type === 'question') {
+                    } else if (comp.type === 'question' || comp.type === 'essay') {
                         hasInteractive = true;
-                        // Render reflection question form
+                        // Render interactive question/essay block
                         const taskCard = document.createElement('div');
                         taskCard.className = 'glass-card';
                         taskCard.style.padding = '2rem';
-                        taskCard.style.borderColor = 'var(--accent-gold-dark)';
+                        taskCard.style.borderColor = comp.type === 'essay' ? 'var(--accent-gold-light)' : 'var(--accent-gold-dark)';
                         taskCard.style.marginTop = '2.5rem';
                         
                         const answeredObj = studentAnswers.find(a => a.moduleId === moduleId && a.componentIndex === index);
@@ -314,32 +353,73 @@
                                 </div>
                             `;
                         }
- 
+
+                        const titleText = comp.type === 'essay' ? 'Essay / Discussion Question' : 'Module Reflection';
+                        const descText = comp.type === 'essay' ? 'Write your essay or discussion response below.' : 'To complete this module, write your personal reflection below.';
+                        const placeholderText = isPreview ? 'Input is disabled in preview mode.' : (comp.type === 'essay' ? 'Type your essay response here... (minimum 20 characters)' : 'Type your reflection response here... (minimum 20 characters)');
+                        const btnText = isPreview ? 'Submit Response (Preview Mode)' : (answeredText ? 'Update Response' : 'Submit Response');
+
+                        const draftKey = `jilgm_draft_${moduleId}_${index}`;
+                        const savedDraft = localStorage.getItem(draftKey) || '';
+                        const initialText = answeredText || savedDraft;
+
                         taskCard.innerHTML = `
-                            <h3 style="margin-bottom: 1rem; color: var(--accent-gold);">Module Reflection</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">To complete this module, write your personal reflection below.</p>
+                            <h3 style="margin-bottom: 1rem; color: var(--accent-gold);">${titleText}</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">${descText}</p>
                             
                             <div id="msg-reflection-${index}" class="auth-error" style="display: none; margin-bottom: 1.2rem;"></div>
- 
+
                             <form id="form-reflection-${index}">
                                 <label style="display: block; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.8rem; font-weight: 500; line-height: 1.4;">
                                     ${comp.content}
                                 </label>
-                                <textarea id="input-reflection-${index}" required class="glass-input" rows="8" placeholder="${isPreview ? 'Reflection input is disabled in preview mode.' : 'Type your response here... (minimum 20 characters)'}" style="width: 100%; resize: vertical; line-height: 1.5; font-family: var(--font-sans); margin-bottom: 1rem;" ${isPreview ? 'disabled' : ''}>${answeredText}</textarea>
-                                <button type="submit" class="btn btn-primary" style="width: 100%;" ${isPreview ? 'disabled style="opacity: 0.6; cursor: not-allowed;"' : ''}>
-                                    ${isPreview ? 'Submit Reflection (Preview Mode)' : (answeredText ? 'Update Reflection' : 'Submit Reflection')}
-                                </button>
+                                <textarea id="input-reflection-${index}" required class="glass-input" rows="8" placeholder="${placeholderText}" style="width: 100%; resize: vertical; line-height: 1.5; font-family: var(--font-sans); margin-bottom: 1rem;" ${isPreview ? 'disabled' : ''}>${initialText}</textarea>
+                                <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                                    <button type="submit" class="btn btn-primary" style="flex: 1;" ${isPreview ? 'disabled style="opacity: 0.6; cursor: not-allowed;"' : ''}>
+                                        ${btnText}
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="btn-save-draft-${index}" style="flex: 1; border-color: var(--accent-gold); color: var(--accent-gold-light);" ${isPreview ? 'disabled style="opacity: 0.6; cursor: not-allowed;"' : ''}>
+                                        Save Draft
+                                    </button>
+                                </div>
+                                <div id="draft-notice-${index}" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: -0.5rem; margin-bottom: 1rem; text-align: left; font-style: italic;"></div>
                                 ${remarksHtml}
                             </form>
                         `;
                         tasksContainer.appendChild(taskCard);
- 
+
                         // Bind form event
                         setTimeout(() => {
                             const refForm = document.getElementById(`form-reflection-${index}`);
                             const refMsg = document.getElementById(`msg-reflection-${index}`);
                             const refInput = document.getElementById(`input-reflection-${index}`);
- 
+                            const saveDraftBtn = document.getElementById(`btn-save-draft-${index}`);
+                            const draftNotice = document.getElementById(`draft-notice-${index}`);
+
+                            if (savedDraft && !answeredText) {
+                                draftNotice.innerText = 'Loaded saved draft';
+                            }
+
+                            let debounceTimer;
+                            refInput.addEventListener('input', () => {
+                                if (isPreview) return;
+                                draftNotice.innerText = 'Saving draft...';
+                                clearTimeout(debounceTimer);
+                                debounceTimer = setTimeout(() => {
+                                    localStorage.setItem(draftKey, refInput.value);
+                                    draftNotice.innerText = 'Draft auto-saved';
+                                }, 1000);
+                            });
+
+                            if (saveDraftBtn) {
+                                saveDraftBtn.addEventListener('click', () => {
+                                    if (isPreview) return;
+                                    localStorage.setItem(draftKey, refInput.value);
+                                    draftNotice.innerText = 'Draft saved manually';
+                                    showToast('Draft saved!');
+                                });
+                            }
+
                             if (answeredText) {
                                 refMsg.style.display = 'block';
                                 refMsg.style.background = 'rgba(34, 197, 94, 0.1)';
@@ -347,35 +427,43 @@
                                 refMsg.style.color = '#4ade80';
                                 refMsg.innerText = 'Completed! You can update your answer above.';
                             }
- 
+
                             refForm.addEventListener('submit', (e) => {
                                 e.preventDefault();
                                 if (isPreview) return;
                                 refMsg.style.display = 'none';
                                 const ansText = refInput.value.trim();
- 
+
                                 if (ansText.length < 20) {
                                     refMsg.style.display = 'block';
                                     refMsg.style.background = 'rgba(239, 68, 68, 0.1)';
                                     refMsg.style.borderColor = 'rgba(239, 68, 68, 0.3)';
                                     refMsg.style.color = '#ef4444';
-                                    refMsg.innerText = 'Please write a reflection of at least 20 characters.';
+                                    refMsg.innerText = 'Please write a response of at least 20 characters.';
                                     return;
                                 }
- 
-                                const btn = refForm.querySelector('button');
-                                btn.innerText = 'Submitting reflection...';
- 
+
+                                const btn = refForm.querySelector('button[type="submit"]');
+                                btn.innerText = 'Submitting response...';
+
                                 setTimeout(() => {
-                                    const res = AuthAPI.submitAnswer(currentUser.id, moduleId, comp.content, ansText, null, index, { type: 'reflection' });
-                                    btn.innerText = answeredText ? 'Update Reflection' : 'Submit Reflection';
+                                    const res = AuthAPI.submitAnswer(currentUser.id, moduleId, comp.content, ansText, null, index, { type: comp.type });
+                                    btn.innerText = answeredText ? 'Update Response' : 'Submit Response';
                                     if (res.success) {
+                                        localStorage.removeItem(draftKey);
+                                        draftNotice.innerText = '';
                                         refMsg.style.display = 'block';
                                         refMsg.style.background = 'rgba(34, 197, 94, 0.1)';
                                         refMsg.style.borderColor = 'rgba(34, 197, 94, 0.3)';
                                         refMsg.style.color = '#4ade80';
-                                        refMsg.innerText = 'Reflection submitted! Updating progress...';
-                                        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+                                        refMsg.innerText = 'Response submitted! Proceed to the end of the lesson to complete it.';
+                                        showToast('Response submitted successfully!');
+                                    } else {
+                                        refMsg.style.display = 'block';
+                                        refMsg.style.background = 'rgba(239, 68, 68, 0.1)';
+                                        refMsg.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                                        refMsg.style.color = '#ef4444';
+                                        refMsg.innerText = res.error || 'Submission failed. Please try again.';
                                     }
                                 }, 800);
                             });
@@ -581,10 +669,8 @@
                                              renderSuccess.innerHTML = `<video src="${base64Url}" controls style="max-height: 240px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: #000;"></video>`;
                                          }
                                      }
-                                     
                                      fileSuccess.classList.remove('hidden');
                                      showToast('File uploaded successfully!');
-                                     setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
                                  };
 
                                  if (selectedFile.base64Data) {
@@ -980,6 +1066,120 @@
                         }
                     };
                 }
+                renderModuleQA();
+            }
+
+            function renderModuleQA() {
+                const qaContainer = document.getElementById('qaSidebarQuestions');
+                if (!qaContainer) return;
+                
+                const currentUser = AuthAPI.getCurrentUser();
+                const overseerText = document.getElementById('qaOverseerText');
+                if (overseerText && currentUser) {
+                    const instructors = AuthAPI.getInstructors();
+                    const overseer = instructors.find(i => i.outreach === currentUser.outreach);
+                    if (overseer) {
+                        overseerText.innerHTML = `Have questions about this lesson? Ask your outreach overseer, <strong>${overseer.name}</strong>, here.`;
+                    } else {
+                        const outName = currentUser.outreach ? `Outreach ${currentUser.outreach}` : 'your assigned outreach';
+                        overseerText.innerHTML = `Have questions about this lesson? Ask the overseer for <strong>${outName}</strong> here.`;
+                    }
+                }
+                
+                if (isPreview || !currentUser) {
+                    qaContainer.innerHTML = '<div style="text-align:center;color:var(--text-secondary);font-size:0.85rem;padding:1.5rem 0;">Q&A is only available to enrolled students.</div>';
+                    const sidebarInput = document.getElementById('qaSidebarInput');
+                    const sidebarSubmit = document.getElementById('qaSidebarSubmit');
+                    if (sidebarInput) sidebarInput.disabled = true;
+                    if (sidebarSubmit) {
+                        sidebarSubmit.disabled = true;
+                        sidebarSubmit.style.opacity = '0.5';
+                        sidebarSubmit.style.cursor = 'not-allowed';
+                    }
+                    return;
+                }
+                
+                qaContainer.innerHTML = '';
+                const questions = (currentUser.questions || []).filter(q => q.moduleId === moduleId);
+                
+                if (questions.length === 0) {
+                    qaContainer.innerHTML = '<div style="text-align:center;color:var(--text-secondary);font-size:0.85rem;padding:1.5rem 0;font-style:italic;">No questions asked yet. Ask a question below!</div>';
+                    return;
+                }
+                
+                questions.forEach(q => {
+                    const item = document.createElement('div');
+                    item.style.background = 'rgba(255,255,255,0.03)';
+                    item.style.border = '1px solid rgba(255,255,255,0.06)';
+                    item.style.borderRadius = '8px';
+                    item.style.padding = '0.8rem';
+                    item.style.fontSize = '0.88rem';
+                    item.style.textAlign = 'left';
+                    item.style.marginBottom = '0.5rem';
+                    
+                    let repliesHtml = '';
+                    if (q.replies && q.replies.length > 0) {
+                        repliesHtml = q.replies.map(r => `
+                            <div style="background: rgba(212,175,55,0.06); border-left: 2px solid var(--accent-gold); padding: 0.4rem 0.6rem; margin-top: 0.4rem; border-radius: 4px;">
+                                <strong style="color: var(--accent-gold-light); font-size: 0.75rem;">${r.senderName}:</strong>
+                                <p style="margin: 0.1rem 0 0; font-size: 0.82rem; color: #fff;">${r.message}</p>
+                            </div>
+                        `).join('');
+                    } else {
+                        repliesHtml = '<p style="font-size: 0.75rem; color: var(--text-secondary); font-style: italic; margin: 0.4rem 0 0;">Awaiting reply from overseer...</p>';
+                    }
+                    
+                    item.innerHTML = `
+                        <div style="display:flex;justify-content:space-between;color:var(--text-secondary);font-size:0.7rem;margin-bottom:0.3rem;">
+                            <span>Question</span>
+                            <span>${new Date(q.date).toLocaleDateString()}</span>
+                        </div>
+                        <p style="margin:0;font-weight:500;color:#fff;">Q: "${q.question}"</p>
+                        <div style="margin-top:0.4rem;padding-left:0.5rem;border-left:1px dashed rgba(255,255,255,0.12);">
+                            ${repliesHtml}
+                        </div>
+                    `;
+                    qaContainer.appendChild(item);
+                });
+                
+                // Scroll questions to bottom
+                setTimeout(() => {
+                    qaContainer.scrollTop = qaContainer.scrollHeight;
+                }, 50);
+            }
+
+            const qaSubmit = document.getElementById('qaSidebarSubmit');
+            if (qaSubmit) {
+                qaSubmit.addEventListener('click', async () => {
+                    if (isPreview) return;
+                    const input = document.getElementById('qaSidebarInput');
+                    if (!input) return;
+                    const val = input.value.trim();
+                    if (!val) return;
+                    
+                    const currentUser = AuthAPI.getCurrentUser();
+                    if (!currentUser) return;
+                    
+                    qaSubmit.innerText = 'Posting...';
+                    qaSubmit.disabled = true;
+                    
+                    const res = await AuthAPI.askQuestion(currentUser.id, moduleId, val);
+                    qaSubmit.innerText = 'Post Question';
+                    qaSubmit.disabled = false;
+                    
+                    if (res.success) {
+                        input.value = '';
+                        const students = AuthAPI.getAllStudents();
+                        const freshUser = students.find(s => s.id === currentUser.id);
+                        if (freshUser) {
+                            localStorage.setItem('jilgm_current_user', JSON.stringify(freshUser));
+                        }
+                        renderModuleQA();
+                        showToast('Question posted!');
+                    } else {
+                        alert("Error posting question: " + (res.error || "unknown"));
+                    }
+                });
             }
 
             // ── Real-time synchronization ──────────────────────────────────

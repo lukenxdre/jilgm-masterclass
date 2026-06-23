@@ -6,9 +6,13 @@
     <title>Register - JILGM Masterclass</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="auth.js?v=2.1"></script>
+    <!-- Firebase SDK Compat (Parallel Loading) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script type="module" src="auth.js?v=2.1"></script>
     <script src="transitions.js" defer></script>
 </head>
+
 <body class="auth-page page-loading">
 
     <div class="glass-card auth-card">
@@ -43,7 +47,33 @@
                 <input type="email" id="email" required class="glass-input" placeholder="you@example.com">
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Submit Application</button>
+            <div style="text-align: left;">
+                <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Outreach Number</label>
+                <select id="outreach" required class="glass-input" style="width: 100%; background: rgba(0, 0, 0, 0.4); color: #fff; font-family: inherit; height: 50px;">
+                    <option value="" disabled selected>Select Outreach Number (1-19)</option>
+                    <option value="1">Outreach 1</option>
+                    <option value="2">Outreach 2</option>
+                    <option value="3">Outreach 3</option>
+                    <option value="4">Outreach 4</option>
+                    <option value="5">Outreach 5</option>
+                    <option value="6">Outreach 6</option>
+                    <option value="7">Outreach 7</option>
+                    <option value="8">Outreach 8</option>
+                    <option value="9">Outreach 9</option>
+                    <option value="10">Outreach 10</option>
+                    <option value="11">Outreach 11</option>
+                    <option value="12">Outreach 12</option>
+                    <option value="13">Outreach 13</option>
+                    <option value="14">Outreach 14</option>
+                    <option value="15">Outreach 15</option>
+                    <option value="16">Outreach 16</option>
+                    <option value="17">Outreach 17</option>
+                    <option value="18">Outreach 18</option>
+                    <option value="19">Outreach 19</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">Submit Application</button>
         </form>
         
         <div style="margin-top: 2rem; font-size: 0.85rem; color: var(--text-secondary);">
@@ -69,6 +99,7 @@
                 const firstName = document.getElementById('firstName').value;
                 const lastName = document.getElementById('lastName').value;
                 const email = document.getElementById('email').value;
+                const outreach = document.getElementById('outreach').value;
 
                 // Wait for the background cloud sync promise to complete if active
                 if (window.syncPromise) {
@@ -78,8 +109,8 @@
                     try { await window.firebaseSyncPromise; } catch(err) { console.warn(err); }
                 }
 
-                setTimeout(() => {
-                    const res = AuthAPI.registerStudent(firstName, lastName, email);
+                setTimeout(async () => {
+                    const res = await AuthAPI.registerStudent(firstName, lastName, email, outreach);
                     btn.innerText = originalText;
                     
                     if (res.success) {
@@ -91,6 +122,7 @@
                         errorMsg.classList.add('show');
                     }
                 }, 400);
+
             });
         });
     </script>

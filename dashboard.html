@@ -6,7 +6,11 @@
     <title>Student Dashboard - JILGM Masterclass</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="auth.js?v=2.1"></script>
+    <!-- Firebase SDK Compat (Parallel Loading) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script type="module" src="auth.js?v=2.1"></script>
+
     <style>
         /* ── Live-update toast ─────────────────────────────────────── */
         #liveUpdateToast {
@@ -282,6 +286,7 @@
             <a href="#" id="student-nav-resources">Resources</a>
             <a href="#" id="student-nav-announcements">Announcements <span id="ann-badge" class="badge" style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
             <a href="#" id="student-nav-grades">Grades & Remarks <span id="grades-badge" class="badge" style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
+            <a href="#" id="student-nav-chat">Private Chat <span id="chat-badge" class="badge" style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
             <a href="#" onclick="AuthAPI.logout(); return false;" style="margin-top: auto; color: #ef4444;">Log Out</a>
         </nav>
     </aside>
@@ -300,7 +305,7 @@
                 <div class="dash-user-badge">
                     <div class="dash-user-info">
                         <span class="dash-user-name" id="userFullName">Student</span>
-                        <span class="dash-user-role">Ministry Apprentice</span>
+                        <span class="dash-user-role" id="userRole">Ministry Apprentice</span>
                     </div>
                     <div class="dash-avatar" id="userAvatar">S</div>
                 </div>
@@ -325,6 +330,15 @@
         <!-- 1. CURRICULUM PANEL -->
         <div id="panel-curriculum">
             <div class="dashboard-grid">
+                <!-- Attempt Warning Card -->
+                <div class="dash-card glass-card" style="grid-column: 1 / -1; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.05); padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                    <div style="font-size: 1.8rem; line-height: 1;">⚠️</div>
+                    <div>
+                        <h4 style="margin: 0 0 0.2rem; color: #fca5a5; font-size: 1rem; font-family: var(--font-sans);">Important Notice</h4>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.88rem; line-height: 1.4;">Only one (1) attempt is allowed when answering every activity (reflections, checks, matching). Your responses are recorded immediately.</p>
+                    </div>
+                </div>
+
                 <!-- Progress Card -->
                 <div class="dash-card glass-card" style="grid-column: 1 / -1;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -382,6 +396,16 @@
                 <!-- Populated dynamically -->
             </div>
         </div>
+
+        <!-- 5. PRIVATE CHAT PANEL -->
+        <div id="panel-chat" class="hidden">
+            <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-primary);">Private Spiritual Chat</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Communicate privately with your assigned outreach instructor for spiritual concerns and mentoring.</p>
+            
+            <div id="studentChatContainer" style="max-width: 800px; width: 100%;">
+                <!-- Rendered by JS -->
+            </div>
+        </div>
     </main>
 
     <script>
@@ -393,6 +417,12 @@
             // Protect this route
             AuthAPI.requireAuth();
 
+            let lastStudentOutreach = null;
+            const initialUser = AuthAPI.getCurrentUser();
+            if (initialUser) {
+                lastStudentOutreach = initialUser.outreach;
+            }
+
             function updateDashboardDOM() {
                 const user = AuthAPI.getCurrentUser();
                 if (!user) return;
@@ -401,6 +431,12 @@
                 document.getElementById('welcomeMessage').innerHTML = `Welcome back, <span>${user.firstName}!</span>`;
                 document.getElementById('userFullName').innerText = `${user.firstName} ${user.lastName}`;
                 document.getElementById('userAvatar').innerText = user.firstName.charAt(0).toUpperCase();
+
+                const outreachText = user.outreach ? ` (Outreach ${user.outreach})` : '';
+                const userRoleEl = document.getElementById('userRole');
+                if (userRoleEl) {
+                    userRoleEl.innerText = `Ministry Apprentice${outreachText}`;
+                }
 
                 // Dynamic Progress Calculations
                 const progress = user.progress || 0;
@@ -487,30 +523,22 @@
 
             // ── Real-time sync helper ────────────────────────────────────────
             // Called by BOTH the storage event (cross-tab) and BroadcastChannel
-            // (same-tab + cross-tab) so admin changes reflect instantly everywhere.
-            function showLiveToast(msg) {
-                const toast = document.getElementById('liveUpdateToast');
-                if (!toast) return;
-                toast.textContent = '✦ ' + (msg || 'Content updated by admin');
-                toast.classList.add('visible');
-                clearTimeout(toast._timer);
-                toast._timer = setTimeout(() => toast.classList.remove('visible'), 3200);
-            }
-
-            // ── Sidebar Tab Switching ──
+            // (same-tab + cross-tab) so admin changes reflect instantly every            // ── Sidebar Tab Switching ──
             const btnCurriculum = document.getElementById('student-nav-curriculum');
             const btnResources = document.getElementById('student-nav-resources');
             const btnAnnouncements = document.getElementById('student-nav-announcements');
             const btnGrades = document.getElementById('student-nav-grades');
+            const btnChat = document.getElementById('student-nav-chat');
  
             const panelCurriculum = document.getElementById('panel-curriculum');
             const panelResources = document.getElementById('panel-resources');
             const panelAnnouncements = document.getElementById('panel-announcements');
             const panelGrades = document.getElementById('panel-grades');
+            const panelChat = document.getElementById('panel-chat');
  
             function switchTab(activeBtn, activePanel) {
-                [btnCurriculum, btnResources, btnAnnouncements, btnGrades].forEach(btn => { if (btn) btn.classList.remove('active'); });
-                [panelCurriculum, panelResources, panelAnnouncements, panelGrades].forEach(p => { if (p) p.classList.add('hidden'); });
+                [btnCurriculum, btnResources, btnAnnouncements, btnGrades, btnChat].forEach(btn => { if (btn) btn.classList.remove('active'); });
+                [panelCurriculum, panelResources, panelAnnouncements, panelGrades, panelChat].forEach(p => { if (p) p.classList.add('hidden'); });
  
                 activeBtn.classList.add('active');
                 activePanel.classList.remove('hidden');
@@ -536,8 +564,32 @@
                 localStorage.setItem('jilgm_unread_announcements', '0');
                 updateAnnBadge();
             });
-
+ 
             btnGrades.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTab(btnGrades, panelGrades);
+                renderGradesStudent();
+                
+                // Reset remarks notification
+                const user = AuthAPI.getCurrentUser();
+                if (user) {
+                    AuthAPI.markRemarksAsRead(user.id);
+                    updateGradesBadge();
+                }
+            });
+
+            btnChat.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTab(btnChat, panelChat);
+                renderStudentChat();
+                
+                // Reset chat notifications
+                const user = AuthAPI.getCurrentUser();
+                if (user) {
+                    AuthAPI.markChatAsRead(user.id, 'student');
+                    updateChatBadge();
+                }
+            });tnGrades.addEventListener('click', (e) => {
                 e.preventDefault();
                 switchTab(btnGrades, panelGrades);
                 renderGradesStudent();
@@ -783,6 +835,10 @@
                     const freshUser = students.find(s => s.id === currentUser.id);
                     if (freshUser && freshUser.status === 'approved') {
                         localStorage.setItem('jilgm_current_user', JSON.stringify(freshUser));
+                        if (freshUser.outreach !== lastStudentOutreach) {
+                            msg = `Your assigned outreach has been updated to Outreach ${freshUser.outreach || 'Unassigned'}!`;
+                            lastStudentOutreach = freshUser.outreach;
+                        }
                     } else {
                         AuthAPI.logout();
                         return;
@@ -791,13 +847,151 @@
                 updateDashboardDOM();
                 updateAnnBadge();
                 updateGradesBadge();
+                updateChatBadge();
                 
                 // If currently viewing resources, announcements, or grades tabs, update them too
                 if (btnResources.classList.contains('active')) renderResourcesStudent();
                 if (btnAnnouncements.classList.contains('active')) renderAnnouncementsStudent();
                 if (btnGrades.classList.contains('active')) renderGradesStudent();
+                if (btnChat.classList.contains('active')) renderStudentChat();
  
                 showLiveToast(msg);
+            }
+
+            function showLiveToast(msg) {
+                const toast = document.getElementById('liveUpdateToast');
+                if (!toast) return;
+                toast.innerHTML = `✦ ${msg || 'Content updated'}`;
+                toast.classList.add('visible');
+                setTimeout(() => {
+                    toast.classList.remove('visible');
+                }, 4000);
+            }
+
+            function updateChatBadge() {
+                const badge = document.getElementById('chat-badge');
+                if (!badge) return;
+                const user = AuthAPI.getCurrentUser();
+                if (!user) {
+                    badge.style.display = 'none';
+                    return;
+                }
+                const count = (user.chatMessages || []).filter(m => m.senderId !== user.id && !m.readByStudent).length;
+                if (count > 0) {
+                    badge.innerText = count.toString();
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
+            function renderStudentChat() {
+                const container = document.getElementById('studentChatContainer');
+                if (!container) return;
+                const user = AuthAPI.getCurrentUser();
+                if (!user) return;
+
+                container.innerHTML = '';
+
+                const chatBox = document.createElement('div');
+                chatBox.style.display = 'flex';
+                chatBox.style.flexDirection = 'column';
+                chatBox.style.height = '480px';
+                chatBox.style.background = 'rgba(0,0,0,0.2)';
+                chatBox.style.borderRadius = '12px';
+                chatBox.style.border = '1px solid var(--glass-border)';
+                chatBox.style.overflow = 'hidden';
+
+                const msgsArea = document.createElement('div');
+                msgsArea.id = 'student-chat-messages-area';
+                msgsArea.style.flex = '1';
+                msgsArea.style.overflowY = 'auto';
+                msgsArea.style.padding = '1.5rem';
+                msgsArea.style.display = 'flex';
+                msgsArea.style.flexDirection = 'column';
+                msgsArea.style.gap = '1rem';
+
+                const messages = user.chatMessages || [];
+                if (messages.length === 0) {
+                    msgsArea.innerHTML = '<div style="text-align:center;color:var(--text-secondary);margin:auto;padding:2rem;">Start a private counseling chat for spiritual concerns with your instructor.</div>';
+                } else {
+                    messages.forEach(msg => {
+                        const isMe = msg.senderId === user.id;
+                        const wrapper = document.createElement('div');
+                        wrapper.style.display = 'flex';
+                        wrapper.style.justifyContent = isMe ? 'flex-end' : 'flex-start';
+
+                        const bubble = document.createElement('div');
+                        bubble.style.maxWidth = '70%';
+                        bubble.style.padding = '0.8rem 1rem';
+                        bubble.style.borderRadius = isMe ? '12px 12px 0 12px' : '12px 12px 12px 0';
+                        bubble.style.background = isMe ? 'linear-gradient(135deg, var(--accent-gold-dark), rgba(212,175,55,0.45))' : 'rgba(255,255,255,0.06)';
+                        bubble.style.border = isMe ? '1px solid rgba(212,175,55,0.3)' : '1px solid rgba(255,255,255,0.1)';
+                        bubble.style.color = '#fff';
+                        bubble.style.textAlign = 'left';
+
+                        bubble.innerHTML = `
+                            <div style="font-size: 0.72rem; color: ${isMe ? 'var(--accent-gold-light)' : 'var(--text-secondary)'}; font-weight: bold; margin-bottom: 0.25rem;">
+                                ${msg.senderName}
+                            </div>
+                            <div style="font-size: 0.9rem; line-height: 1.4; word-break: break-word;">${msg.message}</div>
+                            <div style="font-size: 0.65rem; color: rgba(255,255,255,0.4); text-align: right; margin-top: 0.3rem;">
+                                ${new Date(msg.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                            </div>
+                        `;
+                        wrapper.appendChild(bubble);
+                        msgsArea.appendChild(wrapper);
+                    });
+                }
+
+                const inputArea = document.createElement('div');
+                inputArea.style.padding = '1rem';
+                inputArea.style.borderTop = '1px solid var(--glass-border)';
+                inputArea.style.background = 'rgba(0,0,0,0.3)';
+                inputArea.style.display = 'flex';
+                inputArea.style.gap = '0.8rem';
+
+                inputArea.innerHTML = `
+                    <input type="text" id="student-chat-send-input" class="glass-input" style="flex: 1; padding: 0.6rem 1rem; font-size: 0.9rem;" placeholder="Type private message for spiritual concerns...">
+                    <button class="btn btn-primary" id="btn-student-chat-send" style="padding: 0.6rem 1.5rem; font-size: 0.9rem; height: auto;">Send</button>
+                `;
+
+                chatBox.appendChild(msgsArea);
+                chatBox.appendChild(inputArea);
+                container.appendChild(chatBox);
+
+                // Scroll messages to bottom
+                setTimeout(() => {
+                    msgsArea.scrollTop = msgsArea.scrollHeight;
+                    const input = document.getElementById('student-chat-send-input');
+                    if (input) {
+                        input.focus();
+                        input.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter') {
+                                document.getElementById('btn-student-chat-send').click();
+                            }
+                        });
+                    }
+                }, 100);
+
+                document.getElementById('btn-student-chat-send').addEventListener('click', async () => {
+                    const input = document.getElementById('student-chat-send-input');
+                    const val = input.value.trim();
+                    if (!val) return;
+
+                    input.value = '';
+                    const res = await AuthAPI.sendChatMessage(user.id, val, user.id, `${user.firstName} ${user.lastName}`);
+                    if (res.success) {
+                        const students = AuthAPI.getAllStudents();
+                        const freshUser = students.find(s => s.id === user.id);
+                        if (freshUser) {
+                            localStorage.setItem('jilgm_current_user', JSON.stringify(freshUser));
+                        }
+                        renderStudentChat();
+                    } else {
+                        alert("Error sending message: " + (res.error || "unknown"));
+                    }
+                });
             }
 
             // Cross-tab sync via storage event (fires in OTHER tabs only)
@@ -834,6 +1028,8 @@
             // Run on initial load
             updateDashboardDOM();
             updateAnnBadge();
+            updateGradesBadge();
+            updateChatBadge();
         });
     </script>
 </body>

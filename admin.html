@@ -6,7 +6,12 @@
     <title>Admin Dashboard - JILGM Masterclass</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="auth.js?v=2.1"></script>
+    <!-- Firebase SDK Compat (Parallel Loading) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script type="module" src="auth.js?v=2.1"></script>
+
+
     <!-- html2pdf.js for PPT PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -140,25 +145,49 @@
         <!-- 1. STUDENTS PANEL -->
         <div id="panel-students">
             <div class="dashboard-header">
-                <h1>Student Management</h1>
-                <button class="btn btn-primary" onclick="document.getElementById('addStudentForm').classList.toggle('hidden')">+ Add Student Manually</button>
+                <h1 id="studentManagementHeader">Student Management</h1>
+                <button id="btn-add-student-manual" class="btn btn-primary" onclick="document.getElementById('addStudentForm').classList.toggle('hidden')">+ Add Student Manually</button>
             </div>
 
             <!-- Add Student Form (Manually) -->
             <div id="addStudentForm" class="glass-card hidden" style="padding: 2rem; margin-bottom: 2rem;">
                 <h3 style="margin-bottom: 1.5rem; color: var(--accent-gold);">Add and Approve New Enrollee</h3>
                 <form id="adminAddForm" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 200px;">
+                    <div style="flex: 1; min-width: 150px;">
                         <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">First Name</label>
                         <input type="text" id="firstName" required class="glass-input" style="width: 100%;">
                     </div>
-                    <div style="flex: 1; min-width: 200px;">
+                    <div style="flex: 1; min-width: 150px;">
                         <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Last Name</label>
                         <input type="text" id="lastName" required class="glass-input" style="width: 100%;">
                     </div>
-                    <div style="flex: 1; min-width: 200px;">
+                    <div style="flex: 1; min-width: 150px;">
                         <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Email Address</label>
                         <input type="email" id="email" required class="glass-input" style="width: 100%;">
+                    </div>
+                    <div style="flex: 1; min-width: 120px;">
+                        <label style="display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Outreach</label>
+                        <select id="outreach" required class="glass-input" style="width: 100%; height: 48px; background: rgba(0, 0, 0, 0.4); color: #fff; font-family: inherit;">
+                            <option value="1">Outreach 1</option>
+                            <option value="2">Outreach 2</option>
+                            <option value="3">Outreach 3</option>
+                            <option value="4">Outreach 4</option>
+                            <option value="5">Outreach 5</option>
+                            <option value="6">Outreach 6</option>
+                            <option value="7">Outreach 7</option>
+                            <option value="8">Outreach 8</option>
+                            <option value="9">Outreach 9</option>
+                            <option value="10">Outreach 10</option>
+                            <option value="11">Outreach 11</option>
+                            <option value="12">Outreach 12</option>
+                            <option value="13">Outreach 13</option>
+                            <option value="14">Outreach 14</option>
+                            <option value="15">Outreach 15</option>
+                            <option value="16">Outreach 16</option>
+                            <option value="17">Outreach 17</option>
+                            <option value="18">Outreach 18</option>
+                            <option value="19">Outreach 19</option>
+                        </select>
                     </div>
                     <button type="submit" class="btn btn-primary" style="height: 48px;">Add & Approve</button>
                 </form>
@@ -176,7 +205,7 @@
             </div>
 
             <!-- Section 1: Pending Applications -->
-            <div style="margin-bottom: 3rem;">
+            <div id="section-pending" style="margin-bottom: 3rem;">
                 <h2 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent-gold); display: flex; align-items: center; gap: 0.5rem;">
                     Pending Applications <span id="pendingBadge" class="badge" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">0</span>
                 </h2>
@@ -208,6 +237,7 @@
                             <tr>
                                 <th>Name</th>
                                 <th>Email</th>
+                                <th>Outreach</th>
                                 <th>Username</th>
                                 <th>Password</th>
                                 <th style="width: 200px;">Progress</th>
@@ -493,7 +523,7 @@
         <!-- 6. INSTRUCTORS PANEL -->
         <div id="panel-instructors" class="hidden">
             <div class="dashboard-header">
-                <h1>Instructors Management</h1>
+                <h1 id="instructorsHeader">Instructors Management</h1>
                 <button class="btn btn-primary" onclick="document.getElementById('addInstructorForm').classList.toggle('hidden')">+ Add New Instructor</button>
             </div>
             
@@ -501,7 +531,7 @@
             <div id="addInstructorForm" class="glass-card hidden" style="padding: 2rem; margin-bottom: 2rem; border-color: rgba(212, 175, 55, 0.25);">
                 <h3 style="color: var(--accent-gold); margin-bottom: 1.5rem;">Register Instructor Account</h3>
                 <form id="instructorRegisterForm" style="display: flex; flex-direction: column; gap: 1.2rem;">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
                         <div>
                             <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; text-align: left;">Full Name</label>
                             <input type="text" id="newInstructorName" required class="glass-input" style="width: 100%;" placeholder="e.g. Pastor John Doe">
@@ -513,6 +543,31 @@
                         <div>
                             <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; text-align: left;">Password</label>
                             <input type="password" id="newInstructorPassword" required class="glass-input" style="width: 100%;" placeholder="••••••••">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; text-align: left;">Assigned Outreach</label>
+                            <select id="newInstructorOutreach" class="glass-input" style="width: 100%; height: 50px; background: rgba(0, 0, 0, 0.4); color: #fff; font-family: inherit;">
+                                <option value="" selected>Unassigned</option>
+                                <option value="1">Outreach 1</option>
+                                <option value="2">Outreach 2</option>
+                                <option value="3">Outreach 3</option>
+                                <option value="4">Outreach 4</option>
+                                <option value="5">Outreach 5</option>
+                                <option value="6">Outreach 6</option>
+                                <option value="7">Outreach 7</option>
+                                <option value="8">Outreach 8</option>
+                                <option value="9">Outreach 9</option>
+                                <option value="10">Outreach 10</option>
+                                <option value="11">Outreach 11</option>
+                                <option value="12">Outreach 12</option>
+                                <option value="13">Outreach 13</option>
+                                <option value="14">Outreach 14</option>
+                                <option value="15">Outreach 15</option>
+                                <option value="16">Outreach 16</option>
+                                <option value="17">Outreach 17</option>
+                                <option value="18">Outreach 18</option>
+                                <option value="19">Outreach 19</option>
+                            </select>
                         </div>
                     </div>
                     <div style="display: flex; gap: 1rem;">
@@ -531,6 +586,7 @@
                                 <th style="padding: 0.8rem 1rem;">Instructor Name</th>
                                 <th style="padding: 0.8rem 1rem;">Username</th>
                                 <th style="padding: 0.8rem 1rem;">Password Key</th>
+                                <th style="padding: 0.8rem 1rem;">Assigned Outreach</th>
                                 <th style="padding: 0.8rem 1rem;">Date Created</th>
                                 <th style="padding: 0.8rem 1rem; text-align: right;">Actions</th>
                             </tr>
@@ -545,16 +601,31 @@
 
         <!-- Reflection Answers Modal -->
         <div id="answersModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem;">
-            <div class="glass-card" style="max-width: 700px; width: 100%; padding: 2.5rem; border-color: rgba(212, 175, 55, 0.4); max-height: 90vh; overflow-y: auto;">
-                <h2 style="margin-bottom: 0.5rem; font-size: 1.6rem; color: var(--accent-gold);" id="modalStudentName">Student Name</h2>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Submitted Reflections, File Uploads, & Graded Checks</p>
-                
-                <div id="modalAnswersContainer" style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
-                    <!-- Populated dynamically -->
+            <div class="glass-card" style="max-width: 850px; width: 100%; padding: 2.5rem; border-color: rgba(212, 175, 55, 0.4); max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div>
+                        <h2 style="margin: 0; font-size: 1.6rem; color: var(--accent-gold);" id="modalStudentName">Student Name</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.2rem;">Student Profile, Submissions & Counseling Portal</p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="closeAnswersModal()" style="border-color: #ef4444; color: #ef4444; padding: 0.4rem 0.8rem; height: auto;">Close</button>
+                </div>
+
+                <!-- Modal Sub-Tabs -->
+                <div style="display: flex; border-bottom: 1px solid var(--glass-border); margin-bottom: 1.5rem; gap: 1rem;">
+                    <button id="modal-tab-submissions" class="btn" style="background: none; border: none; border-bottom: 2px solid var(--accent-gold); color: #fff; font-weight: bold; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0;">Lesson Submissions</button>
+                    <button id="modal-tab-qa" class="btn" style="background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0;">Lesson Q&A</button>
+                    <button id="modal-tab-chat" class="btn" style="background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0; display: flex; align-items: center; gap: 0.4rem;">Private Chat <span id="modal-chat-badge" class="badge" style="background:#ef4444; color:#fff; display:none; border:none; padding: 0.1rem 0.35rem; font-size:0.65rem;">0</span></button>
                 </div>
                 
-                <div style="text-align: right;">
-                    <button class="btn btn-secondary" onclick="closeAnswersModal()">Close</button>
+                <div id="modal-content-area" style="flex: 1; overflow-y: auto; padding-right: 0.5rem; margin-bottom: 1rem;">
+                    <!-- Content populated dynamically based on active tab -->
+                    <div id="modalContentSubmissions">
+                        <div id="modalAnswersContainer" style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                    <div id="modalContentQA" class="hidden"></div>
+                    <div id="modalContentChat" class="hidden"></div>
                 </div>
             </div>
         </div>
@@ -755,8 +826,49 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             try {
-                // Secure page with admin credentials check immediately
-                AuthAPI.requireAdminAuth();
+                // Secure page check immediately for either admin or instructor
+                AuthAPI.requireAdminOrInstructorAuth();
+
+                const currentAdmin = AuthAPI.getCurrentAdmin();
+                const currentInstructor = AuthAPI.getCurrentInstructor();
+                const isInstructor = !!currentInstructor;
+                let lastInstructorOutreach = currentInstructor ? currentInstructor.outreach : null;
+
+                if (isInstructor) {
+                    // Hide administrative sidebar tabs
+                    const navBuilder = document.getElementById('nav-builder');
+                    const navAnnouncements = document.getElementById('nav-announcements');
+                    const navResources = document.getElementById('nav-resources');
+                    const navSettings = document.getElementById('nav-settings');
+                    
+                    if (navBuilder) navBuilder.style.display = 'none';
+                    if (navAnnouncements) navAnnouncements.style.display = 'none';
+                    if (navResources) navResources.style.display = 'none';
+                    if (navSettings) navSettings.style.display = 'none';
+                    
+                    // Rename Instructors tab to Co-Instructors
+                    const navInstructors = document.getElementById('nav-instructors');
+                    if (navInstructors) navInstructors.innerText = 'Co-Instructors';
+                    
+                    // Hide manual student add button and pending applications card
+                    const btnAddManual = document.getElementById('btn-add-student-manual');
+                    if (btnAddManual) btnAddManual.style.display = 'none';
+                    const secPending = document.getElementById('section-pending');
+                    if (secPending) secPending.style.display = 'none';
+                    
+                    // Hide Add Instructor button
+                    const addInstBtn = document.querySelector('#panel-instructors .dashboard-header .btn');
+                    if (addInstBtn) addInstBtn.style.display = 'none';
+                }
+
+                // Bind sub-tabs inside answersModal
+                const modalTabSub = document.getElementById('modal-tab-submissions');
+                const modalTabQA = document.getElementById('modal-tab-qa');
+                const modalTabChat = document.getElementById('modal-tab-chat');
+                
+                if (modalTabSub) modalTabSub.addEventListener('click', () => switchModalTab('submissions'));
+                if (modalTabQA) modalTabQA.addEventListener('click', () => switchModalTab('qa'));
+                if (modalTabChat) modalTabChat.addEventListener('click', () => switchModalTab('chat'));
 
                 // Wait for the background cloud sync promise to complete if active (non-blocking)
                 (async () => {
@@ -790,7 +902,11 @@
             if (navLogout) {
                 navLogout.addEventListener('click', (e) => {
                     e.preventDefault();
-                    AuthAPI.logoutAdmin();
+                    if (AuthAPI.getCurrentAdmin()) {
+                        AuthAPI.logoutAdmin();
+                    } else {
+                        AuthAPI.logoutInstructor();
+                    }
                 });
             }
             
@@ -893,13 +1009,260 @@
 
             let activeModalStudentId = null;
 
-             // Expose view answers function globally
+             // Sub-tabs rendering and navigation inside answersModal
+            let activeModalTab = 'submissions';
+            function switchModalTab(tabId) {
+                activeModalTab = tabId;
+                const tabSub = document.getElementById('modal-tab-submissions');
+                const tabQA = document.getElementById('modal-tab-qa');
+                const tabChat = document.getElementById('modal-tab-chat');
+                
+                const paneSub = document.getElementById('modalContentSubmissions');
+                const paneQA = document.getElementById('modalContentQA');
+                const paneChat = document.getElementById('modalContentChat');
+                
+                [tabSub, tabQA, tabChat].forEach(t => {
+                    if (t) {
+                        t.style.borderBottom = '2px solid transparent';
+                        t.style.color = 'var(--text-secondary)';
+                        t.style.fontWeight = '500';
+                    }
+                });
+                [paneSub, paneQA, paneChat].forEach(p => { if (p) p.classList.add('hidden'); });
+                
+                if (tabId === 'submissions') {
+                    if (tabSub) { tabSub.style.borderBottom = '2px solid var(--accent-gold)'; tabSub.style.color = '#fff'; tabSub.style.fontWeight = 'bold'; }
+                    if (paneSub) paneSub.classList.remove('hidden');
+                } else if (tabId === 'qa') {
+                    if (tabQA) { tabQA.style.borderBottom = '2px solid var(--accent-gold)'; tabQA.style.color = '#fff'; tabQA.style.fontWeight = 'bold'; }
+                    if (paneQA) paneQA.classList.remove('hidden');
+                    renderModalQA();
+                } else if (tabId === 'chat') {
+                    if (tabChat) { tabChat.style.borderBottom = '2px solid var(--accent-gold)'; tabChat.style.color = '#fff'; tabChat.style.fontWeight = 'bold'; }
+                    if (paneChat) paneChat.classList.remove('hidden');
+                    renderModalChat();
+                    
+                    if (activeModalStudentId) {
+                        AuthAPI.markChatAsRead(activeModalStudentId, 'instructor');
+                        // Update UI counts (refresh badges)
+                        renderDashboard();
+                    }
+                }
+            }
+
+            function renderModalQA() {
+                const paneQA = document.getElementById('modalContentQA');
+                if (!paneQA || !activeModalStudentId) return;
+                const students = AuthAPI.getAllStudents();
+                const student = students.find(s => s.id === activeModalStudentId);
+                if (!student) return;
+                
+                paneQA.innerHTML = '';
+                const questions = student.questions || [];
+                if (questions.length === 0) {
+                    paneQA.innerHTML = '<div style="text-align:center;color:var(--text-secondary);padding:3rem;">No questions asked by this student yet.</div>';
+                    return;
+                }
+                
+                const modsContent = AuthAPI.getModulesContent();
+                
+                questions.forEach(q => {
+                    const mod = modsContent[q.moduleId] || { title: q.moduleId };
+                    const card = document.createElement('div');
+                    card.style.background = 'rgba(255,255,255,0.03)';
+                    card.style.border = '1px solid rgba(255,255,255,0.08)';
+                    card.style.borderRadius = '8px';
+                    card.style.padding = '1.2rem';
+                    card.style.marginBottom = '1rem';
+                    
+                    let repliesHtml = '';
+                    if (q.replies && q.replies.length > 0) {
+                        repliesHtml = q.replies.map(r => `
+                            <div style="background: rgba(212,175,55,0.05); border-left: 2px solid var(--accent-gold); padding: 0.5rem 0.8rem; margin-top: 0.5rem; border-radius: 4px; text-align: left;">
+                                <span style="font-size: 0.75rem; color: var(--accent-gold-light); font-weight: bold;">${r.senderName} (${new Date(r.date).toLocaleString()}):</span>
+                                <p style="margin: 0.2rem 0 0; font-size: 0.88rem; color: #fff;">${r.message}</p>
+                            </div>
+                        `).join('');
+                    } else {
+                        repliesHtml = '<p style="font-size: 0.8rem; color: var(--text-secondary); font-style: italic; margin-top: 0.5rem; text-align: left;">No replies yet.</p>';
+                    }
+                    
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.4rem; margin-bottom: 0.6rem;">
+                            <span style="font-weight: bold; color: var(--accent-gold-light); font-size: 0.9rem;">${mod.title}</span>
+                            <span style="font-size: 0.72rem; color: var(--text-secondary);">${new Date(q.date).toLocaleString()}</span>
+                        </div>
+                        <p style="margin: 0; font-size: 0.95rem; color: #fff; font-weight: 500; text-align: left;">Q: "${q.question}"</p>
+                        <div style="margin-top: 0.8rem; padding-left: 1rem; border-left: 1px dashed rgba(255,255,255,0.15);">
+                            ${repliesHtml}
+                        </div>
+                        
+                        <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                            <input type="text" id="reply_input_${q.id}" class="glass-input" style="flex: 1; padding: 0.4rem 0.8rem; font-size: 0.85rem;" placeholder="Type your reply here...">
+                            <button class="btn btn-primary" onclick="submitQAQuestionReply('${student.id}', '${q.id}')" style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">Reply</button>
+                        </div>
+                    `;
+                    paneQA.appendChild(card);
+                });
+            }
+
+            window.submitQAQuestionReply = async (studentId, questionId) => {
+                const input = document.getElementById(`reply_input_${questionId}`);
+                if (!input) return;
+                const replyText = input.value.trim();
+                if (!replyText) return;
+                
+                const currentAdmin = AuthAPI.getCurrentAdmin();
+                const currentInstructor = AuthAPI.getCurrentInstructor();
+                const replierName = currentAdmin ? currentAdmin.username : (currentInstructor ? currentInstructor.name : 'Teacher');
+                
+                const res = await AuthAPI.replyToQuestion(studentId, questionId, replyText, replierName);
+                if (res.success) {
+                    showToast("Reply saved successfully!");
+                    renderModalQA();
+                } else {
+                    alert("Error: " + (res.error || "Failed to save reply."));
+                }
+            };
+
+            function renderModalChat() {
+                const paneChat = document.getElementById('modalContentChat');
+                if (!paneChat || !activeModalStudentId) return;
+                const students = AuthAPI.getAllStudents();
+                const student = students.find(s => s.id === activeModalStudentId);
+                if (!student) return;
+                
+                paneChat.innerHTML = '';
+                
+                const chatBox = document.createElement('div');
+                chatBox.style.display = 'flex';
+                chatBox.style.flexDirection = 'column';
+                chatBox.style.height = '420px';
+                chatBox.style.background = 'rgba(0,0,0,0.2)';
+                chatBox.style.borderRadius = '12px';
+                chatBox.style.border = '1px solid var(--glass-border)';
+                chatBox.style.overflow = 'hidden';
+                
+                const msgsArea = document.createElement('div');
+                msgsArea.id = 'chat-messages-area';
+                msgsArea.style.flex = '1';
+                msgsArea.style.overflowY = 'auto';
+                msgsArea.style.padding = '1.5rem';
+                msgsArea.style.display = 'flex';
+                msgsArea.style.flexDirection = 'column';
+                msgsArea.style.gap = '1rem';
+                
+                const messages = student.chatMessages || [];
+                if (messages.length === 0) {
+                    msgsArea.innerHTML = '<div style="text-align:center;color:var(--text-secondary);margin:auto;padding:2rem;">Start a private counseling chat for spiritual concerns.</div>';
+                } else {
+                    messages.forEach(msg => {
+                        const isMe = msg.senderId !== student.id;
+                        const wrapper = document.createElement('div');
+                        wrapper.style.display = 'flex';
+                        wrapper.style.justifyContent = isMe ? 'flex-end' : 'flex-start';
+                        
+                        const bubble = document.createElement('div');
+                        bubble.style.maxWidth = '70%';
+                        bubble.style.padding = '0.8rem 1rem';
+                        bubble.style.borderRadius = isMe ? '12px 12px 0 12px' : '12px 12px 12px 0';
+                        bubble.style.background = isMe ? 'linear-gradient(135deg, var(--accent-gold-dark), rgba(212,175,55,0.45))' : 'rgba(255,255,255,0.06)';
+                        bubble.style.border = isMe ? '1px solid rgba(212,175,55,0.3)' : '1px solid rgba(255,255,255,0.1)';
+                        bubble.style.color = '#fff';
+                        bubble.style.textAlign = 'left';
+                        
+                        bubble.innerHTML = `
+                            <div style="font-size: 0.72rem; color: ${isMe ? 'var(--accent-gold-light)' : 'var(--text-secondary)'}; font-weight: bold; margin-bottom: 0.25rem;">
+                                ${msg.senderName}
+                            </div>
+                            <div style="font-size: 0.9rem; line-height: 1.4; word-break: break-word;">${msg.message}</div>
+                            <div style="font-size: 0.65rem; color: rgba(255,255,255,0.4); text-align: right; margin-top: 0.3rem;">
+                                ${new Date(msg.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                            </div>
+                        `;
+                        wrapper.appendChild(bubble);
+                        msgsArea.appendChild(wrapper);
+                    });
+                }
+                
+                const inputArea = document.createElement('div');
+                inputArea.style.padding = '1rem';
+                inputArea.style.borderTop = '1px solid var(--glass-border)';
+                inputArea.style.background = 'rgba(0,0,0,0.3)';
+                inputArea.style.display = 'flex';
+                inputArea.style.gap = '0.8rem';
+                
+                inputArea.innerHTML = `
+                    <input type="text" id="chat-send-input" class="glass-input" style="flex: 1; padding: 0.6rem 1rem; font-size: 0.9rem;" placeholder="Type private message for spiritual concerns...">
+                    <button class="btn btn-primary" id="btn-chat-send" style="padding: 0.6rem 1.5rem; font-size: 0.9rem; height: auto;">Send</button>
+                `;
+                
+                chatBox.appendChild(msgsArea);
+                chatBox.appendChild(inputArea);
+                paneChat.appendChild(chatBox);
+                
+                // Scroll messages to bottom
+                setTimeout(() => {
+                    msgsArea.scrollTop = msgsArea.scrollHeight;
+                    const input = document.getElementById('chat-send-input');
+                    if (input) {
+                        input.focus();
+                        input.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter') {
+                                document.getElementById('btn-chat-send').click();
+                            }
+                        });
+                    }
+                }, 100);
+                
+                document.getElementById('btn-chat-send').addEventListener('click', async () => {
+                    const input = document.getElementById('chat-send-input');
+                    const val = input.value.trim();
+                    if (!val) return;
+                    
+                    const currentAdmin = AuthAPI.getCurrentAdmin();
+                    const currentInstructor = AuthAPI.getCurrentInstructor();
+                    
+                    const senderId = currentAdmin ? 'admin' : currentInstructor.id;
+                    const senderName = currentAdmin ? currentAdmin.username : currentInstructor.name;
+                    
+                    input.value = '';
+                    const res = await AuthAPI.sendChatMessage(student.id, val, senderId, senderName);
+                    if (res.success) {
+                        renderModalChat();
+                    } else {
+                        alert("Error sending message: " + (res.error || "unknown"));
+                    }
+                });
+            }
+
+            // Expose view answers function globally
             window.viewStudentAnswers = (id) => {
                 activeModalStudentId = id;
+                const currentAdmin = AuthAPI.getCurrentAdmin();
+                const currentInstructor = AuthAPI.getCurrentInstructor();
                 const students = AuthAPI.getAllStudents();
                 const student = students.find(s => s.id === id);
                 if (student) {
+                    if (currentInstructor && student.outreach !== currentInstructor.outreach) {
+                        alert("Access Restricted: You are not the assigned overseer for Outreach " + student.outreach);
+                        return;
+                    }
+
                     document.getElementById('modalStudentName').innerText = `${student.firstName} ${student.lastName}`;
+                    
+                    // Show chat badge if any unread
+                    const unreadChatCount = (student.chatMessages || []).filter(m => m.senderId === student.id && !m.readByInstructor).length;
+                    const badge = document.getElementById('modal-chat-badge');
+                    if (badge) {
+                        if (unreadChatCount > 0) {
+                            badge.innerText = unreadChatCount;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+
                     const container = document.getElementById('modalAnswersContainer');
                     container.innerHTML = '';
                     
@@ -936,8 +1299,8 @@
                             header.style.paddingBottom = '0.6rem';
                             header.style.marginBottom = '1rem';
                             header.innerHTML = `
-                                <h3 style="margin: 0; font-size: 1.25rem; color: #f5d97e; font-family: var(--font-serif);">${mod.title}</h3>
-                                ${mod.subtitle ? `<p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: #8a9bb0;">${mod.subtitle}</p>` : ''}
+                                <h3 style="margin: 0; font-size: 1.25rem; color: #f5d97e; font-family: var(--font-serif); text-align: left;">${mod.title}</h3>
+                                ${mod.subtitle ? `<p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: #8a9bb0; text-align: left;">${mod.subtitle}</p>` : ''}
                             `;
                             modSection.appendChild(header);
                             
@@ -959,7 +1322,7 @@
                                 let remarkFormHtml = '';
                                 
                                 if (ans.answer) {
-                                    contentHtml = `<p style="margin: 0.5rem 0; color: #e2e8f0; line-height: 1.5; font-size: 0.92rem;"><strong>Response:</strong> <span style="font-style: italic; color: #ffffff;">"${ans.answer}"</span></p>`;
+                                    contentHtml = `<p style="margin: 0.5rem 0; color: #e2e8f0; line-height: 1.5; font-size: 0.92rem; text-align: left;"><strong>Response:</strong> <span style="font-style: italic; color: #ffffff;">"${ans.answer}"</span></p>`;
                                 } else if (ans.file) {
                                     let previewHtml = '';
                                     if (ans.file.url) {
@@ -973,7 +1336,7 @@
                                         }
                                     }
                                     contentHtml = `
-                                        <div style="margin: 0.5rem 0; font-size: 0.92rem; color: #e2e8f0;">
+                                        <div style="margin: 0.5rem 0; font-size: 0.92rem; color: #e2e8f0; text-align: left;">
                                             <strong>Attached File:</strong> <span style="font-family: monospace; font-size: 0.85rem; color: #f5d97e;">${ans.file.name} (${ans.file.size})</span>
                                             ${previewHtml}
                                         </div>
@@ -982,7 +1345,7 @@
                                 
                                 if (ans.score !== null) {
                                     gradeHtml = `
-                                        <div style="font-size: 0.85rem; font-weight: bold; color: ${ans.isCorrect ? '#4ade80' : '#f87171'}; margin-top: 0.4rem;">
+                                        <div style="font-size: 0.85rem; font-weight: bold; color: ${ans.isCorrect ? '#4ade80' : '#f87171'}; margin-top: 0.4rem; text-align: left;">
                                             Auto-Graded Result: ${ans.score} / ${ans.maxScore} (${ans.isCorrect ? 'CORRECT' : 'INCORRECT'})
                                         </div>
                                     `;
@@ -992,7 +1355,7 @@
                                 if (ans.type === 'reflection' || ans.type === 'file_upload' || !ans.type) {
                                     const currentRemark = ans.teacherRemarks || '';
                                     remarkFormHtml = `
-                                        <div style="margin-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.12); padding-top: 1rem;">
+                                        <div style="margin-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.12); padding-top: 1rem; text-align: left;">
                                             <label style="display: block; font-size: 0.8rem; color: #f5d97e; font-weight: bold; margin-bottom: 0.4rem;">INSTRUCTOR REMARKS / COMMENTS</label>
                                             <div style="display: flex; gap: 0.6rem;">
                                                 <textarea id="remark_input_${ans.moduleId}_${ans.componentIndex || ''}" class="glass-input" rows="2" style="flex: 1; font-size: 0.85rem; padding: 0.5rem; line-height: 1.4; color: #fff; background: rgba(0,0,0,0.4);" placeholder="Type your comment/remarks here...">${currentRemark}</textarea>
@@ -1005,7 +1368,7 @@
                                 
                                 card.innerHTML = `
                                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.4rem; margin-bottom: 0.6rem;">
-                                        <span style="font-weight: bold; font-size: 0.92rem; color: #ffffff;">${ans.question}</span>
+                                        <span style="font-weight: bold; font-size: 0.92rem; color: #ffffff; text-align: left;">${ans.question}</span>
                                         <span class="badge" style="background: rgba(212,175,55,0.15); color: #f5d97e; border: 1px solid rgba(212,175,55,0.3); font-size: 0.65rem;">${typeLabel}</span>
                                     </div>
                                     ${contentHtml}
@@ -1020,6 +1383,7 @@
                         });
                     }
                     
+                    switchModalTab(activeModalTab || 'submissions');
                     document.getElementById('answersModal').style.display = 'flex';
                 }
             };
@@ -1031,7 +1395,8 @@
                 const remarkText = textarea.value.trim();
                 
                 const currentAdmin = AuthAPI.getCurrentAdmin();
-                const adminName = currentAdmin ? currentAdmin.username : 'Instructor';
+                const currentInstructor = AuthAPI.getCurrentInstructor();
+                const adminName = currentAdmin ? currentAdmin.username : (currentInstructor ? currentInstructor.name : 'Instructor');
                 
                 const res = AuthAPI.saveTeacherRemark(studentId, moduleId, componentIndex, remarkText, adminName);
                 if (res.success) {
@@ -1046,6 +1411,7 @@
             window.closeAnswersModal = () => {
                 document.getElementById('answersModal').style.display = 'none';
                 activeModalStudentId = null;
+                activeModalTab = 'submissions';
             };
 
             // Expose toggleModule globally
@@ -1972,6 +2338,16 @@
 
             // --- Render Dashboard Lists ---
             function renderDashboard() {
+                const currentInstructor = AuthAPI.getCurrentInstructor();
+                const studentsHeader = document.getElementById('studentManagementHeader');
+                if (studentsHeader) {
+                    if (currentInstructor) {
+                        studentsHeader.innerHTML = `Student Management <span style="font-size: 1.1rem; color: var(--accent-gold); font-weight: normal; margin-left: 1rem; border: 1px solid rgba(212,175,55,0.4); padding: 0.2rem 0.6rem; border-radius: 20px; background: rgba(212,175,55,0.05); white-space: nowrap;">Overseeing: Outreach ${currentInstructor.outreach || 'Unassigned'}</span>`;
+                    } else {
+                        studentsHeader.innerText = 'Student Management';
+                    }
+                }
+
                 const students = AuthAPI.getAllStudents();
                 
                 const pendingList = students.filter(s => s.status === 'pending');
@@ -2087,7 +2463,7 @@
                 // 2. Render Enrolled Table
                 studentsTableBody.innerHTML = '';
                 if (enrolledList.length === 0) {
-                    studentsTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No enrolled students yet.</td></tr>';
+                    studentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No enrolled students yet.</td></tr>';
                 } else {
                     enrolledList.forEach(student => {
                         const tr = document.createElement('tr');
@@ -2105,15 +2481,31 @@
 
                         // Answers button logic
                         let actionHtml = '';
-                        if (student.answers && student.answers.length > 0) {
-                            actionHtml = `<button class="btn btn-secondary" onclick="viewStudentAnswers('${student.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; border-color: rgba(212, 175, 55, 0.4); font-family: var(--font-sans);">View Submissions</button>`;
+                        if (currentInstructor && student.outreach !== currentInstructor.outreach) {
+                            actionHtml = `<span class="badge" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); font-size: 0.75rem;">Restricted (Outreach ${student.outreach || 'Unassigned'})</span>`;
                         } else {
-                            actionHtml = `<span style="color: var(--text-secondary); font-size: 0.85rem; font-style: italic;">No submissions yet</span>`;
+                            actionHtml = `<button class="btn btn-secondary" onclick="viewStudentAnswers('${student.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; border-color: rgba(212, 175, 55, 0.4); font-family: var(--font-sans);">Open Portal</button>`;
+                        }
+
+                        // Outreach assignment dropdown for admins or text label for instructors
+                        let outreachColHtml = '';
+                        if (currentAdmin) {
+                            outreachColHtml = `
+                                <select onchange="handleUpdateStudentOutreach('${student.id}', this.value)" style="background: #0b172c; color: #fff; border: 1px solid rgba(212,175,55,0.3); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-family: var(--font-sans);">
+                                    <option value="" ${!student.outreach ? 'selected' : ''}>Unassigned</option>
+                                    ${Array.from({length: 19}, (_, i) => i + 1).map(num => `
+                                        <option value="${num}" ${student.outreach === num.toString() ? 'selected' : ''}>Outreach ${num}</option>
+                                    `).join('')}
+                                </select>
+                            `;
+                        } else {
+                            outreachColHtml = `<span style="font-weight: bold; color: var(--accent-gold-light);">${student.outreach ? 'Outreach ' + student.outreach : 'Unassigned'}</span>`;
                         }
 
                         tr.innerHTML = `
                             <td><strong>${student.firstName} ${student.lastName}</strong></td>
                             <td style="color: var(--text-secondary); font-size: 0.9rem;">${student.email}</td>
+                            <td>${outreachColHtml}</td>
                             <td><span style="font-family: monospace; background: rgba(255,255,255,0.07); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9rem;">${student.username}</span></td>
                             <td><span style="font-family: monospace; background: rgba(255,255,255,0.07); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9rem;">${student.password}</span></td>
                             <td>${progressHtml}</td>
@@ -2130,9 +2522,10 @@
                 const firstName = document.getElementById('firstName').value;
                 const lastName = document.getElementById('lastName').value;
                 const email = document.getElementById('email').value;
+                const outreach = document.getElementById('outreach').value;
 
                 // Register student (adds as pending)
-                const regRes = AuthAPI.registerStudent(firstName, lastName, email);
+                const regRes = AuthAPI.registerStudent(firstName, lastName, email, outreach);
                 if (regRes.success) {
                     // Approve student instantly
                     const approvedStudent = AuthAPI.approveStudent(regRes.student.id);
@@ -2249,7 +2642,7 @@
 
              // Real-time synchronization event listener
              window.addEventListener('storage', (e) => {
-                 if (e.key === 'jilgm_students' || e.key === 'jilgm_unlocked_modules') {
+                 if (e.key === 'jilgm_students' || e.key === 'jilgm_unlocked_modules' || e.key === 'jilgm_instructors') {
                      renderDashboard();
                      // If the answers modal is open for a student, refresh it in place
                      if (activeModalStudentId) {
@@ -2259,6 +2652,17 @@
                              window.viewStudentAnswers(activeModalStudentId);
                          } else {
                              window.closeAnswersModal();
+                         }
+                     }
+                     if (typeof renderInstructorsAdmin === 'function') {
+                         renderInstructorsAdmin();
+                     }
+
+                     if (e.key === 'jilgm_instructors') {
+                         const freshInst = AuthAPI.getCurrentInstructor();
+                         if (freshInst && freshInst.outreach !== lastInstructorOutreach) {
+                             showToast(`Your assigned outreach has been updated to Outreach ${freshInst.outreach || 'Unassigned'}!`);
+                             lastInstructorOutreach = freshInst.outreach;
                          }
                      }
                  } else if (e.key === 'jilgm_modules_content') {
@@ -2323,12 +2727,37 @@
 
             function renderInstructorsAdmin() {
                 if (!instructorsTableBody) return;
+                const currentInstructor = AuthAPI.getCurrentInstructor();
+                const instructorsHeader = document.getElementById('instructorsHeader');
+                if (instructorsHeader) {
+                    if (currentInstructor) {
+                        instructorsHeader.innerText = 'Co-Instructors Directory';
+                    } else {
+                        instructorsHeader.innerText = 'Instructors Management';
+                    }
+                }
+
                 const list = AuthAPI.getInstructors();
                 instructorsTableBody.innerHTML = '';
+                
+                const currentAdmin = AuthAPI.getCurrentAdmin();
+                const currentInstructorVal = AuthAPI.getCurrentInstructor(); // renamed helper variable to avoid conflict with existing references if any
+                
+                // If instructor is logged in, hide password header and actions header in table
+                const pwdTh = document.querySelector('#panel-instructors th:nth-child(3)');
+                const actionTh = document.querySelector('#panel-instructors th:nth-child(6)');
+                if (currentInstructor) {
+                    if (pwdTh) pwdTh.style.display = 'none';
+                    if (actionTh) actionTh.style.display = 'none';
+                } else {
+                    if (pwdTh) pwdTh.style.display = '';
+                    if (actionTh) actionTh.style.display = '';
+                }
+
                 if (list.length === 0) {
                     instructorsTableBody.innerHTML = `
                         <tr>
-                            <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-secondary); font-style: italic;">
+                            <td colspan="6" style="padding: 2rem; text-align: center; color: var(--text-secondary); font-style: italic;">
                                 No instructors registered. Use the button above to add one.
                             </td>
                         </tr>
@@ -2342,14 +2771,40 @@
                     
                     const dateStr = inst.dateAdded ? new Date(inst.dateAdded).toLocaleDateString() : 'N/A';
                     
+                    let actionColHtml = '';
+                    if (currentAdmin) {
+                        actionColHtml = `<td style="padding: 1rem; text-align: right;">
+                            <button class="btn btn-secondary" onclick="handleDeleteInstructor('${inst.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.75rem; border-color: #ef4444; color: #ef4444; background: transparent; height: auto;">Delete</button>
+                        </td>`;
+                    }
+                    
+                    let pwdColHtml = '';
+                    if (currentAdmin) {
+                        pwdColHtml = `<td style="padding: 1rem; color: var(--text-secondary); font-family: monospace;">${inst.password}</td>`;
+                    }
+
+                    // Outreach assignment dropdown for admins or text label for instructors
+                    let outreachHtml = '';
+                    if (currentAdmin) {
+                        outreachHtml = `
+                            <select onchange="handleUpdateInstructorOutreach('${inst.id}', this.value)" style="background: #0b172c; color: #fff; border: 1px solid rgba(212,175,55,0.3); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-family: var(--font-sans);">
+                                <option value="" ${!inst.outreach ? 'selected' : ''}>Unassigned</option>
+                                ${Array.from({length: 19}, (_, i) => i + 1).map(num => `
+                                    <option value="${num}" ${inst.outreach === num.toString() ? 'selected' : ''}>Outreach ${num}</option>
+                                `).join('')}
+                            </select>
+                        `;
+                    } else {
+                        outreachHtml = `<span style="color: var(--accent-gold-light); font-weight: bold;">${inst.outreach ? 'Outreach ' + inst.outreach : 'Unassigned'}</span>`;
+                    }
+                    
                     row.innerHTML = `
                         <td style="padding: 1rem; color: #fff; font-weight: 500;">${inst.name}</td>
                         <td style="padding: 1rem; color: var(--accent-gold-light);">${inst.username}</td>
-                        <td style="padding: 1rem; color: var(--text-secondary); font-family: monospace;">${inst.password}</td>
+                        ${pwdColHtml}
+                        <td style="padding: 1rem; color: var(--text-secondary);">${outreachHtml}</td>
                         <td style="padding: 1rem; color: var(--text-secondary);">${dateStr}</td>
-                        <td style="padding: 1rem; text-align: right;">
-                            <button class="btn btn-secondary" onclick="handleDeleteInstructor('${inst.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.75rem; border-color: #ef4444; color: #ef4444; background: transparent; height: auto;">Delete</button>
-                        </td>
+                        ${actionColHtml}
                     `;
                     instructorsTableBody.appendChild(row);
                 });
@@ -2361,8 +2816,9 @@
                     const name = document.getElementById('newInstructorName').value.trim();
                     const username = document.getElementById('newInstructorUsername').value.trim();
                     const password = document.getElementById('newInstructorPassword').value;
-
-                    const res = AuthAPI.addInstructor(name, username, password);
+                    const outreach = document.getElementById('newInstructorOutreach').value;
+ 
+                    const res = AuthAPI.addInstructor(name, username, password, outreach);
                     if (res.success) {
                         showToast(`Instructor account for "${name}" created!`);
                         instructorRegisterForm.reset();
@@ -2373,6 +2829,26 @@
                     }
                 });
             }
+
+            window.handleUpdateInstructorOutreach = async (id, outreach) => {
+                const res = await AuthAPI.updateInstructorOutreach(id, outreach);
+                if (res.success) {
+                    showToast("Instructor outreach updated!");
+                    renderInstructorsAdmin();
+                } else {
+                    alert("Error: " + (res.error || "Failed to update outreach."));
+                }
+            };
+
+            window.handleUpdateStudentOutreach = async (id, outreach) => {
+                const res = await AuthAPI.updateStudentOutreach(id, outreach);
+                if (res.success) {
+                    showToast("Student outreach updated!");
+                    renderDashboard();
+                } else {
+                    alert("Error: " + (res.error || "Failed to update outreach."));
+                }
+            };
 
             window.handleDeleteInstructor = (id) => {
                 if (confirm("Are you sure you want to delete this instructor account? They will lose access immediately.")) {
