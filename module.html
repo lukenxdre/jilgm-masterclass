@@ -1109,20 +1109,21 @@
                 
                 questions.forEach(q => {
                     const item = document.createElement('div');
-                    item.style.background = 'rgba(255,255,255,0.03)';
-                    item.style.border = '1px solid rgba(255,255,255,0.06)';
+                    item.style.background = 'var(--bg-card, rgba(255, 255, 255, 0.8))';
+                    item.style.border = '1px solid var(--glass-border)';
                     item.style.borderRadius = '8px';
                     item.style.padding = '0.8rem';
                     item.style.fontSize = '0.88rem';
                     item.style.textAlign = 'left';
                     item.style.marginBottom = '0.5rem';
+                    item.style.boxShadow = 'var(--glass-shadow)';
                     
                     let repliesHtml = '';
                     if (q.replies && q.replies.length > 0) {
                         repliesHtml = q.replies.map(r => `
-                            <div style="background: rgba(212,175,55,0.06); border-left: 2px solid var(--accent-gold); padding: 0.4rem 0.6rem; margin-top: 0.4rem; border-radius: 4px;">
-                                <strong style="color: var(--accent-gold-light); font-size: 0.75rem;">${r.senderName}:</strong>
-                                <p style="margin: 0.1rem 0 0; font-size: 0.82rem; color: #fff;">${r.message}</p>
+                            <div style="background: rgba(249,115,22,0.04); border-left: 2px solid var(--accent-gold); padding: 0.4rem 0.6rem; margin-top: 0.4rem; border-radius: 4px;">
+                                <strong style="color: var(--accent-gold); font-size: 0.75rem;">${r.senderName}:</strong>
+                                <p style="margin: 0.1rem 0 0; font-size: 0.82rem; color: var(--text-primary);">${r.message}</p>
                             </div>
                         `).join('');
                     } else {
@@ -1134,8 +1135,8 @@
                             <span>Question</span>
                             <span>${new Date(q.date).toLocaleDateString()}</span>
                         </div>
-                        <p style="margin:0;font-weight:500;color:#fff;">Q: "${q.question}"</p>
-                        <div style="margin-top:0.4rem;padding-left:0.5rem;border-left:1px dashed rgba(255,255,255,0.12);">
+                        <p style="margin:0;font-weight:500;color:var(--text-primary);">Q: "${q.question}"</p>
+                        <div style="margin-top:0.4rem;padding-left:0.5rem;border-left:1px dashed rgba(249,115,22,0.25);">
                             ${repliesHtml}
                         </div>
                     `;

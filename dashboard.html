@@ -539,14 +539,10 @@
                 const dynamicModulesContainer = document.getElementById('dynamicModulesContainer');
                 dynamicModulesContainer.innerHTML = '';
 
-                // Grab raw data directly from your browser's localStorage memory
-                const rawModsContent = localStorage.getItem('jilgm_modules_content');
-                const rawUnlocked = localStorage.getItem('jilgm_unlocked_modules');
-
-                // Parse the data or fallback to empty containers if they don't exist yet
-                const modsContent = rawModsContent ? JSON.parse(rawModsContent) : {};
+                // Grab data via AuthAPI to ensure correct default fallbacks (e.g. defaultModules, ['module1'])
+                const modsContent = AuthAPI.getModulesContent();
                 const modIds = Object.keys(modsContent);
-                const unlockedModules = rawUnlocked ? JSON.parse(rawUnlocked) : [];
+                const unlockedModules = AuthAPI.getUnlockedModules();
                 const studentAnswers = user.answers || [];
 
                 const modulesData = modIds.map((id, index) => {
