@@ -618,18 +618,40 @@
                     const allStudents = AuthAPI.getAllStudents();
                     const cohortList = allStudents.filter(s => s.status === 'approved' && s.outreach === inst.outreach);
                     const modsContent = AuthAPI.getModulesContent();
+                    const modIds = Object.keys(modsContent);
 
                     qaBoardContainer.innerHTML = '';
                     let questionCount = 0;
 
                     cohortList.forEach(student => {
                         const questions = student.questions || [];
+                        if (questions.length === 0) return;
+                        
+                        const studentSection = document.createElement('div');
+                        studentSection.style.marginBottom = '2rem';
+                        studentSection.style.padding = '1.5rem';
+                        studentSection.style.borderRadius = '12px';
+                        studentSection.style.background = 'rgba(255, 255, 255, 0.02)';
+                        studentSection.style.border = '1px solid rgba(255,255,255,0.05)';
+
+                        const studentHeader = document.createElement('h3');
+                        studentHeader.style.color = 'var(--accent-gold)';
+                        studentHeader.style.margin = '0 0 1rem 0';
+                        studentHeader.style.borderBottom = '1px solid rgba(212,175,55,0.3)';
+                        studentHeader.style.paddingBottom = '0.5rem';
+                        studentHeader.innerText = `${student.firstName} ${student.lastName}`;
+                        studentSection.appendChild(studentHeader);
+
                         questions.forEach(q => {
                             questionCount++;
+                            const modIdx = modIds.indexOf(q.moduleId) + 1;
+                            const modNum = modIdx > 0 ? `Module ${modIdx}: ` : '';
                             const mod = modsContent[q.moduleId] || { title: q.moduleId };
+                            
                             const card = document.createElement('div');
                             card.className = 'glass-card';
                             card.style.padding = '1.5rem';
+                            card.style.marginBottom = '1rem';
                             card.style.borderColor = 'rgba(255, 255, 255, 0.05)';
 
                             let repliesHtml = '';
@@ -647,8 +669,7 @@
                             card.innerHTML = `
                                 <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(249,115,22,0.12); padding-bottom: 0.5rem; margin-bottom: 0.8rem;">
                                     <div>
-                                        <strong style="color: var(--accent-gold); font-size: 0.95rem;">${student.firstName} ${student.lastName}</strong>
-                                        <span style="font-size: 0.78rem; color: var(--text-secondary); margin-left: 0.5rem;">&bull; ${mod.title}</span>
+                                        <a href="module.html?id=${q.moduleId}&preview=true&from=instructor" style="font-size: 0.85rem; color: var(--accent-gold); text-decoration: none; border-bottom: 1px dashed rgba(212,175,55,0.4); font-weight: bold;">${modNum}${mod.title}</a>
                                     </div>
                                     <span style="font-size: 0.72rem; color: var(--text-secondary);">${new Date(q.date).toLocaleString()}</span>
                                 </div>
@@ -657,12 +678,13 @@
                                     ${repliesHtml}
                                 </div>
                                 <div style="margin-top: 1.2rem; display: flex; gap: 0.5rem;">
-                                    <input type="text" id="board_reply_input_${q.id}" class="glass-input" style="flex: 1; padding: 0.4rem 0.8rem; font-size: 0.85rem;" placeholder="Type your reply to ${student.firstName}...">
+                                    <input type="text" id="board_reply_input_${q.id}" class="glass-input" style="flex: 1; padding: 0.4rem 0.8rem; font-size: 0.85rem;" placeholder="Type your reply...">
                                     <button class="btn btn-primary" onclick="submitBoardQAQuestionReply('${student.id}', '${q.id}')" style="padding: 0.4rem 1.2rem; font-size: 0.85rem; height: auto;">Reply</button>
                                 </div>
                             `;
-                            qaBoardContainer.appendChild(card);
+                            studentSection.appendChild(card);
                         });
+                        qaBoardContainer.appendChild(studentSection);
                     });
 
                     if (questionCount === 0) {
@@ -971,7 +993,11 @@
                         grouped[ans.moduleId].push(ans);
                     });
 
+                    const modIdsArray = Object.keys(modsContent);
+
                     Object.keys(grouped).forEach(modId => {
+                        const modIdx = modIdsArray.indexOf(modId) + 1;
+                        const modNum = modIdx > 0 ? `Module ${modIdx}: ` : '';
                         const mod = modsContent[modId] || { title: 'Unknown Module' };
                         const modSection = document.createElement('div');
                         modSection.style.border = '1.5px solid rgba(249, 115, 22, 0.2)';
@@ -986,7 +1012,7 @@
                         header.style.borderBottom = '2px solid rgba(249, 115, 22, 0.25)';
                         header.style.paddingBottom = '0.6rem';
                         header.style.marginBottom = '1rem';
-                        header.innerHTML = `<h4 style="margin: 0; font-size: 1.15rem; color: var(--accent-gold); font-family: var(--font-serif); font-style: italic;">${mod.title}</h4>`;
+                        header.innerHTML = `<h4 style="margin: 0; font-size: 1.15rem; font-family: var(--font-serif); font-style: italic;"><a href="module.html?id=${modId}&preview=true&from=instructor" style="color: var(--accent-gold); text-decoration: none; border-bottom: 1px dashed rgba(212,175,55,0.4);">${modNum}${mod.title}</a></h4>`;
                         modSection.appendChild(header);
 
                         grouped[modId].forEach(ans => {
@@ -1069,7 +1095,10 @@
                     }
 
                     const modsContent = AuthAPI.getModulesContent();
+                    const modIds = Object.keys(modsContent);
                     questions.forEach(q => {
+                        const modIdx = modIds.indexOf(q.moduleId) + 1;
+                        const modNum = modIdx > 0 ? `Module ${modIdx}: ` : '';
                         const mod = modsContent[q.moduleId] || { title: q.moduleId };
                         const card = document.createElement('div');
                         card.style.background = 'var(--bg-card, rgba(255, 255, 255, 0.85))';
@@ -1092,9 +1121,9 @@
                         }
 
                         card.innerHTML = `
-                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.4rem; margin-bottom: 0.6rem;">
-                                <span style="font-weight: bold; color: var(--accent-gold); font-size: 0.9rem;">${mod.title}</span>
-                                <span style="font-size: 0.72rem; color: var(--text-secondary);">${new Date(q.date).toLocaleString()}</span>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.4rem; margin-bottom: 0.6rem;">
+                                <a href="module.html?id=${q.moduleId}&preview=true&from=instructor" style="font-weight: bold; color: var(--accent-gold); font-size: 0.9rem; text-decoration: none; border-bottom: 1px dashed rgba(212,175,55,0.4);">${modNum}${mod.title}</a>
+                                <span style="font-size: 0.75rem; color: var(--text-secondary);">${new Date(q.date).toLocaleString()}</span>
                             </div>
                             <p style="margin: 0; font-size: 0.95rem; color: var(--text-primary); font-weight: 500; text-align: left;">Q: "${q.question}"</p>
                             <div style="margin-top: 0.8rem; padding-left: 1rem; border-left: 1px dashed var(--glass-border);">

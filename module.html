@@ -171,8 +171,9 @@
             } else {
                 const backBtn = document.getElementById('sidebarBackBtn');
                 if (backBtn) {
-                    backBtn.innerText = '← Back to Admin';
-                    backBtn.href = 'admin.html';
+                    const fromInst = urlParams.get('from') === 'instructor';
+                    backBtn.innerText = fromInst ? '← Back to Dashboard' : '← Back to Admin';
+                    backBtn.href = fromInst ? 'instructor_dashboard.html' : 'admin.html';
                 }
             }
 
