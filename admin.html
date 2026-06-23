@@ -826,40 +826,10 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             try {
-                // Secure page check immediately for either admin or instructor
-                AuthAPI.requireAdminOrInstructorAuth();
+                // Secure page check immediately for admin only
+                AuthAPI.requireAdminAuth();
 
                 const currentAdmin = AuthAPI.getCurrentAdmin();
-                const currentInstructor = AuthAPI.getCurrentInstructor();
-                const isInstructor = !!currentInstructor;
-                let lastInstructorOutreach = currentInstructor ? currentInstructor.outreach : null;
-
-                if (isInstructor) {
-                    // Hide administrative sidebar tabs
-                    const navBuilder = document.getElementById('nav-builder');
-                    const navAnnouncements = document.getElementById('nav-announcements');
-                    const navResources = document.getElementById('nav-resources');
-                    const navSettings = document.getElementById('nav-settings');
-                    
-                    if (navBuilder) navBuilder.style.display = 'none';
-                    if (navAnnouncements) navAnnouncements.style.display = 'none';
-                    if (navResources) navResources.style.display = 'none';
-                    if (navSettings) navSettings.style.display = 'none';
-                    
-                    // Rename Instructors tab to Co-Instructors
-                    const navInstructors = document.getElementById('nav-instructors');
-                    if (navInstructors) navInstructors.innerText = 'Co-Instructors';
-                    
-                    // Hide manual student add button and pending applications card
-                    const btnAddManual = document.getElementById('btn-add-student-manual');
-                    if (btnAddManual) btnAddManual.style.display = 'none';
-                    const secPending = document.getElementById('section-pending');
-                    if (secPending) secPending.style.display = 'none';
-                    
-                    // Hide Add Instructor button
-                    const addInstBtn = document.querySelector('#panel-instructors .dashboard-header .btn');
-                    if (addInstBtn) addInstBtn.style.display = 'none';
-                }
 
                 // Bind sub-tabs inside answersModal
                 const modalTabSub = document.getElementById('modal-tab-submissions');
@@ -2338,14 +2308,9 @@
 
             // --- Render Dashboard Lists ---
             function renderDashboard() {
-                const currentInstructor = AuthAPI.getCurrentInstructor();
                 const studentsHeader = document.getElementById('studentManagementHeader');
                 if (studentsHeader) {
-                    if (currentInstructor) {
-                        studentsHeader.innerHTML = `Student Management <span style="font-size: 1.1rem; color: var(--accent-gold); font-weight: normal; margin-left: 1rem; border: 1px solid rgba(212,175,55,0.4); padding: 0.2rem 0.6rem; border-radius: 20px; background: rgba(212,175,55,0.05); white-space: nowrap;">Overseeing: Outreach ${currentInstructor.outreach || 'Unassigned'}</span>`;
-                    } else {
-                        studentsHeader.innerText = 'Student Management';
-                    }
+                    studentsHeader.innerText = 'Student Management';
                 }
 
                 const students = AuthAPI.getAllStudents();
@@ -2480,27 +2445,17 @@
                         `;
 
                         // Answers button logic
-                        let actionHtml = '';
-                        if (currentInstructor && student.outreach !== currentInstructor.outreach) {
-                            actionHtml = `<span class="badge" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); font-size: 0.75rem;">Restricted (Outreach ${student.outreach || 'Unassigned'})</span>`;
-                        } else {
-                            actionHtml = `<button class="btn btn-secondary" onclick="viewStudentAnswers('${student.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; border-color: rgba(212, 175, 55, 0.4); font-family: var(--font-sans);">Open Portal</button>`;
-                        }
+                        const actionHtml = `<button class="btn btn-secondary" onclick="viewStudentAnswers('${student.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; border-color: rgba(212, 175, 55, 0.4); font-family: var(--font-sans);">Open Portal</button>`;
 
-                        // Outreach assignment dropdown for admins or text label for instructors
-                        let outreachColHtml = '';
-                        if (currentAdmin) {
-                            outreachColHtml = `
-                                <select onchange="handleUpdateStudentOutreach('${student.id}', this.value)" style="background: #0b172c; color: #fff; border: 1px solid rgba(212,175,55,0.3); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-family: var(--font-sans);">
-                                    <option value="" ${!student.outreach ? 'selected' : ''}>Unassigned</option>
-                                    ${Array.from({length: 19}, (_, i) => i + 1).map(num => `
-                                        <option value="${num}" ${student.outreach === num.toString() ? 'selected' : ''}>Outreach ${num}</option>
-                                    `).join('')}
-                                </select>
-                            `;
-                        } else {
-                            outreachColHtml = `<span style="font-weight: bold; color: var(--accent-gold-light);">${student.outreach ? 'Outreach ' + student.outreach : 'Unassigned'}</span>`;
-                        }
+                        // Outreach assignment dropdown for admins
+                        const outreachColHtml = `
+                            <select onchange="handleUpdateStudentOutreach('${student.id}', this.value)" style="background: #0b172c; color: #fff; border: 1px solid rgba(212,175,55,0.3); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-family: var(--font-sans);">
+                                <option value="" ${!student.outreach ? 'selected' : ''}>Unassigned</option>
+                                ${Array.from({length: 19}, (_, i) => i + 1).map(num => `
+                                    <option value="${num}" ${student.outreach === num.toString() ? 'selected' : ''}>Outreach ${num}</option>
+                                `).join('')}
+                            </select>
+                        `;
 
                         tr.innerHTML = `
                             <td><strong>${student.firstName} ${student.lastName}</strong></td>
@@ -2727,32 +2682,21 @@
 
             function renderInstructorsAdmin() {
                 if (!instructorsTableBody) return;
-                const currentInstructor = AuthAPI.getCurrentInstructor();
                 const instructorsHeader = document.getElementById('instructorsHeader');
                 if (instructorsHeader) {
-                    if (currentInstructor) {
-                        instructorsHeader.innerText = 'Co-Instructors Directory';
-                    } else {
-                        instructorsHeader.innerText = 'Instructors Management';
-                    }
+                    instructorsHeader.innerText = 'Instructors Management';
                 }
 
                 const list = AuthAPI.getInstructors();
                 instructorsTableBody.innerHTML = '';
                 
                 const currentAdmin = AuthAPI.getCurrentAdmin();
-                const currentInstructorVal = AuthAPI.getCurrentInstructor(); // renamed helper variable to avoid conflict with existing references if any
                 
-                // If instructor is logged in, hide password header and actions header in table
+                // Ensure password and actions headers are visible
                 const pwdTh = document.querySelector('#panel-instructors th:nth-child(3)');
                 const actionTh = document.querySelector('#panel-instructors th:nth-child(6)');
-                if (currentInstructor) {
-                    if (pwdTh) pwdTh.style.display = 'none';
-                    if (actionTh) actionTh.style.display = 'none';
-                } else {
-                    if (pwdTh) pwdTh.style.display = '';
-                    if (actionTh) actionTh.style.display = '';
-                }
+                if (pwdTh) pwdTh.style.display = '';
+                if (actionTh) actionTh.style.display = '';
 
                 if (list.length === 0) {
                     instructorsTableBody.innerHTML = `
@@ -2766,7 +2710,7 @@
                 }
                 list.forEach(inst => {
                     const row = document.createElement('tr');
-                    row.style.borderBottom = '1px solid rgba(255,255,255,0.03)';
+                    row.style.borderBottom = '1px solid rgba(0,0,0,0.03)';
                     row.style.fontSize = '0.9rem';
                     
                     const dateStr = inst.dateAdded ? new Date(inst.dateAdded).toLocaleDateString() : 'N/A';
@@ -2783,23 +2727,18 @@
                         pwdColHtml = `<td style="padding: 1rem; color: var(--text-secondary); font-family: monospace;">${inst.password}</td>`;
                     }
 
-                    // Outreach assignment dropdown for admins or text label for instructors
-                    let outreachHtml = '';
-                    if (currentAdmin) {
-                        outreachHtml = `
-                            <select onchange="handleUpdateInstructorOutreach('${inst.id}', this.value)" style="background: #0b172c; color: #fff; border: 1px solid rgba(212,175,55,0.3); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-family: var(--font-sans);">
-                                <option value="" ${!inst.outreach ? 'selected' : ''}>Unassigned</option>
-                                ${Array.from({length: 19}, (_, i) => i + 1).map(num => `
-                                    <option value="${num}" ${inst.outreach === num.toString() ? 'selected' : ''}>Outreach ${num}</option>
-                                `).join('')}
-                            </select>
-                        `;
-                    } else {
-                        outreachHtml = `<span style="color: var(--accent-gold-light); font-weight: bold;">${inst.outreach ? 'Outreach ' + inst.outreach : 'Unassigned'}</span>`;
-                    }
+                    // Outreach assignment dropdown for admins
+                    const outreachHtml = `
+                        <select onchange="handleUpdateInstructorOutreach('${inst.id}', this.value)" style="background: #0b172c; color: #fff; border: 1px solid rgba(212,175,55,0.3); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-family: var(--font-sans);">
+                            <option value="" ${!inst.outreach ? 'selected' : ''}>Unassigned</option>
+                            ${Array.from({length: 19}, (_, i) => i + 1).map(num => `
+                                <option value="${num}" ${inst.outreach === num.toString() ? 'selected' : ''}>Outreach ${num}</option>
+                            `).join('')}
+                        </select>
+                    `;
                     
                     row.innerHTML = `
-                        <td style="padding: 1rem; color: #fff; font-weight: 500;">${inst.name}</td>
+                        <td style="padding: 1rem; color: var(--text-primary); font-weight: 500;">${inst.name}</td>
                         <td style="padding: 1rem; color: var(--accent-gold-light);">${inst.username}</td>
                         ${pwdColHtml}
                         <td style="padding: 1rem; color: var(--text-secondary);">${outreachHtml}</td>

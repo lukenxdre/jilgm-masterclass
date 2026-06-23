@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructor Dashboard - JILGM Masterclass</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Firebase SDK Compat -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script type="module" src="auth.js?v=2.1"></script>
+    <script src="transitions.js" defer></script>
+    
+    <style>
+        /* Fierce Sunset Theme Overrides (Light Mode) */
+        body.dashboard-layout {
+            /* Sunset Theme CSS Variables Overrides */
+            --bg-dark: #faf8f5 !important;
+            --bg-darker: #f5eae0 !important;
+            --bg-card: rgba(255, 255, 255, 0.82) !important;
+            
+            --text-primary: #1e1b18 !important;
+            --text-secondary: #6e5f58 !important;
+            
+            --accent-gold: #f97316 !important; /* Sunset orange */
+            --accent-gold-light: #f59e0b !important; /* Sunset amber */
+            --accent-gold-dark: #dc2626 !important; /* Crimson red */
+            
+            --glass-border: rgba(249, 115, 22, 0.2) !important;
+            --glass-shadow: 0 10px 30px rgba(249, 115, 22, 0.04), 0 1px 3px rgba(0, 0, 0, 0.01) !important;
+
+            background: radial-gradient(circle at 50% 50%, #fffbf7 0%, #faefe4 100%) !important;
+            color: #1e1b18 !important;
+        }
+
+        body.dashboard-layout::before {
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(249, 115, 22, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(220, 38, 38, 0.06) 0%, transparent 50%) !important;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #fbf6f0 0%, #f4eae0 100%) !important;
+            border-right: 2px solid rgba(249, 115, 22, 0.2) !important;
+            box-shadow: 10px 0 30px rgba(249, 115, 22, 0.03) !important;
+        }
+
+        .sidebar-nav a {
+            color: #6e5f58 !important;
+        }
+
+        .sidebar-nav a:hover {
+            color: #ea580c !important;
+            background: rgba(249, 115, 22, 0.08) !important;
+            border-left: 3px solid rgba(249, 115, 22, 0.4) !important;
+            transform: translateX(4px);
+        }
+
+        .sidebar-nav a.active {
+            color: #ea580c !important;
+            background: linear-gradient(90deg, rgba(249, 115, 22, 0.12) 0%, rgba(249, 115, 22, 0.02) 100%) !important;
+            border-left: 3px solid #f97316 !important;
+            box-shadow: inset 0 0 10px rgba(249, 115, 22, 0.05) !important;
+        }
+
+        .dashboard-content {
+            background: transparent !important;
+        }
+
+        /* Fierce Sunset Hero Banner */
+        .dash-hero {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg,
+                #b91c1c 0%,
+                #ea580c 50%,
+                #f59e0b 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.25) !important;
+            box-shadow: 0 12px 40px rgba(234, 88, 12, 0.2), inset 0 0 50px rgba(255, 255, 255, 0.08) !important;
+            border-radius: 20px;
+            padding: 2.4rem 2.4rem 1.6rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+        .dash-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 80% at 5% 50%, rgba(255,255,255,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 95% 20%, rgba(255,255,255,0.06) 0%, transparent 70%) !important;
+            pointer-events: none;
+        }
+        .dash-hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .dash-hero-label {
+            font-family: var(--font-sans, 'Outfit', sans-serif);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #ffe5d9 !important;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .dash-hero-label::before,
+        .dash-hero-label::after {
+            content: '';
+            display: block;
+            width: 28px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ffe5d9) !important;
+        }
+        .dash-hero-label::before { transform: rotate(180deg); }
+        .dash-hero-welcome {
+            font-family: var(--font-serif, 'Playfair Display', serif);
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-style: italic;
+            font-weight: 600;
+            color: #ffffff !important;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            margin: 0 0 0.4rem;
+            line-height: 1.2;
+        }
+        .dash-hero-welcome span {
+            color: #fffbdf !important;
+            text-shadow: 0 0 30px rgba(255, 251, 223, 0.4) !important;
+        }
+        .dash-hero-sub {
+            font-size: 0.92rem;
+            color: #ffe5d9 !important;
+            margin: 0;
+            line-height: 1.6;
+        }
+        .dash-user-badge {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.12) !important;
+            border: 1px solid rgba(255, 255, 255, 0.25) !important;
+            border-radius: 14px;
+            padding: 0.9rem 1.3rem;
+            flex-shrink: 0;
+            backdrop-filter: blur(10px);
+        }
+        .dash-user-info { text-align: right; }
+        .dash-user-name {
+            font-family: var(--font-sans, 'Outfit', sans-serif);
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #ffffff !important;
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+        .dash-user-role {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #fffbdf !important;
+            font-weight: 700;
+        }
+        .dash-avatar {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fffbdf, #ffd0b5) !important;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            font-family: var(--font-serif, 'Playfair Display', serif);
+            color: #9a3412 !important;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.15) !important;
+        }
+        .dash-hero-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.4rem 0 1.2rem;
+        }
+        .dash-hero-divider-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent) !important;
+        }
+        .dash-hero-diamond {
+            width: 6px; height: 6px;
+            background: #fffbdf !important;
+            transform: rotate(45deg);
+            flex-shrink: 0;
+        }
+
+        /* Headers and Dividers */
+        .dashboard-header {
+            border-bottom: 1.5px solid rgba(249, 115, 22, 0.25) !important;
+            margin-bottom: 2.5rem !important;
+            padding-bottom: 1.2rem !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dashboard-header h1 {
+            color: #1e1b18 !important;
+            font-size: 2.2rem !important;
+            font-family: var(--font-serif, 'Playfair Display', serif) !important;
+            font-style: italic !important;
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(249, 115, 22, 0.18) !important;
+            box-shadow: 0 12px 40px rgba(249, 115, 22, 0.05) !important;
+            color: #1e1b18 !important;
+        }
+        .glass-card:hover {
+            border-color: rgba(249, 115, 22, 0.35) !important;
+        }
+
+        /* Table custom styling for sunset readability */
+        .admin-table-container {
+            background: transparent !important;
+            border: none !important;
+            margin-top: 0 !important;
+        }
+        table {
+            color: #1e1b18 !important;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: rgba(249, 115, 22, 0.06) !important;
+            color: #c2410c !important;
+            border-bottom: 2px solid rgba(249, 115, 22, 0.25) !important;
+            font-weight: 700 !important;
+            padding: 1rem !important;
+            text-transform: uppercase !important;
+            font-size: 0.8rem !important;
+            letter-spacing: 0.05em !important;
+        }
+        td {
+            border-bottom: 1px solid rgba(249, 115, 22, 0.08) !important;
+            padding: 1rem !important;
+            color: #2d2724 !important;
+        }
+        tr:hover td {
+            background: rgba(249, 115, 22, 0.02) !important;
+        }
+        table td, table td strong, table td span {
+            color: #2d2724 !important;
+        }
+
+        /* Private Counseling Chat */
+        .chat-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 1.5rem;
+            height: 550px;
+            background: rgba(255, 255, 255, 0.8) !important;
+            border-radius: 16px;
+            border: 1px solid rgba(249, 115, 22, 0.2) !important;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(249, 115, 22, 0.04) !important;
+        }
+        .chat-sidebar {
+            border-right: 1px solid rgba(249, 115, 22, 0.15) !important;
+            background: rgba(249, 115, 22, 0.02) !important;
+        }
+        .chat-sidebar-header {
+            color: #c2410c !important;
+            border-bottom: 1px solid rgba(249, 115, 22, 0.15) !important;
+        }
+        .chat-student-item {
+            border-bottom: 1px solid rgba(249, 115, 22, 0.06) !important;
+        }
+        .chat-student-item:hover, .chat-student-item.active {
+            background: rgba(249, 115, 22, 0.08) !important;
+        }
+        .chat-student-name {
+            color: #1e1b18 !important;
+        }
+        .chat-student-email {
+            color: #6e5f58 !important;
+        }
+        .chat-pane-empty {
+            background: transparent !important;
+            color: #6e5f58 !important;
+        }
+
+        /* Glass Input inside cards */
+        .glass-input {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border: 1px solid rgba(249, 115, 22, 0.25) !important;
+            color: #1e1b18 !important;
+        }
+        .glass-input:focus {
+            border-color: #f97316 !important;
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.15) !important;
+        }
+
+        #liveUpdateToast.visible {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+            pointer-events: auto !important;
+        }
+    </style>
+</head>
+<body class="dashboard-layout page-loading">
+
+    <!-- Live update toast -->
+    <div id="liveUpdateToast" style="position: fixed; bottom: 1.5rem; right: 1.5rem; background: linear-gradient(135deg, rgba(212,175,55,0.18), rgba(212,175,55,0.08)); border: 1px solid rgba(212,175,55,0.5); color: #f5d97e; padding: 0.6rem 1.1rem; border-radius: 50px; font-size: 0.8rem; font-family: var(--font-sans); font-weight: 500; letter-spacing: 0.03em; backdrop-filter: blur(12px); box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 0.45rem; z-index: 9999; opacity: 0; transform: translateY(12px); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none;">✦ Content updated by admin</div>
+    
+    <aside class="sidebar">
+        <a href="index.html" class="logo-sidebar-brand">
+            <img src="hero_logo.png" alt="JILGM Riyadh Logo" class="sidebar-logo">
+        </a>
+        <nav class="sidebar-nav">
+            <a href="#" id="nav-cohort" class="active">Student Cohort</a>
+            <a href="#" id="nav-qa">Q&A Board</a>
+            <a href="#" id="nav-chat">Counseling Chat <span id="chat-nav-badge" class="badge" style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
+            <a href="#" id="nav-instructors">Co-Instructors</a>
+            <a href="#" onclick="AuthAPI.logoutInstructor(); return false;" style="margin-top: auto; color: #ef4444; border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05);">Sign Out</a>
+            <a href="index.html">Return to Site</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-content">
+        <!-- ── Dashboard hero header ──────────────────────────────────── -->
+        <div class="dash-hero" style="margin-bottom: 2rem;">
+            <div class="dash-hero-top">
+                <div>
+                    <div class="dash-hero-label">JILGM Riyadh Leadership Masterclass &mdash; Instructor Portal</div>
+                    <h1 id="welcomeInstructorName" class="dash-hero-welcome">Welcome back, <span>Teacher</span>!</h1>
+                    <p class="dash-hero-sub">Provide shepherding shepherding, reviews, and guidance to apprentices.</p>
+                </div>
+                <div class="dash-user-badge">
+                    <div class="dash-user-info" style="text-align: right;">
+                        <span class="dash-user-name" id="instructorFullName">Instructor</span>
+                        <span class="dash-user-role" id="instructorRole">Overseer</span>
+                    </div>
+                    <div class="dash-avatar" id="instructorAvatar">👨‍🏫</div>
+                </div>
+            </div>
+
+            <!-- Decorative gold divider -->
+            <div class="dash-hero-divider">
+                <div class="dash-hero-divider-line"></div>
+                <div class="dash-hero-diamond"></div>
+                <div class="dash-hero-divider-line"></div>
+            </div>
+        </div>
+
+        <!-- 1. COHORT PANEL -->
+        <div id="panel-cohort">
+            <div class="dashboard-header">
+                <h1 id="cohortHeader">Student Cohort</h1>
+            </div>
+            
+            <div class="glass-card" style="padding: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card);">
+                <div class="admin-table-container" style="margin-top: 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Assigned Outreach</th>
+                                <th>Apprentice Username</th>
+                                <th>Course Progress</th>
+                                <th style="width: 150px; text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cohortTableBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Q&A PANEL -->
+        <div id="panel-qa" class="hidden">
+            <div class="dashboard-header">
+                <h1>Active Q&A Board</h1>
+            </div>
+            <div id="qaBoardContainer" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+
+        <!-- 3. COUNSELING CHAT PANEL -->
+        <div id="panel-chat" class="hidden">
+            <div class="dashboard-header">
+                <h1>Private Spiritual counseling</h1>
+            </div>
+            <div class="chat-layout">
+                <div class="chat-sidebar">
+                    <div class="chat-sidebar-header">Apprentice Chats</div>
+                    <div id="chatStudentsList">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+                <div id="chatBoxArea" class="chat-pane-empty">
+                    Select an apprentice from the left sidebar to start shepherding counseling
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. CO-INSTRUCTORS PANEL -->
+        <div id="panel-instructors" class="hidden">
+            <div class="dashboard-header">
+                <h1>Co-Instructors Directory</h1>
+            </div>
+            <div class="glass-card" style="padding: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card);">
+                <div class="admin-table-container" style="margin-top: 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Username</th>
+                                <th>Assigned Outreach Oversight</th>
+                                <th>Registered Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coInstructorsTableBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submissions Details Modal -->
+        <div id="answersModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem;">
+            <div class="glass-card" style="max-width: 850px; width: 100%; padding: 2.5rem; border-color: rgba(212, 175, 55, 0.4); max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div>
+                        <h2 style="margin: 0; font-size: 1.6rem; color: var(--accent-gold);" id="modalStudentName">Student Name</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.2rem;">Student Profile, Submissions & Counseling Portal</p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="closeAnswersModal()" style="border-color: #ef4444; color: #ef4444; padding: 0.4rem 0.8rem; height: auto;">Close</button>
+                </div>
+
+                <!-- Modal Sub-Tabs -->
+                <div style="display: flex; border-bottom: 1px solid var(--glass-border); margin-bottom: 1.5rem; gap: 1rem;">
+                    <button id="modal-tab-submissions" class="btn" style="background: none; border: none; border-bottom: 2px solid var(--accent-gold); color: var(--text-primary); font-weight: bold; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0;">Lesson Submissions</button>
+                    <button id="modal-tab-qa" class="btn" style="background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0;">Lesson Q&A</button>
+                    <button id="modal-tab-chat" class="btn" style="background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0; display: flex; align-items: center; gap: 0.4rem;">Private Chat <span id="modal-chat-badge" class="badge" style="background:#ef4444; color:#fff; display:none; border:none; padding: 0.1rem 0.35rem; font-size:0.65rem;">0</span></button>
+                </div>
+                
+                <div id="modal-content-area" style="flex: 1; overflow-y: auto; padding-right: 0.5rem; margin-bottom: 1rem;">
+                    <div id="modalContentSubmissions">
+                        <div id="modalAnswersContainer" style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                    <div id="modalContentQA" class="hidden"></div>
+                    <div id="modalContentChat" class="hidden"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Route authentication enforcement
+                AuthAPI.requireInstructorAuth();
+
+                const welcomeName = document.getElementById('welcomeInstructorName');
+                const instFullName = document.getElementById('instructorFullName');
+                const instRole = document.getElementById('instructorRole');
+                const instAvatar = document.getElementById('instructorAvatar');
+
+                const cohortTableBody = document.getElementById('cohortTableBody');
+                const qaBoardContainer = document.getElementById('qaBoardContainer');
+                const chatStudentsList = document.getElementById('chatStudentsList');
+                const chatBoxArea = document.getElementById('chatBoxArea');
+                const coInstructorsTableBody = document.getElementById('coInstructorsTableBody');
+                const chatNavBadge = document.getElementById('chat-nav-badge');
+
+                // State
+                let activePanel = 'cohort';
+                let activeChatStudentId = null;
+                let activeModalStudentId = null;
+                let activeModalTab = 'submissions';
+                let lastInstructorOutreach = null;
+
+                const currentInstructor = AuthAPI.getCurrentInstructor();
+                if (currentInstructor) {
+                    lastInstructorOutreach = currentInstructor.outreach;
+                }
+
+                // Wait for the background cloud sync promise to complete if active
+                if (window.syncPromise) {
+                    try { await window.syncPromise; } catch(err) { console.warn(err); }
+                }
+                if (window.firebaseSyncPromise) {
+                    try { await window.firebaseSyncPromise; } catch(err) { console.warn(err); }
+                }
+
+                // Render dynamic details
+                function updateIdentityUI() {
+                    const inst = AuthAPI.getCurrentInstructor();
+                    if (!inst) return;
+                    welcomeName.innerHTML = `Welcome back, <span>${inst.name}!</span>`;
+                    instFullName.innerText = inst.name;
+                    instRole.innerText = inst.outreach ? `Overseer - Outreach ${inst.outreach}` : 'Overseer - Unassigned';
+                    instAvatar.innerText = inst.name.charAt(0).toUpperCase();
+
+                    const cohortHeader = document.getElementById('cohortHeader');
+                    if (cohortHeader) {
+                        cohortHeader.innerHTML = `Student Cohort <span style="font-size: 1.1rem; color: var(--accent-gold); font-weight: normal; margin-left: 1rem; border: 1px solid rgba(212,175,55,0.4); padding: 0.2rem 0.6rem; border-radius: 20px; background: rgba(212,175,55,0.05); white-space: nowrap;">Overseeing: Outreach ${inst.outreach || 'Unassigned'}</span>`;
+                    }
+                }
+
+                updateIdentityUI();
+
+                // --- Navigation Tabs ---
+                const tabs = {
+                    cohort: { nav: document.getElementById('nav-cohort'), panel: document.getElementById('panel-cohort') },
+                    qa: { nav: document.getElementById('nav-qa'), panel: document.getElementById('panel-qa') },
+                    chat: { nav: document.getElementById('nav-chat'), panel: document.getElementById('panel-chat') },
+                    instructors: { nav: document.getElementById('nav-instructors'), panel: document.getElementById('panel-instructors') }
+                };
+
+                function switchPanel(panelId) {
+                    activePanel = panelId;
+                    Object.keys(tabs).forEach(k => {
+                        if (tabs[k].nav) {
+                            if (k === panelId) {
+                                tabs[k].nav.classList.add('active');
+                                tabs[k].panel.classList.remove('hidden');
+                            } else {
+                                tabs[k].nav.classList.remove('active');
+                                tabs[k].panel.classList.add('hidden');
+                            }
+                        }
+                    });
+
+                    // Trigger target renderers
+                    if (panelId === 'cohort') renderCohortTable();
+                    if (panelId === 'qa') renderQABoard();
+                    if (panelId === 'chat') renderChatList();
+                    if (panelId === 'instructors') renderInstructorsTable();
+                }
+
+                Object.keys(tabs).forEach(k => {
+                    if (tabs[k].nav) {
+                        tabs[k].nav.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            switchPanel(k);
+                        });
+                    }
+                });
+
+                // Bind modal sub-tabs
+                const modalTabSub = document.getElementById('modal-tab-submissions');
+                const modalTabQA = document.getElementById('modal-tab-qa');
+                const modalTabChat = document.getElementById('modal-tab-chat');
+                
+                if (modalTabSub) modalTabSub.addEventListener('click', () => switchModalTab('submissions'));
+                if (modalTabQA) modalTabQA.addEventListener('click', () => switchModalTab('qa'));
+                if (modalTabChat) modalTabChat.addEventListener('click', () => switchModalTab('chat'));
+
+                // --- Cohort List Renderer ---
+                function renderCohortTable() {
+                    const inst = AuthAPI.getCurrentInstructor();
+                    if (!inst) return;
+
+                    const allStudents = AuthAPI.getAllStudents();
+                    // Filter Cohort to same outreach only
+                    const cohortList = allStudents.filter(s => s.status === 'approved' && s.outreach === inst.outreach);
+
+                    cohortTableBody.innerHTML = '';
+                    if (cohortList.length === 0) {
+                        cohortTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 3rem;">No apprentices registered in Outreach ${inst.outreach || 'Unassigned'} yet.</td></tr>`;
+                        return;
+                    }
+
+                    cohortList.forEach(student => {
+                        const tr = document.createElement('tr');
+                        const progress = student.progress || 0;
+                        const progressHtml = `
+                            <div style="display: flex; align-items: center; gap: 0.8rem;">
+                                <div style="flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                                    <div style="width: ${progress}%; height: 100%; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); border-radius: 3px;"></div>
+                                </div>
+                                <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-gold); min-width: 35px;">${progress}%</span>
+                            </div>
+                        `;
+
+                        tr.innerHTML = `
+                            <td><strong>${student.firstName} ${student.lastName}</strong></td>
+                            <td style="color: var(--text-secondary); font-size: 0.9rem;">${student.email}</td>
+                            <td><span style="font-weight: bold; color: var(--accent-gold-light);">Outreach ${student.outreach}</span></td>
+                            <td><span style="font-family: monospace; background: rgba(255,255,255,0.07); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9rem;">${student.username}</span></td>
+                            <td>${progressHtml}</td>
+                            <td style="text-align: center;"><button class="btn btn-secondary" onclick="viewStudentAnswers('${student.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; border-color: rgba(212, 175, 55, 0.4); font-family: var(--font-sans);">Open Portal</button></td>
+                        `;
+                        cohortTableBody.appendChild(tr);
+                    });
+                }
+
+                // --- Central Q&A Board Renderer ---
+                function renderQABoard() {
+                    const inst = AuthAPI.getCurrentInstructor();
+                    if (!inst || !qaBoardContainer) return;
+
+                    const allStudents = AuthAPI.getAllStudents();
+                    const cohortList = allStudents.filter(s => s.status === 'approved' && s.outreach === inst.outreach);
+                    const modsContent = AuthAPI.getModulesContent();
+
+                    qaBoardContainer.innerHTML = '';
+                    let questionCount = 0;
+
+                    cohortList.forEach(student => {
+                        const questions = student.questions || [];
+                        questions.forEach(q => {
+                            questionCount++;
+                            const mod = modsContent[q.moduleId] || { title: q.moduleId };
+                            const card = document.createElement('div');
+                            card.className = 'glass-card';
+                            card.style.padding = '1.5rem';
+                            card.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+
+                            let repliesHtml = '';
+                            if (q.replies && q.replies.length > 0) {
+                                repliesHtml = q.replies.map(r => `
+                                    <div style="background: rgba(249,115,22,0.04); border-left: 2px solid var(--accent-gold); padding: 0.5rem 0.8rem; margin-top: 0.5rem; border-radius: 4px; text-align: left;">
+                                        <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: bold;">${r.senderName} (${new Date(r.date).toLocaleString()}):</span>
+                                        <p style="margin: 0.2rem 0 0; font-size: 0.88rem; color: var(--text-primary);">${r.message}</p>
+                                    </div>
+                                `).join('');
+                            } else {
+                                repliesHtml = '<p style="font-size: 0.8rem; color: var(--text-secondary); font-style: italic; margin-top: 0.5rem;">No replies yet.</p>';
+                            }
+
+                            card.innerHTML = `
+                                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(249,115,22,0.12); padding-bottom: 0.5rem; margin-bottom: 0.8rem;">
+                                    <div>
+                                        <strong style="color: var(--accent-gold); font-size: 0.95rem;">${student.firstName} ${student.lastName}</strong>
+                                        <span style="font-size: 0.78rem; color: var(--text-secondary); margin-left: 0.5rem;">&bull; ${mod.title}</span>
+                                    </div>
+                                    <span style="font-size: 0.72rem; color: var(--text-secondary);">${new Date(q.date).toLocaleString()}</span>
+                                </div>
+                                <p style="margin: 0; font-size: 0.95rem; color: var(--text-primary); font-weight: 500; text-align: left;">Q: "${q.question}"</p>
+                                <div style="margin-top: 0.8rem; padding-left: 1rem; border-left: 1px dashed rgba(249,115,22,0.25); text-align: left;">
+                                    ${repliesHtml}
+                                </div>
+                                <div style="margin-top: 1.2rem; display: flex; gap: 0.5rem;">
+                                    <input type="text" id="board_reply_input_${q.id}" class="glass-input" style="flex: 1; padding: 0.4rem 0.8rem; font-size: 0.85rem;" placeholder="Type your reply to ${student.firstName}...">
+                                    <button class="btn btn-primary" onclick="submitBoardQAQuestionReply('${student.id}', '${q.id}')" style="padding: 0.4rem 1.2rem; font-size: 0.85rem; height: auto;">Reply</button>
+                                </div>
+                            `;
+                            qaBoardContainer.appendChild(card);
+                        });
+                    });
+
+                    if (questionCount === 0) {
+                        qaBoardContainer.innerHTML = '<div class="glass-card" style="padding: 3rem; text-align: center; color: var(--text-secondary); font-style: italic;">No questions have been posted on the Q&A boards in your outreach yet.</div>';
+                    }
+                }
+
+                window.submitBoardQAQuestionReply = async (studentId, questionId) => {
+                    const input = document.getElementById(`board_reply_input_${questionId}`);
+                    if (!input) return;
+                    const replyText = input.value.trim();
+                    if (!replyText) return;
+                    
+                    const inst = AuthAPI.getCurrentInstructor();
+                    const replierName = inst ? inst.name : 'Teacher';
+                    
+                    const res = await AuthAPI.replyToQuestion(studentId, questionId, replyText, replierName);
+                    if (res.success) {
+                        showToast("Reply saved successfully!");
+                        renderQABoard();
+                    } else {
+                        alert("Error: " + (res.error || "Failed to save reply."));
+                    }
+                };
+
+                // --- Counseling Chat Panel Renderer ---
+                function renderChatList() {
+                    const inst = AuthAPI.getCurrentInstructor();
+                    if (!inst) return;
+
+                    const allStudents = AuthAPI.getAllStudents();
+                    const cohortList = allStudents.filter(s => s.status === 'approved' && s.outreach === inst.outreach);
+
+                    chatStudentsList.innerHTML = '';
+                    if (cohortList.length === 0) {
+                        chatStudentsList.innerHTML = '<div style="color: var(--text-secondary); text-align: center; padding: 2rem; font-size: 0.85rem;">No apprentices registered.</div>';
+                        return;
+                    }
+
+                    cohortList.forEach(student => {
+                        const item = document.createElement('div');
+                        item.className = 'chat-student-item' + (activeChatStudentId === student.id ? ' active' : '');
+                        
+                        const unreadCount = (student.chatMessages || []).filter(m => m.senderId === student.id && !m.readByInstructor).length;
+                        const badgeHtml = unreadCount > 0 ? `<span class="badge" style="background: #ef4444; border: none; padding: 0.15rem 0.4rem; font-size: 0.7rem; color: #fff;">${unreadCount}</span>` : '';
+
+                        item.innerHTML = `
+                            <div class="chat-student-info">
+                                <span class="chat-student-name">${student.firstName} ${student.lastName}</span>
+                                <span class="chat-student-email">${student.email}</span>
+                            </div>
+                            ${badgeHtml}
+                        `;
+                        item.addEventListener('click', () => selectChatStudent(student.id));
+                        chatStudentsList.appendChild(item);
+                    });
+
+                    // Refresh active chat window if matching student
+                    if (activeChatStudentId) {
+                        const activeStudent = cohortList.find(s => s.id === activeChatStudentId);
+                        if (activeStudent) {
+                            renderChatBox(activeStudent);
+                        } else {
+                            activeChatStudentId = null;
+                            chatBoxArea.className = 'chat-pane-empty';
+                            chatBoxArea.innerHTML = 'Select an apprentice from the left sidebar to start shepherding counseling';
+                        }
+                    }
+                }
+
+                function selectChatStudent(studentId) {
+                    activeChatStudentId = studentId;
+                    
+                    // Mark as read
+                    AuthAPI.markChatAsRead(studentId, 'instructor');
+                    updateChatBadge();
+                    
+                    const listItems = chatStudentsList.querySelectorAll('.chat-student-item');
+                    listItems.forEach(el => el.classList.remove('active'));
+                    
+                    renderChatList();
+                }
+
+                function renderChatBox(student) {
+                    chatBoxArea.className = '';
+                    chatBoxArea.innerHTML = '';
+                    chatBoxArea.style.display = 'flex';
+                    chatBoxArea.style.flexDirection = 'column';
+                    chatBoxArea.style.height = '100%';
+                    chatBoxArea.style.justifyContent = 'space-between';
+
+                    // Chat header
+                    const header = document.createElement('div');
+                    header.style.padding = '1.2rem';
+                    header.style.background = 'rgba(0, 0, 0, 0.2)';
+                    header.style.borderBottom = '1px solid var(--glass-border)';
+                    header.style.textAlign = 'left';
+                    header.innerHTML = `
+                        <h4 style="margin: 0; color: var(--accent-gold-light);">${student.firstName} ${student.lastName}</h4>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">${student.email}</span>
+                    `;
+
+                    // Messages area
+                    const msgsArea = document.createElement('div');
+                    msgsArea.id = 'chat-messages-area-panel';
+                    msgsArea.style.flex = '1';
+                    msgsArea.style.overflowY = 'auto';
+                    msgsArea.style.padding = '1.5rem';
+                    msgsArea.style.display = 'flex';
+                    msgsArea.style.flexDirection = 'column';
+                    msgsArea.style.gap = '1rem';
+
+                    const messages = student.chatMessages || [];
+                    if (messages.length === 0) {
+                        msgsArea.innerHTML = '<div style="text-align:center;color:var(--text-secondary);margin:auto;padding:2rem;">Start a private counseling chat for spiritual concerns.</div>';
+                    } else {
+                        messages.forEach(msg => {
+                            const isMe = msg.senderId !== student.id;
+                            const wrapper = document.createElement('div');
+                            wrapper.style.display = 'flex';
+                            wrapper.style.justifyContent = isMe ? 'flex-end' : 'flex-start';
+                            
+                            const bubble = document.createElement('div');
+                            bubble.style.maxWidth = '70%';
+                            bubble.style.padding = '0.8rem 1rem';
+                            bubble.style.borderRadius = isMe ? '12px 12px 0 12px' : '12px 12px 12px 0';
+                            bubble.style.background = isMe ? 'linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark))' : 'rgba(0,0,0,0.05)';
+                            bubble.style.border = isMe ? '1px solid rgba(212,175,55,0.3)' : '1px solid rgba(0,0,0,0.08)';
+                            bubble.style.color = isMe ? '#fff' : 'var(--text-primary)';
+                            bubble.style.textAlign = 'left';
+                            
+                            bubble.innerHTML = `
+                                <div style="font-size: 0.72rem; color: ${isMe ? '#fcd34d' : 'var(--accent-gold)'}; font-weight: bold; margin-bottom: 0.25rem;">
+                                    ${msg.senderName}
+                                </div>
+                                <div style="font-size: 0.9rem; line-height: 1.4; word-break: break-word;">${msg.message}</div>
+                                <div style="font-size: 0.65rem; color: ${isMe ? 'rgba(255,255,255,0.6)' : 'var(--text-secondary)'}; text-align: right; margin-top: 0.3rem;">
+                                    ${new Date(msg.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                </div>
+                            `;
+                            wrapper.appendChild(bubble);
+                            msgsArea.appendChild(wrapper);
+                        });
+                    }
+
+                    // Input area
+                    const inputArea = document.createElement('div');
+                    inputArea.style.padding = '1rem';
+                    inputArea.style.borderTop = '1px solid var(--glass-border)';
+                    inputArea.style.background = 'rgba(0,0,0,0.02)';
+                    inputArea.style.display = 'flex';
+                    inputArea.style.gap = '0.8rem';
+                    
+                    inputArea.innerHTML = `
+                        <input type="text" id="chat-send-input-panel" class="glass-input" style="flex: 1; padding: 0.6rem 1rem; font-size: 0.9rem;" placeholder="Type private message...">
+                        <button class="btn btn-primary" id="btn-chat-send-panel" style="padding: 0.6rem 1.5rem; font-size: 0.9rem; height: auto;">Send</button>
+                    `;
+
+                    chatBoxArea.appendChild(header);
+                    chatBoxArea.appendChild(msgsArea);
+                    chatBoxArea.appendChild(inputArea);
+
+                    // Scroll to bottom
+                    setTimeout(() => {
+                        msgsArea.scrollTop = msgsArea.scrollHeight;
+                        const input = document.getElementById('chat-send-input-panel');
+                        if (input) {
+                            input.focus();
+                            input.addEventListener('keydown', (e) => {
+                                if (e.key === 'Enter') {
+                                    document.getElementById('btn-chat-send-panel').click();
+                                }
+                            });
+                        }
+                    }, 100);
+
+                    document.getElementById('btn-chat-send-panel').addEventListener('click', async () => {
+                        const input = document.getElementById('chat-send-input-panel');
+                        const val = input.value.trim();
+                        if (!val) return;
+                        
+                        const inst = AuthAPI.getCurrentInstructor();
+                        if (!inst) return;
+                        
+                        input.value = '';
+                        const res = await AuthAPI.sendChatMessage(student.id, val, inst.id, inst.name);
+                        if (res.success) {
+                            renderChatList();
+                        } else {
+                            alert("Error sending message: " + (res.error || "unknown"));
+                        }
+                    });
+                }
+
+                // --- Co-Instructors Directory Renderer ---
+                function renderInstructorsTable() {
+                    const list = AuthAPI.getInstructors();
+                    coInstructorsTableBody.innerHTML = '';
+                    
+                    if (list.length === 0) {
+                        coInstructorsTableBody.innerHTML = `<tr><td colspan="4" style="padding: 3rem; text-align: center; color: var(--text-secondary); font-style: italic;">No other instructors registered.</td></tr>`;
+                        return;
+                    }
+
+                    list.forEach(inst => {
+                        const row = document.createElement('tr');
+                        row.style.borderBottom = '1px solid rgba(0,0,0,0.03)';
+                        row.style.fontSize = '0.9rem';
+                        const dateStr = inst.dateAdded ? new Date(inst.dateAdded).toLocaleDateString() : 'N/A';
+                        
+                        row.innerHTML = `
+                            <td style="padding: 1rem; color: var(--text-primary); font-weight: 500;">${inst.name}</td>
+                            <td style="padding: 1rem; color: var(--accent-gold-light);">${inst.username}</td>
+                            <td style="padding: 1rem; color: var(--text-secondary); font-weight: 600;">${inst.outreach ? 'Outreach ' + inst.outreach : 'Unassigned'}</td>
+                            <td style="padding: 1rem; color: var(--text-secondary);">${dateStr}</td>
+                        `;
+                        coInstructorsTableBody.appendChild(row);
+                    });
+                }
+
+                // --- Chat Badge Updates ---
+                function updateChatBadge() {
+                    const inst = AuthAPI.getCurrentInstructor();
+                    if (!inst) return;
+
+                    const students = AuthAPI.getAllStudents();
+                    const cohortList = students.filter(s => s.status === 'approved' && s.outreach === inst.outreach);
+                    
+                    let totalUnread = 0;
+                    cohortList.forEach(s => {
+                        const count = (s.chatMessages || []).filter(m => m.senderId === s.id && !m.readByInstructor).length;
+                        totalUnread += count;
+                    });
+
+                    if (totalUnread > 0) {
+                        chatNavBadge.innerText = totalUnread.toString();
+                        chatNavBadge.style.display = 'inline-block';
+                    } else {
+                        chatNavBadge.style.display = 'none';
+                    }
+                }
+
+                // --- Answers Modal Sub-tabs Logic ---
+                function switchModalTab(tabId) {
+                    activeModalTab = tabId;
+                    const tabSub = document.getElementById('modal-tab-submissions');
+                    const tabQA = document.getElementById('modal-tab-qa');
+                    const tabChat = document.getElementById('modal-tab-chat');
+                    
+                    const paneSub = document.getElementById('modalContentSubmissions');
+                    const paneQA = document.getElementById('modalContentQA');
+                    const paneChat = document.getElementById('modalContentChat');
+                    
+                    [tabSub, tabQA, tabChat].forEach(t => {
+                        if (t) {
+                            t.style.borderBottom = '2px solid transparent';
+                            t.style.color = 'var(--text-secondary)';
+                            t.style.fontWeight = '500';
+                        }
+                    });
+                    [paneSub, paneQA, paneChat].forEach(p => { if (p) p.classList.add('hidden'); });
+                    
+                    if (tabId === 'submissions') {
+                        if (tabSub) { tabSub.style.borderBottom = '2px solid var(--accent-gold)'; tabSub.style.color = 'var(--text-primary)'; tabSub.style.fontWeight = 'bold'; }
+                        if (paneSub) paneSub.classList.remove('hidden');
+                        renderModalSubmissions();
+                    } else if (tabId === 'qa') {
+                        if (tabQA) { tabQA.style.borderBottom = '2px solid var(--accent-gold)'; tabQA.style.color = 'var(--text-primary)'; tabQA.style.fontWeight = 'bold'; }
+                        if (paneQA) paneQA.classList.remove('hidden');
+                        renderModalQA();
+                    } else if (tabId === 'chat') {
+                        if (tabChat) { tabChat.style.borderBottom = '2px solid var(--accent-gold)'; tabChat.style.color = 'var(--text-primary)'; tabChat.style.fontWeight = 'bold'; }
+                        if (paneChat) paneChat.classList.remove('hidden');
+                        renderModalChat();
+                        
+                        if (activeModalStudentId) {
+                            AuthAPI.markChatAsRead(activeModalStudentId, 'instructor');
+                            updateChatBadge();
+                        }
+                    }
+                }
+
+                function renderModalSubmissions() {
+                    const container = document.getElementById('modalAnswersContainer');
+                    if (!container || !activeModalStudentId) return;
+
+                    const students = AuthAPI.getAllStudents();
+                    const student = students.find(s => s.id === activeModalStudentId);
+                    if (!student) return;
+
+                    container.innerHTML = '';
+                    const answers = student.answers || [];
+                    if (answers.length === 0) {
+                        container.innerHTML = '<div style="text-align:center;color:var(--text-secondary);padding:2rem;">No submissions found for this student.</div>';
+                        return;
+                    }
+
+                    const modsContent = AuthAPI.getModulesContent();
+                    const grouped = {};
+                    answers.forEach(ans => {
+                        if (!grouped[ans.moduleId]) grouped[ans.moduleId] = [];
+                        grouped[ans.moduleId].push(ans);
+                    });
+
+                    Object.keys(grouped).forEach(modId => {
+                        const mod = modsContent[modId] || { title: 'Unknown Module' };
+                        const modSection = document.createElement('div');
+                        modSection.style.border = '1.5px solid rgba(249, 115, 22, 0.2)';
+                        modSection.style.borderRadius = '12px';
+                        modSection.style.padding = '1.5rem';
+                        modSection.style.background = 'rgba(255, 255, 255, 0.9)';
+                        modSection.style.marginBottom = '1.5rem';
+                        modSection.style.color = 'var(--text-primary)';
+                        modSection.style.boxShadow = '0 8px 30px rgba(249, 115, 22, 0.04)';
+                        
+                        const header = document.createElement('div');
+                        header.style.borderBottom = '2px solid rgba(249, 115, 22, 0.25)';
+                        header.style.paddingBottom = '0.6rem';
+                        header.style.marginBottom = '1rem';
+                        header.innerHTML = `<h4 style="margin: 0; font-size: 1.15rem; color: var(--accent-gold); font-family: var(--font-serif); font-style: italic;">${mod.title}</h4>`;
+                        modSection.appendChild(header);
+
+                        grouped[modId].forEach(ans => {
+                            const block = document.createElement('div');
+                            block.style.marginBottom = '1.5rem';
+                            block.style.borderBottom = '1px solid rgba(249, 115, 22, 0.12)';
+                            block.style.paddingBottom = '1rem';
+                            
+                            const scoreVal = ans.score !== undefined ? ans.score : '';
+                            const currentRemark = ans.teacherRemarks || '';
+                            const compIdxStr = ans.componentIndex !== null ? ans.componentIndex : 'null';
+
+                            block.innerHTML = `
+                                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.4rem;">
+                                    <span>Task Type: ${ans.type || 'Reflection'}</span>
+                                    <span>Submitted: ${new Date(ans.dateSubmitted).toLocaleString()}</span>
+                                </div>
+                                <div style="background: rgba(249, 115, 22, 0.05); border: 1px solid rgba(249, 115, 22, 0.15); padding: 1rem; border-radius: 6px; font-size: 0.95rem; line-height: 1.5; color: var(--text-primary); margin-bottom: 1rem; white-space: pre-wrap; text-align: left;">${ans.text}</div>
+                                
+                                <div style="background: rgba(249, 115, 22, 0.03); border: 1px solid rgba(249, 115, 22, 0.2); border-radius: 8px; padding: 1rem; margin-top: 0.8rem; display: flex; flex-direction: column; gap: 0.8rem;">
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <label style="font-size: 0.85rem; color: var(--accent-gold); font-weight: bold; min-width: 100px; text-align: left;">GRADE SCORE:</label>
+                                        <input type="number" id="score_input_${ans.moduleId}_${ans.componentIndex !== null ? ans.componentIndex : ''}" class="glass-input" style="width: 80px; padding: 0.3rem 0.5rem; text-align: center;" min="0" max="100" placeholder="0-100" value="${scoreVal}">
+                                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-style: italic;">% (Apprentices view instantly)</span>
+                                    </div>
+                                    <div style="display: flex; gap: 0.8rem; align-items: flex-start;">
+                                        <textarea id="remark_input_${ans.moduleId}_${ans.componentIndex !== null ? ans.componentIndex : ''}" class="glass-input" rows="2" style="flex: 1; font-size: 0.85rem; padding: 0.5rem; line-height: 1.4;" placeholder="Type teacher comments or shepherding remarks here...">${currentRemark}</textarea>
+                                        <button class="btn btn-primary" style="font-size: 0.8rem; padding: 0.5rem 1.2rem; height: auto;" onclick="saveGradeAndRemarks('${student.id}', '${ans.moduleId}', ${compIdxStr})">Save Grade</button>
+                                    </div>
+                                    ${ans.teacherRemarksDate ? `<span style="font-size: 0.72rem; color: var(--text-secondary); text-align: left;">Last evaluated on ${new Date(ans.teacherRemarksDate).toLocaleString()} by ${ans.teacherRemarksAdmin || 'Teacher'}</span>` : ''}
+                                </div>
+                            `;
+                            modSection.appendChild(block);
+                        });
+
+                        container.appendChild(modSection);
+                    });
+                }
+
+                window.saveGradeAndRemarks = async (studentId, moduleId, componentIndex) => {
+                    const searchIdx = componentIndex !== null ? componentIndex : '';
+                    const scoreInput = document.getElementById(`score_input_${moduleId}_${searchIdx}`);
+                    const textarea = document.getElementById(`remark_input_${moduleId}_${searchIdx}`);
+                    if (!textarea || !scoreInput) return;
+
+                    const remarkText = textarea.value.trim();
+                    const scoreVal = scoreInput.value ? parseInt(scoreInput.value) : undefined;
+
+                    const inst = AuthAPI.getCurrentInstructor();
+                    const teacherName = inst ? inst.name : 'Instructor';
+
+                    // Save score
+                    if (scoreVal !== undefined) {
+                        await AuthAPI.saveGradeScore(studentId, moduleId, componentIndex, scoreVal);
+                    }
+
+                    // Save remarks
+                    const res = await AuthAPI.saveTeacherRemark(studentId, moduleId, componentIndex, remarkText, teacherName);
+                    if (res.success) {
+                        showToast('Evaluation details saved & student notified!');
+                        renderModalSubmissions();
+                    } else {
+                        alert('Error saving evaluation details: ' + (res.error || 'unknown'));
+                    }
+                };
+
+                function renderModalQA() {
+                    const paneQA = document.getElementById('modalContentQA');
+                    if (!paneQA || !activeModalStudentId) return;
+
+                    const students = AuthAPI.getAllStudents();
+                    const student = students.find(s => s.id === activeModalStudentId);
+                    if (!student) return;
+
+                    paneQA.innerHTML = '';
+                    const questions = student.questions || [];
+                    if (questions.length === 0) {
+                        paneQA.innerHTML = '<div style="text-align:center;color:var(--text-secondary);padding:3rem;">No questions asked by this student yet.</div>';
+                        return;
+                    }
+
+                    const modsContent = AuthAPI.getModulesContent();
+                    questions.forEach(q => {
+                        const mod = modsContent[q.moduleId] || { title: q.moduleId };
+                        const card = document.createElement('div');
+                        card.style.background = 'rgba(255,255,255,0.03)';
+                        card.style.border = '1px solid rgba(255,255,255,0.08)';
+                        card.style.borderRadius = '8px';
+                        card.style.padding = '1.2rem';
+                        card.style.marginBottom = '1rem';
+
+                        let repliesHtml = '';
+                        if (q.replies && q.replies.length > 0) {
+                            repliesHtml = q.replies.map(r => `
+                                <div style="background: rgba(212,175,55,0.05); border-left: 2px solid var(--accent-gold); padding: 0.5rem 0.8rem; margin-top: 0.5rem; border-radius: 4px; text-align: left;">
+                                    <span style="font-size: 0.75rem; color: var(--accent-gold-light); font-weight: bold;">${r.senderName} (${new Date(r.date).toLocaleString()}):</span>
+                                    <p style="margin: 0.2rem 0 0; font-size: 0.88rem; color: #fff;">${r.message}</p>
+                                </div>
+                            `).join('');
+                        } else {
+                            repliesHtml = '<p style="font-size: 0.8rem; color: var(--text-secondary); font-style: italic; margin-top: 0.5rem; text-align: left;">No replies yet.</p>';
+                        }
+
+                        card.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.4rem; margin-bottom: 0.6rem;">
+                                <span style="font-weight: bold; color: var(--accent-gold-light); font-size: 0.9rem;">${mod.title}</span>
+                                <span style="font-size: 0.72rem; color: var(--text-secondary);">${new Date(q.date).toLocaleString()}</span>
+                            </div>
+                            <p style="margin: 0; font-size: 0.95rem; color: #fff; font-weight: 500; text-align: left;">Q: "${q.question}"</p>
+                            <div style="margin-top: 0.8rem; padding-left: 1rem; border-left: 1px dashed rgba(255,255,255,0.15);">
+                                ${repliesHtml}
+                            </div>
+                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                                <input type="text" id="modal_reply_input_${q.id}" class="glass-input" style="flex: 1; padding: 0.4rem 0.8rem; font-size: 0.85rem;" placeholder="Type your reply here...">
+                                <button class="btn btn-primary" onclick="submitModalQAQuestionReply('${student.id}', '${q.id}')" style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">Reply</button>
+                            </div>
+                        `;
+                        paneQA.appendChild(card);
+                    });
+                }
+
+                window.submitModalQAQuestionReply = async (studentId, questionId) => {
+                    const input = document.getElementById(`modal_reply_input_${questionId}`);
+                    if (!input) return;
+                    const replyText = input.value.trim();
+                    if (!replyText) return;
+
+                    const inst = AuthAPI.getCurrentInstructor();
+                    const replierName = inst ? inst.name : 'Teacher';
+
+                    const res = await AuthAPI.replyToQuestion(studentId, questionId, replyText, replierName);
+                    if (res.success) {
+                        showToast("Reply saved successfully!");
+                        renderModalQA();
+                    } else {
+                        alert("Error: " + (res.error || "Failed to save reply."));
+                    }
+                };
+
+                function renderModalChat() {
+                    const paneChat = document.getElementById('modalContentChat');
+                    if (!paneChat || !activeModalStudentId) return;
+
+                    const students = AuthAPI.getAllStudents();
+                    const student = students.find(s => s.id === activeModalStudentId);
+                    if (!student) return;
+
+                    paneChat.innerHTML = '';
+                    
+                    const chatBox = document.createElement('div');
+                    chatBox.style.display = 'flex';
+                    chatBox.style.flexDirection = 'column';
+                    chatBox.style.height = '420px';
+                    chatBox.style.background = 'rgba(0,0,0,0.2)';
+                    chatBox.style.borderRadius = '12px';
+                    chatBox.style.border = '1px solid var(--glass-border)';
+                    chatBox.style.overflow = 'hidden';
+                    
+                    const msgsArea = document.createElement('div');
+                    msgsArea.id = 'chat-messages-area-modal';
+                    msgsArea.style.flex = '1';
+                    msgsArea.style.overflowY = 'auto';
+                    msgsArea.style.padding = '1.5rem';
+                    msgsArea.style.display = 'flex';
+                    msgsArea.style.flexDirection = 'column';
+                    msgsArea.style.gap = '1rem';
+
+                    const messages = student.chatMessages || [];
+                    if (messages.length === 0) {
+                        msgsArea.innerHTML = '<div style="text-align:center;color:var(--text-secondary);margin:auto;padding:2rem;">Start a private counseling chat for spiritual concerns.</div>';
+                    } else {
+                        messages.forEach(msg => {
+                            const isMe = msg.senderId !== student.id;
+                            const wrapper = document.createElement('div');
+                            wrapper.style.display = 'flex';
+                            wrapper.style.justifyContent = isMe ? 'flex-end' : 'flex-start';
+                            
+                            const bubble = document.createElement('div');
+                            bubble.style.maxWidth = '70%';
+                            bubble.style.padding = '0.8rem 1rem';
+                            bubble.style.borderRadius = isMe ? '12px 12px 0 12px' : '12px 12px 12px 0';
+                            bubble.style.background = isMe ? 'linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark))' : 'rgba(0,0,0,0.05)';
+                            bubble.style.border = isMe ? '1px solid rgba(212,175,55,0.3)' : '1px solid rgba(0,0,0,0.08)';
+                            bubble.style.color = isMe ? '#fff' : 'var(--text-primary)';
+                            bubble.style.textAlign = 'left';
+                            
+                            bubble.innerHTML = `
+                                <div style="font-size: 0.72rem; color: ${isMe ? '#fcd34d' : 'var(--accent-gold)'}; font-weight: bold; margin-bottom: 0.25rem;">
+                                    ${msg.senderName}
+                                </div>
+                                <div style="font-size: 0.9rem; line-height: 1.4; word-break: break-word;">${msg.message}</div>
+                                <div style="font-size: 0.65rem; color: ${isMe ? 'rgba(255,255,255,0.6)' : 'var(--text-secondary)'}; text-align: right; margin-top: 0.3rem;">
+                                    ${new Date(msg.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                </div>
+                            `;
+                            wrapper.appendChild(bubble);
+                            msgsArea.appendChild(wrapper);
+                        });
+                    }
+
+                    const inputArea = document.createElement('div');
+                    inputArea.style.padding = '1rem';
+                    inputArea.style.borderTop = '1px solid var(--glass-border)';
+                    inputArea.style.background = 'rgba(0,0,0,0.02)';
+                    inputArea.style.display = 'flex';
+                    inputArea.style.gap = '0.8rem';
+                    
+                    inputArea.innerHTML = `
+                        <input type="text" id="modal-chat-send-input" class="glass-input" style="flex: 1; padding: 0.6rem 1rem; font-size: 0.9rem;" placeholder="Type private message...">
+                        <button class="btn btn-primary" id="modal-btn-chat-send" style="padding: 0.6rem 1.5rem; font-size: 0.9rem; height: auto;">Send</button>
+                    `;
+
+                    chatBox.appendChild(msgsArea);
+                    chatBox.appendChild(inputArea);
+                    paneChat.appendChild(chatBox);
+
+                    // Scroll to bottom
+                    setTimeout(() => {
+                        msgsArea.scrollTop = msgsArea.scrollHeight;
+                        const input = document.getElementById('modal-chat-send-input');
+                        if (input) {
+                            input.focus();
+                            input.addEventListener('keydown', (e) => {
+                                if (e.key === 'Enter') {
+                                    document.getElementById('modal-btn-chat-send').click();
+                                }
+                            });
+                        }
+                    }, 100);
+
+                    document.getElementById('modal-btn-chat-send').addEventListener('click', async () => {
+                        const input = document.getElementById('modal-chat-send-input');
+                        const val = input.value.trim();
+                        if (!val) return;
+                        
+                        const inst = AuthAPI.getCurrentInstructor();
+                        if (!inst) return;
+                        
+                        input.value = '';
+                        const res = await AuthAPI.sendChatMessage(student.id, val, inst.id, inst.name);
+                        if (res.success) {
+                            renderModalChat();
+                        } else {
+                            alert("Error sending message: " + (res.error || "unknown"));
+                        }
+                    });
+                }
+
+                window.viewStudentAnswers = (id) => {
+                    activeModalStudentId = id;
+                    const students = AuthAPI.getAllStudents();
+                    const student = students.find(s => s.id === id);
+                    if (student) {
+                        document.getElementById('modalStudentName').innerText = `${student.firstName} ${student.lastName}`;
+                        
+                        // Show chat badge if any unread
+                        const unreadChatCount = (student.chatMessages || []).filter(m => m.senderId === student.id && !m.readByInstructor).length;
+                        const badge = document.getElementById('modal-chat-badge');
+                        if (badge) {
+                            if (unreadChatCount > 0) {
+                                badge.innerText = unreadChatCount;
+                                badge.style.display = 'inline-block';
+                            } else {
+                                badge.style.display = 'none';
+                            }
+                        }
+
+                        document.getElementById('answersModal').style.display = 'flex';
+                        switchModalTab(activeModalTab || 'submissions');
+                    }
+                };
+
+                window.closeAnswersModal = () => {
+                    document.getElementById('answersModal').style.display = 'none';
+                    activeModalStudentId = null;
+                    activeModalTab = 'submissions';
+                    
+                    // Reload currently visible panels to catch read updates
+                    if (activePanel === 'cohort') renderCohortTable();
+                    if (activePanel === 'chat') renderChatList();
+                };
+
+                // --- Toast Messages ---
+                function showToast(message) {
+                    const toast = document.getElementById('liveUpdateToast');
+                    if (!toast) return;
+                    toast.innerHTML = `✦ ${message}`;
+                    toast.classList.add('visible');
+                    setTimeout(() => {
+                        toast.classList.remove('visible');
+                    }, 4000);
+                }
+
+                // --- Initial Load ---
+                switchPanel('cohort');
+                updateChatBadge();
+
+                // --- Real-time updates sync ---
+                window.addEventListener('storage', (e) => {
+                    if (e.key === 'jilgm_students' || e.key === 'jilgm_instructors') {
+                        // Refresh data lists
+                        if (activePanel === 'cohort') renderCohortTable();
+                        if (activePanel === 'qa') renderQABoard();
+                        if (activePanel === 'chat') renderChatList();
+                        if (activePanel === 'instructors') renderInstructorsTable();
+                        
+                        updateChatBadge();
+
+                        // Refresh modal details in place if active
+                        if (activeModalStudentId) {
+                            if (activeModalTab === 'submissions') renderModalSubmissions();
+                            if (activeModalTab === 'qa') renderModalQA();
+                            if (activeModalTab === 'chat') renderModalChat();
+                        }
+
+                        // Monitor outreach updates for this instructor
+                        if (e.key === 'jilgm_instructors') {
+                            const freshInst = AuthAPI.getCurrentInstructor();
+                            if (freshInst) {
+                                updateIdentityUI();
+                                if (freshInst.outreach !== lastInstructorOutreach) {
+                                    showToast(`Your assigned outreach oversight was updated to Outreach ${freshInst.outreach || 'Unassigned'}!`);
+                                    lastInstructorOutreach = freshInst.outreach;
+                                    // Re-draw student lists according to the new outreach assignment
+                                    if (activePanel === 'cohort') renderCohortTable();
+                                    if (activePanel === 'chat') renderChatList();
+                                    if (activePanel === 'qa') renderQABoard();
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } catch (err) {
+                console.error("Dashboard error:", err);
+            }
+        });
+    </script>
+</body>
+</html>

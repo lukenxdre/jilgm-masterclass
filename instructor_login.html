@@ -52,8 +52,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Redirect to admin portal if already authenticated
-            if (AuthAPI.getCurrentAdmin() || AuthAPI.getCurrentInstructor()) {
+            // Redirect to appropriate portal if already authenticated
+            if (AuthAPI.getCurrentInstructor()) {
+                window.location.href = 'instructor_dashboard.html';
+            } else if (AuthAPI.getCurrentAdmin()) {
                 window.location.href = 'admin.html';
             }
 
@@ -83,7 +85,7 @@
                     const successInst = AuthAPI.loginInstructor(username, password);
                     btn.innerText = originalText;
                     if (successInst) {
-                        window.location.href = 'admin.html';
+                        window.location.href = 'instructor_dashboard.html';
                     } else {
                         errorMsg.classList.add('show');
                     }
