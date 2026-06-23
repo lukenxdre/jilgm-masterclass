@@ -259,41 +259,9 @@
             color: #2d2724 !important;
         }
 
-        /* Private Counseling Chat */
-        .chat-layout {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 1.5rem;
-            height: 550px;
-            background: rgba(255, 255, 255, 0.8) !important;
-            border-radius: 16px;
-            border: 1px solid rgba(249, 115, 22, 0.2) !important;
-            overflow: hidden;
-            box-shadow: 0 15px 40px rgba(249, 115, 22, 0.04) !important;
-        }
-        .chat-sidebar {
-            border-right: 1px solid rgba(249, 115, 22, 0.15) !important;
-            background: rgba(249, 115, 22, 0.02) !important;
-        }
-        .chat-sidebar-header {
-            color: #c2410c !important;
-            border-bottom: 1px solid rgba(249, 115, 22, 0.15) !important;
-        }
-        .chat-student-item {
-            border-bottom: 1px solid rgba(249, 115, 22, 0.06) !important;
-        }
+        /* Private Counseling Chat (Replaced with Grid View) */
         .chat-student-item:hover, .chat-student-item.active {
             background: rgba(249, 115, 22, 0.08) !important;
-        }
-        .chat-student-name {
-            color: #1e1b18 !important;
-        }
-        .chat-student-email {
-            color: #6e5f58 !important;
-        }
-        .chat-pane-empty {
-            background: transparent !important;
-            color: #6e5f58 !important;
         }
 
         /* Glass Input inside cards */
@@ -401,16 +369,14 @@
             <div class="dashboard-header">
                 <h1>Private Messages</h1>
             </div>
-            <div class="chat-layout">
-                <div class="chat-sidebar">
-                    <div class="chat-sidebar-header">Chats</div>
-                    <div id="chatStudentsList">
-                        <!-- Populated dynamically -->
-                    </div>
+            <div id="chatGridArea">
+                <div id="chatStudentsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <!-- Populated dynamically -->
                 </div>
-                <div id="chatBoxArea" class="chat-pane-empty">
-                    Select a student from the sidebar to view private messages.
-                </div>
+            </div>
+
+            <div id="chatBoxArea" style="display: none; flex-direction: column; height: 600px; background: rgba(255, 255, 255, 0.8); border-radius: 16px; border: 1px solid rgba(249, 115, 22, 0.2); overflow: hidden; box-shadow: 0 15px 40px rgba(249, 115, 22, 0.04);">
+                <!-- Populated dynamically -->
             </div>
         </div>
 
@@ -720,38 +686,55 @@
 
                     chatStudentsList.innerHTML = '';
                     if (cohortList.length === 0) {
-                        chatStudentsList.innerHTML = '<div style="color: var(--text-secondary); text-align: center; padding: 2rem; font-size: 0.85rem;">No apprentices registered.</div>';
+                        chatStudentsList.innerHTML = '<div style="color: var(--text-secondary); text-align: center; padding: 2rem; font-size: 0.85rem; grid-column: 1 / -1;">No apprentices registered.</div>';
                         return;
                     }
 
                     cohortList.forEach(student => {
-                        const item = document.createElement('div');
-                        item.className = 'chat-student-item' + (activeChatStudentId === student.id ? ' active' : '');
+                        const item = document.createElement('button');
+                        item.className = 'glass-card';
+                        item.style.padding = '1.5rem';
+                        item.style.textAlign = 'left';
+                        item.style.border = '1px solid rgba(249, 115, 22, 0.2)';
+                        item.style.background = 'rgba(255, 255, 255, 0.8)';
+                        item.style.cursor = 'pointer';
+                        item.style.display = 'flex';
+                        item.style.flexDirection = 'column';
+                        item.style.gap = '0.5rem';
+                        item.style.transition = 'transform 0.2s, box-shadow 0.2s';
+                        
+                        item.onmouseover = () => { item.style.transform = 'translateY(-2px)'; item.style.boxShadow = '0 8px 20px rgba(249, 115, 22, 0.1)'; };
+                        item.onmouseout = () => { item.style.transform = 'translateY(0)'; item.style.boxShadow = 'var(--glass-shadow)'; };
                         
                         const unreadCount = (student.chatMessages || []).filter(m => m.senderId === student.id && !m.readByInstructor).length;
-                        const badgeHtml = unreadCount > 0 ? `<span class="badge" style="background: #ef4444; border: none; padding: 0.15rem 0.4rem; font-size: 0.7rem; color: #fff;">${unreadCount}</span>` : '';
+                        const badgeHtml = unreadCount > 0 ? `<span class="badge" style="background: #ef4444; border: none; padding: 0.2rem 0.5rem; font-size: 0.75rem; color: #fff; border-radius: 12px; margin-left: auto;">${unreadCount} New</span>` : '';
 
                         item.innerHTML = `
-                            <div class="chat-student-info">
-                                <span class="chat-student-name">${student.firstName} ${student.lastName}</span>
-                                <span class="chat-student-email">${student.email}</span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <strong style="color: var(--accent-gold); font-size: 1.1rem;">${student.firstName} ${student.lastName}</strong>
+                                ${badgeHtml}
                             </div>
-                            ${badgeHtml}
+                            <span style="color: var(--text-secondary); font-size: 0.85rem;">${student.email}</span>
+                            <span style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.5rem;">Click to open messages</span>
                         `;
                         item.addEventListener('click', () => selectChatStudent(student.id));
                         chatStudentsList.appendChild(item);
                     });
 
-                    // Refresh active chat window if matching student
+                    // Manage visibility
                     if (activeChatStudentId) {
                         const activeStudent = cohortList.find(s => s.id === activeChatStudentId);
                         if (activeStudent) {
+                            document.getElementById('chatGridArea').style.display = 'none';
                             renderChatBox(activeStudent);
                         } else {
                             activeChatStudentId = null;
-                            chatBoxArea.className = 'chat-pane-empty';
-                            chatBoxArea.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-secondary);font-style:italic;">Select a student from the sidebar to view private messages.</div>';
+                            document.getElementById('chatGridArea').style.display = 'block';
+                            chatBoxArea.style.display = 'none';
                         }
+                    } else {
+                        document.getElementById('chatGridArea').style.display = 'block';
+                        chatBoxArea.style.display = 'none';
                     }
                 }
 
@@ -762,30 +745,43 @@
                     AuthAPI.markChatAsRead(studentId, 'instructor');
                     updateChatBadge();
                     
-                    const listItems = chatStudentsList.querySelectorAll('.chat-student-item');
-                    listItems.forEach(el => el.classList.remove('active'));
+                    document.getElementById('chatGridArea').style.display = 'none';
                     
-                    renderChatList();
+                    const allStudents = AuthAPI.getAllStudents();
+                    const activeStudent = allStudents.find(s => s.id === studentId);
+                    if(activeStudent) {
+                        renderChatBox(activeStudent);
+                    }
                 }
 
                 function renderChatBox(student) {
                     chatBoxArea.className = '';
                     chatBoxArea.innerHTML = '';
                     chatBoxArea.style.display = 'flex';
-                    chatBoxArea.style.flexDirection = 'column';
-                    chatBoxArea.style.height = '100%';
-                    chatBoxArea.style.justifyContent = 'space-between';
 
                     // Chat header
                     const header = document.createElement('div');
                     header.style.padding = '1.2rem';
-                    header.style.background = 'var(--bg-darker, rgba(245, 234, 224, 0.5))';
-                    header.style.borderBottom = '1px solid var(--glass-border)';
-                    header.style.textAlign = 'left';
+                    header.style.background = 'rgba(255, 255, 255, 0.9)';
+                    header.style.borderBottom = '1px solid rgba(249, 115, 22, 0.15)';
+                    header.style.display = 'flex';
+                    header.style.alignItems = 'center';
+                    header.style.gap = '1rem';
                     header.innerHTML = `
-                        <h4 style="margin: 0; color: var(--accent-gold); font-weight: bold;">${student.firstName} ${student.lastName}</h4>
-                        <span style="font-size: 0.75rem; color: var(--text-secondary);">${student.email}</span>
+                        <button id="btnChatBack" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; border-color: rgba(249, 115, 22, 0.3);">← Back to Students</button>
+                        <div style="flex: 1; text-align: left;">
+                            <h4 style="margin: 0; color: var(--accent-gold); font-weight: bold; font-size: 1.1rem;">${student.firstName} ${student.lastName}</h4>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">${student.email}</span>
+                        </div>
                     `;
+                    chatBoxArea.appendChild(header);
+
+                    document.getElementById('btnChatBack').addEventListener('click', () => {
+                        activeChatStudentId = null;
+                        document.getElementById('chatGridArea').style.display = 'block';
+                        chatBoxArea.style.display = 'none';
+                        renderChatList();
+                    });
 
                     // Messages area
                     const msgsArea = document.createElement('div');
@@ -838,7 +834,7 @@
                     const inputArea = document.createElement('div');
                     inputArea.style.padding = '1.2rem';
                     inputArea.style.borderTop = '1px solid var(--glass-border)';
-                    inputArea.style.background = 'var(--bg-darker, #f5eae0)';
+                    inputArea.style.background = 'rgba(255, 255, 255, 0.9)';
                     inputArea.style.display = 'flex';
                     inputArea.style.gap = '0.8rem';
                     
@@ -847,7 +843,6 @@
                         <button class="btn btn-primary" id="btn-chat-send-panel" style="padding: 0.6rem 1.6rem; font-size: 0.9rem; height: auto; border-radius: 24px;">Send</button>
                     `;
 
-                    chatBoxArea.appendChild(header);
                     chatBoxArea.appendChild(msgsArea);
                     chatBoxArea.appendChild(inputArea);
 
