@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard - JILGM Masterclass</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <!-- Firebase SDK Compat (Parallel Loading) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -17,8 +20,8 @@
             position: fixed;
             bottom: 1.5rem;
             right: 1.5rem;
-            background: linear-gradient(135deg, rgba(212,175,55,0.18), rgba(212,175,55,0.08));
-            border: 1px solid rgba(212,175,55,0.5);
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(212, 175, 55, 0.08));
+            border: 1px solid rgba(212, 175, 55, 0.5);
             color: #f5d97e;
             padding: 0.6rem 1.1rem;
             border-radius: 50px;
@@ -27,7 +30,7 @@
             font-weight: 500;
             letter-spacing: 0.03em;
             backdrop-filter: blur(12px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
             display: flex;
             align-items: center;
             gap: 0.45rem;
@@ -37,31 +40,37 @@
             transition: opacity 0.3s ease, transform 0.3s ease;
             pointer-events: none;
         }
-        #liveUpdateToast.visible { opacity: 1; transform: translateY(0); }
+
+        #liveUpdateToast.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
         /* ── Dashboard hero header ─────────────────────────────────── */
         .dash-hero {
             position: relative;
             overflow: hidden;
             background: linear-gradient(135deg,
-                rgba(11,23,44,0.97) 0%,
-                rgba(20,38,70,0.95) 40%,
-                rgba(11,23,44,0.97) 100%);
-            border: 1px solid rgba(212,175,55,0.2);
+                    rgba(11, 23, 44, 0.97) 0%,
+                    rgba(20, 38, 70, 0.95) 40%,
+                    rgba(11, 23, 44, 0.97) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.2);
             border-radius: 20px;
             padding: 2.4rem 2.4rem 1.6rem;
             margin-bottom: 2rem;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 0 80px rgba(212,175,55,0.03);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), inset 0 0 80px rgba(212, 175, 55, 0.03);
         }
+
         .dash-hero::before {
             content: '';
             position: absolute;
             inset: 0;
             background:
-                radial-gradient(ellipse 60% 80% at 5% 50%, rgba(212,175,55,0.07) 0%, transparent 70%),
-                radial-gradient(ellipse 40% 60% at 95% 20%, rgba(212,175,55,0.05) 0%, transparent 70%);
+                radial-gradient(ellipse 60% 80% at 5% 50%, rgba(212, 175, 55, 0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 95% 20%, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
             pointer-events: none;
         }
+
         .dash-hero-top {
             display: flex;
             justify-content: space-between;
@@ -69,6 +78,7 @@
             gap: 1.5rem;
             flex-wrap: wrap;
         }
+
         .dash-hero-label {
             font-family: var(--font-sans, 'Outfit', sans-serif);
             font-size: 0.7rem;
@@ -81,6 +91,7 @@
             align-items: center;
             gap: 0.5rem;
         }
+
         .dash-hero-label::before,
         .dash-hero-label::after {
             content: '';
@@ -89,40 +100,51 @@
             height: 1px;
             background: linear-gradient(90deg, transparent, var(--accent-gold, #d4af37));
         }
-        .dash-hero-label::before { transform: rotate(180deg); }
+
+        .dash-hero-label::before {
+            transform: rotate(180deg);
+        }
+
         .dash-hero-welcome {
             font-family: var(--font-serif, 'Playfair Display', serif);
             font-size: clamp(1.8rem, 4vw, 2.6rem);
             font-style: italic;
             font-weight: 600;
             color: #ffffff;
-            text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
             margin: 0 0 0.4rem;
             line-height: 1.2;
         }
+
         .dash-hero-welcome span {
             color: var(--accent-gold-light, #f5d97e);
-            text-shadow: 0 0 30px rgba(245,217,126,0.4);
+            text-shadow: 0 0 30px rgba(245, 217, 126, 0.4);
         }
+
         .dash-hero-sub {
             font-size: 0.92rem;
             color: var(--text-secondary, #8a9bb0);
             margin: 0;
             line-height: 1.6;
         }
+
         /* User badge */
         .dash-user-badge {
             display: flex;
             align-items: center;
             gap: 1rem;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(212,175,55,0.2);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(212, 175, 55, 0.2);
             border-radius: 14px;
             padding: 0.9rem 1.3rem;
             flex-shrink: 0;
             backdrop-filter: blur(10px);
         }
-        .dash-user-info { text-align: right; }
+
+        .dash-user-info {
+            text-align: right;
+        }
+
         .dash-user-name {
             font-family: var(--font-sans, 'Outfit', sans-serif);
             font-weight: 700;
@@ -131,6 +153,7 @@
             display: block;
             margin-bottom: 0.15rem;
         }
+
         .dash-user-role {
             font-size: 0.72rem;
             text-transform: uppercase;
@@ -138,17 +161,22 @@
             color: var(--accent-gold-light, #f5d97e);
             font-weight: 700;
         }
+
         .dash-avatar {
-            width: 48px; height: 48px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--accent-gold-light, #f5d97e), var(--accent-gold-dark, #a07728));
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 800;
             font-size: 1.1rem;
             font-family: var(--font-serif, 'Playfair Display', serif);
             color: var(--bg-dark, #0b172c);
-            box-shadow: 0 0 0 3px rgba(212,175,55,0.25), 0 4px 12px rgba(0,0,0,0.4);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25), 0 4px 12px rgba(0, 0, 0, 0.4);
         }
+
         /* Divider strip */
         .dash-hero-divider {
             display: flex;
@@ -156,23 +184,28 @@
             gap: 1rem;
             margin: 1.4rem 0 1.2rem;
         }
+
         .dash-hero-divider-line {
             flex: 1;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(212,175,55,0.3), transparent);
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
         }
+
         .dash-hero-diamond {
-            width: 6px; height: 6px;
+            width: 6px;
+            height: 6px;
             background: var(--accent-gold, #d4af37);
             transform: rotate(45deg);
             flex-shrink: 0;
         }
+
         /* Stat strip */
         .dash-hero-stats {
             display: flex;
             gap: 2rem;
             flex-wrap: wrap;
         }
+
         .dash-stat {
             display: flex;
             align-items: center;
@@ -180,10 +213,12 @@
             font-size: 0.8rem;
             color: var(--text-secondary, #8a9bb0);
         }
+
         .dash-stat-icon {
             font-size: 1rem;
             line-height: 1;
         }
+
         .dash-stat strong {
             color: var(--accent-gold-light, #f5d97e);
             font-weight: 600;
@@ -193,47 +228,59 @@
         .mod-card {
             position: relative;
             border-radius: 16px;
-            background: var(--bg-card, rgba(15,30,55,0.9));
-            border: 1px solid rgba(212,175,55,0.15);
+            background: var(--bg-card, rgba(15, 30, 55, 0.9));
+            border: 1px solid rgba(212, 175, 55, 0.15);
             padding: 0;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
+
         .mod-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 35px rgba(0,0,0,0.45);
-            border-color: rgba(212,175,55,0.35);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+            border-color: rgba(212, 175, 55, 0.35);
         }
+
         .mod-card-accent {
             height: 4px;
             width: 100%;
-            background: linear-gradient(90deg, var(--accent-gold-dark,#a07728), var(--accent-gold-light,#f5d97e), var(--accent-gold-dark,#a07728));
+            background: linear-gradient(90deg, var(--accent-gold-dark, #a07728), var(--accent-gold-light, #f5d97e), var(--accent-gold-dark, #a07728));
         }
-        .mod-card-accent.locked { background: rgba(255,255,255,0.08); }
-        .mod-card-accent.completed { background: linear-gradient(90deg,#166534,#4ade80,#166534); }
+
+        .mod-card-accent.locked {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .mod-card-accent.completed {
+            background: linear-gradient(90deg, #166534, #4ade80, #166534);
+        }
+
         .mod-card-body {
             padding: 1.4rem 1.5rem 1.5rem;
             display: flex;
             flex-direction: column;
             flex: 1;
         }
+
         .mod-card-top {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 0.8rem;
         }
+
         .mod-num {
             font-size: 0.68rem;
             font-weight: 700;
             letter-spacing: 0.18em;
             text-transform: uppercase;
             color: var(--accent-gold, #d4af37);
-            font-family: var(--font-sans,'Outfit',sans-serif);
+            font-family: var(--font-sans, 'Outfit', sans-serif);
         }
+
         .mod-status-pill {
             font-size: 0.68rem;
             font-weight: 700;
@@ -245,23 +292,41 @@
             align-items: center;
             gap: 0.3rem;
         }
-        .mod-status-pill.unlocked   { background:rgba(212,175,55,0.12); color:#f5d97e; border:1px solid rgba(212,175,55,0.3); }
-        .mod-status-pill.completed  { background:rgba(74,222,128,0.1);  color:#4ade80; border:1px solid rgba(74,222,128,0.3); }
-        .mod-status-pill.locked     { background:rgba(255,255,255,0.05);color:var(--text-secondary,#8a9bb0); border:1px solid rgba(255,255,255,0.1); }
+
+        .mod-status-pill.unlocked {
+            background: rgba(212, 175, 55, 0.12);
+            color: #f5d97e;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .mod-status-pill.completed {
+            background: rgba(74, 222, 128, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
+
+        .mod-status-pill.locked {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary, #8a9bb0);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         .mod-title {
-            font-family: var(--font-serif,'Playfair Display',serif);
+            font-family: var(--font-serif, 'Playfair Display', serif);
             font-size: 1.05rem;
             font-weight: 600;
-            color: var(--text-primary,#f0ece4);
+            color: var(--text-primary, #f0ece4);
             margin: 0 0 0.5rem;
             line-height: 1.35;
         }
+
         .mod-lock-msg {
             font-size: 0.78rem;
-            color: var(--text-secondary,#8a9bb0);
+            color: var(--text-secondary, #8a9bb0);
             margin-bottom: 1.2rem;
             flex: 1;
         }
+
         .mod-card .btn {
             margin-top: auto;
             width: 100%;
@@ -272,6 +337,7 @@
         }
     </style>
 </head>
+
 <body class="dashboard-layout">
 
     <!-- Live update toast -->
@@ -284,9 +350,12 @@
         <nav class="sidebar-nav">
             <a href="#" id="student-nav-curriculum" class="active">My Curriculum</a>
             <a href="#" id="student-nav-resources">Resources</a>
-            <a href="#" id="student-nav-announcements">Announcements <span id="ann-badge" class="badge" style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
-            <a href="#" id="student-nav-grades">Grades & Remarks <span id="grades-badge" class="badge" style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
-            <a href="#" id="student-nav-chat">Private Chat <span id="chat-badge" class="badge" style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
+            <a href="#" id="student-nav-announcements">Announcements <span id="ann-badge" class="badge"
+                    style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
+            <a href="#" id="student-nav-grades">Grades & Remarks <span id="grades-badge" class="badge"
+                    style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
+            <a href="#" id="student-nav-chat">Private Chat <span id="chat-badge" class="badge"
+                    style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
             <a href="#" onclick="AuthAPI.logout(); return false;" style="margin-top: auto; color: #ef4444;">Log Out</a>
         </nav>
     </aside>
@@ -320,10 +389,14 @@
 
             <!-- Tagline / stat strip -->
             <div class="dash-hero-stats">
-                <div class="dash-stat"><span class="dash-stat-icon">📖</span> <span>Word &mdash; <strong>Rooted in Truth</strong></span></div>
-                <div class="dash-stat"><span class="dash-stat-icon">🏛️</span> <span>Lead &mdash; <strong>With Purpose</strong></span></div>
-                <div class="dash-stat"><span class="dash-stat-icon">🤝</span> <span>Serve &mdash; <strong>With Humility</strong></span></div>
-                <div class="dash-stat"><span class="dash-stat-icon">🌍</span> <span>Impact &mdash; <strong>Beyond Borders</strong></span></div>
+                <div class="dash-stat"><span class="dash-stat-icon">📖</span> <span>Word &mdash; <strong>Rooted in
+                            Truth</strong></span></div>
+                <div class="dash-stat"><span class="dash-stat-icon">🏛️</span> <span>Lead &mdash; <strong>With
+                            Purpose</strong></span></div>
+                <div class="dash-stat"><span class="dash-stat-icon">🤝</span> <span>Serve &mdash; <strong>With
+                            Humility</strong></span></div>
+                <div class="dash-stat"><span class="dash-stat-icon">🌍</span> <span>Impact &mdash; <strong>Beyond
+                            Borders</strong></span></div>
             </div>
         </div>
 
@@ -331,22 +404,30 @@
         <div id="panel-curriculum">
             <div class="dashboard-grid">
                 <!-- Attempt Warning Card -->
-                <div class="dash-card glass-card" style="grid-column: 1 / -1; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.05); padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                <div class="dash-card glass-card"
+                    style="grid-column: 1 / -1; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.05); padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1rem;">
                     <div style="font-size: 1.8rem; line-height: 1;">⚠️</div>
                     <div>
-                        <h4 style="margin: 0 0 0.2rem; color: #fca5a5; font-size: 1rem; font-family: var(--font-sans);">Important Notice</h4>
-                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.88rem; line-height: 1.4;">Only one (1) attempt is allowed when answering every activity (reflections, checks, matching). Your responses are recorded immediately.</p>
+                        <h4 style="margin: 0 0 0.2rem; color: #fca5a5; font-size: 1rem; font-family: var(--font-sans);">
+                            Important Notice</h4>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.88rem; line-height: 1.4;">Only
+                            one (1) attempt is allowed when answering every activity (reflections, checks, matching).
+                            Your responses are recorded immediately.</p>
                     </div>
                 </div>
 
                 <!-- Progress Card -->
                 <div class="dash-card glass-card" style="grid-column: 1 / -1;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                         <h3 style="margin: 0;">Overall Progress</h3>
                         <span id="overallProgressText" style="color: var(--accent-gold); font-weight: bold;">0%</span>
                     </div>
-                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-                        <div id="overallProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); border-radius: 4px; transition: width 0.5s ease;"></div>
+                    <div
+                        style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                        <div id="overallProgressBar"
+                            style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); border-radius: 4px; transition: width 0.5s ease;">
+                        </div>
                     </div>
                 </div>
 
@@ -358,8 +439,9 @@
         <!-- 2. RESOURCES PANEL -->
         <div id="panel-resources" class="hidden">
             <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-primary);">Resource Library</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Access reading materials, PowerPoint presentation decks, video replays, and other guides.</p>
-            
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Access reading materials, PowerPoint
+                presentation decks, video replays, and other guides.</p>
+
             <div class="dashboard-grid" id="resourcesGrid">
                 <!-- Populated dynamically -->
             </div>
@@ -368,8 +450,9 @@
         <!-- 3. ANNOUNCEMENTS PANEL -->
         <div id="panel-announcements" class="hidden">
             <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-primary);">Announcements</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Stay updated with the latest instructions and posts from your leadership instructors.</p>
-            
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Stay updated with the latest instructions and
+                posts from your leadership instructors.</p>
+
             <div style="display: flex; flex-direction: column; gap: 1.5rem;" id="announcementsList">
                 <!-- Populated dynamically -->
             </div>
@@ -378,20 +461,27 @@
         <!-- 4. GRADES PANEL -->
         <div id="panel-grades" class="hidden">
             <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-primary);">Grades & Remarks</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Review your grades for interactive checks and view teacher feedback on your reflections and uploads.</p>
-            
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Review your grades for interactive checks
+                and view teacher feedback on your reflections and uploads.</p>
+
             <!-- Mastery Percentage Card -->
-            <div class="dash-card glass-card" style="margin-bottom: 2rem; border-color: rgba(170, 132, 28, 0.4); padding: 1.8rem;">
+            <div class="dash-card glass-card"
+                style="margin-bottom: 2rem; border-color: rgba(170, 132, 28, 0.4); padding: 1.8rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
                     <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-primary);">Academic Mastery</h3>
-                    <span id="masteryScoreText" style="color: var(--accent-gold-dark); font-weight: bold; font-size: 1.35rem;">0%</span>
+                    <span id="masteryScoreText"
+                        style="color: var(--accent-gold-dark); font-weight: bold; font-size: 1.35rem;">0%</span>
                 </div>
-                <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.05); border-radius: 4px; overflow: hidden; margin-bottom: 0.5rem;">
-                    <div id="masteryProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #15803d, #4ade80); border-radius: 4px; transition: width 0.5s ease;"></div>
+                <div
+                    style="width: 100%; height: 8px; background: rgba(0,0,0,0.05); border-radius: 4px; overflow: hidden; margin-bottom: 0.5rem;">
+                    <div id="masteryProgressBar"
+                        style="width: 0%; height: 100%; background: linear-gradient(90deg, #15803d, #4ade80); border-radius: 4px; transition: width 0.5s ease;">
+                    </div>
                 </div>
-                <p style="margin: 0; font-size: 0.82rem; color: var(--text-secondary);" id="masteryStatsText">Points: 0 / 0 auto-graded questions correct.</p>
+                <p style="margin: 0; font-size: 0.82rem; color: var(--text-secondary);" id="masteryStatsText">Points: 0
+                    / 0 auto-graded questions correct.</p>
             </div>
- 
+
             <div style="display: flex; flex-direction: column; gap: 1.5rem;" id="gradesList">
                 <!-- Populated dynamically -->
             </div>
@@ -399,9 +489,11 @@
 
         <!-- 5. PRIVATE CHAT PANEL -->
         <div id="panel-chat" class="hidden">
-            <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-primary);">Private Spiritual Chat</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Communicate privately with your assigned outreach instructor for spiritual concerns and mentoring.</p>
-            
+            <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-primary);">Private Spiritual Chat
+            </h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Communicate privately with your assigned
+                outreach instructor for spiritual concerns and mentoring.</p>
+
             <div id="studentChatContainer" style="max-width: 800px; width: 100%;">
                 <!-- Rendered by JS -->
             </div>
@@ -411,7 +503,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             if (window.syncPromise) {
-                try { await window.syncPromise; } catch(err) { console.warn(err); }
+                try { await window.syncPromise; } catch (err) { console.warn(err); }
             }
 
             // Protect this route
@@ -447,9 +539,14 @@
                 const dynamicModulesContainer = document.getElementById('dynamicModulesContainer');
                 dynamicModulesContainer.innerHTML = '';
 
-                const modsContent = AuthAPI.getModulesContent();
+                // Grab raw data directly from your browser's localStorage memory
+                const rawModsContent = localStorage.getItem('jilgm_modules_content');
+                const rawUnlocked = localStorage.getItem('jilgm_unlocked_modules');
+
+                // Parse the data or fallback to empty containers if they don't exist yet
+                const modsContent = rawModsContent ? JSON.parse(rawModsContent) : {};
                 const modIds = Object.keys(modsContent);
-                const unlockedModules = AuthAPI.getUnlockedModules();
+                const unlockedModules = rawUnlocked ? JSON.parse(rawUnlocked) : [];
                 const studentAnswers = user.answers || [];
 
                 const modulesData = modIds.map((id, index) => {
@@ -529,47 +626,47 @@
             const btnAnnouncements = document.getElementById('student-nav-announcements');
             const btnGrades = document.getElementById('student-nav-grades');
             const btnChat = document.getElementById('student-nav-chat');
- 
+
             const panelCurriculum = document.getElementById('panel-curriculum');
             const panelResources = document.getElementById('panel-resources');
             const panelAnnouncements = document.getElementById('panel-announcements');
             const panelGrades = document.getElementById('panel-grades');
             const panelChat = document.getElementById('panel-chat');
- 
+
             function switchTab(activeBtn, activePanel) {
                 [btnCurriculum, btnResources, btnAnnouncements, btnGrades, btnChat].forEach(btn => { if (btn) btn.classList.remove('active'); });
                 [panelCurriculum, panelResources, panelAnnouncements, panelGrades, panelChat].forEach(p => { if (p) p.classList.add('hidden'); });
- 
+
                 activeBtn.classList.add('active');
                 activePanel.classList.remove('hidden');
             }
- 
+
             btnCurriculum.addEventListener('click', (e) => {
                 e.preventDefault();
                 switchTab(btnCurriculum, panelCurriculum);
             });
- 
+
             btnResources.addEventListener('click', (e) => {
                 e.preventDefault();
                 switchTab(btnResources, panelResources);
                 renderResourcesStudent();
             });
- 
+
             btnAnnouncements.addEventListener('click', (e) => {
                 e.preventDefault();
                 switchTab(btnAnnouncements, panelAnnouncements);
                 renderAnnouncementsStudent();
-                
+
                 // Reset notification unread counts
                 localStorage.setItem('jilgm_unread_announcements', '0');
                 updateAnnBadge();
             });
- 
+
             btnGrades.addEventListener('click', (e) => {
                 e.preventDefault();
                 switchTab(btnGrades, panelGrades);
                 renderGradesStudent();
-                
+
                 // Reset remarks notification
                 const user = AuthAPI.getCurrentUser();
                 if (user) {
@@ -582,18 +679,18 @@
                 e.preventDefault();
                 switchTab(btnChat, panelChat);
                 renderStudentChat();
-                
+
                 // Reset chat notifications
                 const user = AuthAPI.getCurrentUser();
                 if (user) {
                     AuthAPI.markChatAsRead(user.id, 'student');
                     updateChatBadge();
                 }
-            });tnGrades.addEventListener('click', (e) => {
+            }); btnGrades.addEventListener('click', (e) => {
                 e.preventDefault();
                 switchTab(btnGrades, panelGrades);
                 renderGradesStudent();
-                
+
                 // Reset remarks notification
                 const user = AuthAPI.getCurrentUser();
                 if (user) {
@@ -702,10 +799,10 @@
                 if (!gradesList) return;
                 const user = AuthAPI.getCurrentUser();
                 if (!user) return;
-                
+
                 const answers = user.answers || [];
                 const modsContent = AuthAPI.getModulesContent();
-                
+
                 // Calculate mastery percentage
                 let pointsEarned = 0;
                 let totalMaxScore = 0;
@@ -715,11 +812,11 @@
                         totalMaxScore += ans.maxScore;
                     }
                 });
-                
+
                 const masteryScoreText = document.getElementById('masteryScoreText');
                 const masteryProgressBar = document.getElementById('masteryProgressBar');
                 const masteryStatsText = document.getElementById('masteryStatsText');
-                
+
                 if (masteryScoreText && masteryProgressBar && masteryStatsText) {
                     if (totalMaxScore > 0) {
                         const pct = Math.round((pointsEarned / totalMaxScore) * 100);
@@ -732,14 +829,14 @@
                         masteryStatsText.innerText = 'No auto-graded items completed yet.';
                     }
                 }
-                
+
                 gradesList.innerHTML = '';
-                
+
                 if (answers.length === 0) {
                     gradesList.innerHTML = '<div class="dash-card glass-card" style="text-align:center;padding:3rem;color:var(--text-secondary);">You have not completed any activities yet. Start a module and submit your responses!</div>';
                     return;
                 }
-                
+
                 // Group answers by module ID
                 const grouped = {};
                 answers.forEach(ans => {
@@ -748,24 +845,24 @@
                     }
                     grouped[ans.moduleId].push(ans);
                 });
-                
+
                 Object.keys(grouped).forEach(modId => {
                     const mod = modsContent[modId];
                     if (!mod) return;
-                    
+
                     const card = document.createElement('div');
                     card.className = 'dash-card glass-card';
                     card.style.padding = '2rem';
                     card.style.display = 'flex';
                     card.style.flexDirection = 'column';
                     card.style.gap = '1.2rem';
-                    
+
                     const listHtml = grouped[modId].map(ans => {
                         let badgeColor = 'rgba(212,175,55,0.1)';
                         let badgeText = ans.type.replace('_', ' ').toUpperCase();
                         let scoreHtml = '';
                         let contentHtml = '';
-                        
+
                         if (ans.isCorrect !== null && ans.score !== null) {
                             badgeColor = ans.isCorrect ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)';
                             scoreHtml = `
@@ -774,7 +871,7 @@
                                 </div>
                             `;
                         }
-                        
+
                         if (ans.answer) {
                             contentHtml = `<p style="margin: 0.5rem 0 0; color: var(--text-secondary); font-size: 0.95rem; font-style: italic;">"${ans.answer}"</p>`;
                         } else if (ans.file) {
@@ -785,7 +882,7 @@
                                 </div>
                             `;
                         }
-                        
+
                         let remarkBubble = '';
                         if (ans.teacherRemarks) {
                             remarkBubble = `
@@ -801,7 +898,7 @@
                                 </div>
                             `;
                         }
-                        
+
                         return `
                             <div style="border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 1rem; margin-bottom: 1rem;">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
@@ -814,7 +911,7 @@
                             </div>
                         `;
                     }).join('');
-                    
+
                     card.innerHTML = `
                         <div style="border-bottom: 2.5px solid rgba(170,132,28,0.2); padding-bottom: 0.6rem;">
                             <h3 style="margin: 0; font-family: var(--font-serif); font-size: 1.35rem; color: var(--text-primary);">${mod.title}</h3>
@@ -827,7 +924,7 @@
                     gradesList.appendChild(card);
                 });
             }
- 
+
             function handleAdminSync(msg) {
                 const currentUser = AuthAPI.getCurrentUser();
                 if (currentUser) {
@@ -848,13 +945,13 @@
                 updateAnnBadge();
                 updateGradesBadge();
                 updateChatBadge();
-                
+
                 // If currently viewing resources, announcements, or grades tabs, update them too
                 if (btnResources.classList.contains('active')) renderResourcesStudent();
                 if (btnAnnouncements.classList.contains('active')) renderAnnouncementsStudent();
                 if (btnGrades.classList.contains('active')) renderGradesStudent();
                 if (btnChat.classList.contains('active')) renderStudentChat();
- 
+
                 showLiveToast(msg);
             }
 
@@ -936,7 +1033,7 @@
                             </div>
                             <div style="font-size: 0.9rem; line-height: 1.4; word-break: break-word;">${msg.message}</div>
                             <div style="font-size: 0.65rem; color: rgba(255,255,255,0.4); text-align: right; margin-top: 0.3rem;">
-                                ${new Date(msg.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                ${new Date(msg.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </div>
                         `;
                         wrapper.appendChild(bubble);
@@ -1023,7 +1120,7 @@
                         handleAdminSync('New teacher feedback posted');
                     }
                 };
-            } catch(err) { /* BroadcastChannel not supported – storage event is the fallback */ }
+            } catch (err) { /* BroadcastChannel not supported – storage event is the fallback */ }
 
             // Run on initial load
             updateDashboardDOM();
@@ -1033,4 +1130,5 @@
         });
     </script>
 </body>
+
 </html>
