@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LocalStorage Debugger</title>
+</head>
+<body style="font-family: monospace; padding: 2rem; background: #f8fafc; color: #0f172a;">
+    <h2>LocalStorage Values</h2>
+    <pre id="output" style="background: #e2e8f0; padding: 1rem; border-radius: 8px;"></pre>
+    <script>
+        document.getElementById('output').innerText = JSON.stringify({
+            "jilgm_modules_content": localStorage.getItem('jilgm_modules_content'),
+            "jilgm_unlocked_modules": localStorage.getItem('jilgm_unlocked_modules'),
+            "jilgm_current_user": localStorage.getItem('jilgm_current_user'),
+            "jilgm_db_version": localStorage.getItem('jilgm_db_version')
+        }, null, 2);
+    </script>
+</body>
+</html>
