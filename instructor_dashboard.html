@@ -584,7 +584,7 @@
                     const allStudents = AuthAPI.getAllStudents();
                     const cohortList = allStudents.filter(s => s.status === 'approved' && s.outreach === inst.outreach);
                     const modsContent = AuthAPI.getModulesContent();
-                    const modIds = Object.keys(modsContent);
+                    const modIds = AuthAPI.getModuleOrder().filter(id => modsContent[id]);
 
                     qaBoardContainer.innerHTML = '';
                     let questionCount = 0;
@@ -988,7 +988,7 @@
                         grouped[ans.moduleId].push(ans);
                     });
 
-                    const modIdsArray = Object.keys(modsContent);
+                    const modIdsArray = AuthAPI.getModuleOrder().filter(id => modsContent[id]);
 
                     Object.keys(grouped).forEach(modId => {
                         const modIdx = modIdsArray.indexOf(modId) + 1;
@@ -1090,7 +1090,7 @@
                     }
 
                     const modsContent = AuthAPI.getModulesContent();
-                    const modIds = Object.keys(modsContent);
+                    const modIds = AuthAPI.getModuleOrder().filter(id => modsContent[id]);
                     questions.forEach(q => {
                         const modIdx = modIds.indexOf(q.moduleId) + 1;
                         const modNum = modIdx > 0 ? `Module ${modIdx}: ` : '';

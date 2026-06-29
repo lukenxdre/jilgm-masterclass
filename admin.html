@@ -1854,7 +1854,7 @@
                 const selectedVal = selectModule.value || currentModuleId;
                 
                 selectModule.innerHTML = '';
-                Object.keys(modsContent).forEach((id, idx) => {
+                AuthAPI.getModuleOrder().filter(id => modsContent[id]).forEach((id, idx) => {
                     const option = document.createElement('option');
                     option.value = id;
                     option.innerText = `Module ${idx + 1}: ${modsContent[id].title || id}`;
@@ -1907,7 +1907,7 @@
                         showToast('Module deleted successfully.');
                         
                         const modsContent = AuthAPI.getModulesContent();
-                        const modIds = Object.keys(modsContent);
+                        const modIds = AuthAPI.getModuleOrder().filter(id => modsContent[id]);
                         if (currentModuleId === id) {
                             currentModuleId = modIds[0] || '';
                         }
@@ -1916,6 +1916,29 @@
                         renderDashboard();
                         loadBuilderModule();
                     }
+                }
+            };
+
+            // Bind Module Order Global functions
+            window.moveModuleUp = (id) => {
+                let order = AuthAPI.getModuleOrder();
+                const idx = order.indexOf(id);
+                if (idx > 0) {
+                    [order[idx - 1], order[idx]] = [order[idx], order[idx - 1]];
+                    AuthAPI.saveModuleOrder(order);
+                    populateModuleSelect();
+                    renderDashboard();
+                }
+            };
+            
+            window.moveModuleDown = (id) => {
+                let order = AuthAPI.getModuleOrder();
+                const idx = order.indexOf(id);
+                if (idx !== -1 && idx < order.length - 1) {
+                    [order[idx], order[idx + 1]] = [order[idx + 1], order[idx]];
+                    AuthAPI.saveModuleOrder(order);
+                    populateModuleSelect();
+                    renderDashboard();
                 }
             };
 
@@ -2330,7 +2353,7 @@
                 // 3. Render Lesson Access Grid (in Course Builder panel)
                 const unlockedModules = AuthAPI.getUnlockedModules();
                 const modsContent = AuthAPI.getModulesContent();
-                const modulesList = Object.keys(modsContent).map((id, index) => ({
+                const modulesList = AuthAPI.getModuleOrder().filter(id => modsContent[id]).map((id, index) => ({
                     id: id,
                     name: `Module ${index + 1}: ${modsContent[id].title || id}`
                 }));
@@ -2359,6 +2382,8 @@
                                     </span>
                                     <div style="display: flex; gap: 0.3rem; align-items: center;">
                                         <button class="btn btn-secondary" onclick="handleRenameModule('${mod.id}')" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; border-color: var(--accent-gold); color: var(--accent-gold-light); background: transparent; min-width: auto; height: auto; line-height: 1; border-radius: 4px;">Rename</button>
+                                        <button class="btn btn-secondary" onclick="moveModuleUp('${mod.id}')" style="padding: 0; font-size: 0.8rem; border-color: #4ade80; color: #4ade80; background: transparent; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; line-height: 1; font-weight: bold;" title="Move Up">⬆</button>
+                                        <button class="btn btn-secondary" onclick="moveModuleDown('${mod.id}')" style="padding: 0; font-size: 0.8rem; border-color: #f59e0b; color: #f59e0b; background: transparent; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; line-height: 1; font-weight: bold;" title="Move Down">⬇</button>
                                         <button class="btn btn-secondary" onclick="handleDeleteModule('${mod.id}')" style="padding: 0; font-size: 0.8rem; border-color: #ef4444; color: #ef4444; background: transparent; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; line-height: 1; font-weight: bold;" title="Delete Module">✕</button>
                                     </div>
                                 </div>

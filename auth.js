@@ -7,6 +7,7 @@ const SESSION_KEY = 'jilgm_current_user';
 const UNLOCKED_KEY = 'jilgm_unlocked_modules';
 const CONTENT_KEY = 'jilgm_modules_content';
 const ARCHIVED_KEY = 'jilgm_archived_modules';
+const ORDER_KEY = 'jilgm_module_order';
 
 function triggerStorageSync(key) {
     try {
@@ -1126,7 +1127,8 @@ function initFirestoreSync(onCollectionLoaded) {
         unlocked_modules: false,
         archived_modules: false,
         admins: false,
-        instructors: false
+        instructors: false,
+        module_order: false
     };
 
     const markLoaded = (key) => {
@@ -1274,6 +1276,33 @@ function initFirestoreSync(onCollectionLoaded) {
     }, err => {
         console.error("Firestore sync unlocked modules error", err);
         markLoaded('unlocked_modules');
+    });
+
+    // 5.5 Sync module order
+    firebaseDb.collection('settings').doc('module_order').onSnapshot(doc => {
+        if (doc.exists) {
+            const data = doc.data();
+            if (data && data.list) {
+                localStorage.setItem(ORDER_KEY, JSON.stringify(data.list));
+                triggerStorageSync(ORDER_KEY);
+            }
+            markLoaded('module_order');
+        } else {
+            if (isTeacherOrAdmin) {
+                const defaultOrder = Object.keys(defaultModules);
+                firebaseDb.collection('settings').doc('module_order').set({ list: defaultOrder })
+                    .then(() => markLoaded('module_order'))
+                    .catch(err => {
+                        console.error("Firestore sync module order error", err);
+                        markLoaded('module_order');
+                    });
+            } else {
+                markLoaded('module_order');
+            }
+        }
+    }, err => {
+        console.error("Firestore sync module order error", err);
+        markLoaded('module_order');
     });
 
     // 6. Sync archived modules
@@ -1919,6 +1948,27 @@ const AuthAPI = {
         }
     },
 
+    getModuleOrder: () => {
+        try {
+            const order = localStorage.getItem(ORDER_KEY);
+            if (order) {
+                const parsed = JSON.parse(order);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+            return Object.keys(AuthAPI.getModulesContent());
+        } catch(e) {
+            return Object.keys(AuthAPI.getModulesContent());
+        }
+    },
+
+    saveModuleOrder: (orderArray) => {
+        localStorage.setItem(ORDER_KEY, JSON.stringify(orderArray));
+        if (isFirebaseInitialized && firebaseDb) {
+            firebaseDb.collection('settings').doc('module_order').set({ list: orderArray })
+                .catch(err => console.error("Firestore save module order error", err));
+        }
+    },
+
     getModule: (moduleId) => {
         const mods = AuthAPI.getModulesContent();
         return mods[moduleId] || null;
@@ -1953,6 +2003,12 @@ const AuthAPI = {
         
         const docRef = firebaseDb.collection('modules_content').doc();
         docRef.set(newMod).catch(err => console.error("Firestore add module error", err));
+        
+        let order = AuthAPI.getModuleOrder();
+        if (!order.includes(docRef.id)) {
+            order.push(docRef.id);
+            AuthAPI.saveModuleOrder(order);
+        }
         return docRef.id;
     },
 
@@ -1983,6 +2039,11 @@ const AuthAPI = {
             let unlocked = AuthAPI.getUnlockedModules();
             unlocked = unlocked.filter(id => id !== moduleId);
             firebaseDb.collection('settings').doc('unlocked_modules').set({ list: unlocked });
+
+            let order = AuthAPI.getModuleOrder();
+            order = order.filter(id => id !== moduleId);
+            AuthAPI.saveModuleOrder(order);
+            
             return true;
         }
         return false;
@@ -2003,6 +2064,12 @@ const AuthAPI = {
                 };
                 firebaseDb.collection('modules_content').doc(moduleId).set(restoredMod);
                 firebaseDb.collection('archived_modules').doc(moduleId).delete();
+                
+                let order = AuthAPI.getModuleOrder();
+                if (!order.includes(moduleId)) {
+                    order.push(moduleId);
+                    AuthAPI.saveModuleOrder(order);
+                }
             }
         }).catch(err => console.error("Firestore restore module error", err));
         return true;

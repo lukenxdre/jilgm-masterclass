@@ -539,7 +539,7 @@
 
                 // Grab data via AuthAPI to ensure correct default fallbacks (e.g. defaultModules, ['module1'])
                 const modsContent = AuthAPI.getModulesContent();
-                const modIds = Object.keys(modsContent);
+                const modIds = AuthAPI.getModuleOrder().filter(id => modsContent[id]);
                 const unlockedModules = AuthAPI.getUnlockedModules();
                 const studentAnswers = user.answers || [];
 

@@ -189,7 +189,7 @@
 
                 // Bind title & headers
                 const modsContent = AuthAPI.getModulesContent();
-                const modIds = Object.keys(modsContent);
+                const modIds = AuthAPI.getModuleOrder().filter(id => modsContent[id]);
                 const moduleIndex = modIds.indexOf(moduleId) + 1;
                 document.getElementById('moduleLabel').innerText = `Module ${moduleIndex > 0 ? moduleIndex : ''}`;
                 document.getElementById('moduleTitle').innerText = moduleData.title;
