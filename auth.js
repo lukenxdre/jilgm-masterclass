@@ -248,8 +248,6 @@ const defaultModules = {
             { type: 'question', content: 'Reflect on Ephesians 4 and your own ministry model. Write a brief response (minimum 20 characters): What is one specific way you need to change your leadership to better equip the saints for ministry?' },
             { type: 'file_upload', title: 'Module 3 Assignment', content: 'Upload your completed Ministry Audit or Journal Reflection for this week.' }
         ]
-    },l conflict situation in your ministry or personal life. Write a detailed response (minimum 20 characters) answering: How can you apply the Matthew 18 process to bring biblical resolution, and what personal changes do you need to make in how you handle conflict?' }
-        ]
     },
     module4: {
         title: "Spiritual Disciplines of a Pastor",
