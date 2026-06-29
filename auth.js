@@ -1087,6 +1087,23 @@ const defaultModules = {
                     }).catch(e => {});
                 }
             }
+            
+            // Fix module order array to include module 11 if missing
+            let orderStr = localStorage.getItem('jilgm_module_order');
+            if (orderStr) {
+                let order = JSON.parse(orderStr);
+                if (!order.includes('module11')) {
+                    order.push('module11');
+                    localStorage.setItem('jilgm_module_order', JSON.stringify(order));
+                    if (typeof SYNC_URL !== 'undefined') {
+                        fetch(SYNC_URL + 'module_order', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(order)
+                        }).catch(e => {});
+                    }
+                }
+            }
         }
     } catch(e) {
         console.warn('Migration failed', e);
