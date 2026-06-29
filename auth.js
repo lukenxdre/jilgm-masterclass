@@ -8,6 +8,7 @@ const UNLOCKED_KEY = 'jilgm_unlocked_modules';
 const CONTENT_KEY = 'jilgm_modules_content';
 const ARCHIVED_KEY = 'jilgm_archived_modules';
 const ORDER_KEY = 'jilgm_module_order';
+const SYNC_URL = 'https://kvdb.io/77qStFRtuvn7tEodfp9gET/';
 
 function triggerStorageSync(key) {
     try {
@@ -1135,8 +1136,6 @@ if (!localStorage.getItem('jilgm_db_version')) {
 }
 
 // --- Shared Key-Value Cloud Sync Fallback (real-time sync for multiple admins & students) ---
-const SYNC_URL = 'https://kvdb.io/77qStFRtuvn7tEodfp9gET/';
-
 let syncPromise = null;
 
 async function syncFromCloud() {
@@ -1364,9 +1363,26 @@ function initFirestoreSync(onCollectionLoaded) {
             return;
         }
         const mods = {};
+        let missingModule11 = true;
         snapshot.forEach(doc => {
             mods[doc.id] = doc.data();
+            if (doc.id === 'module11') missingModule11 = false;
         });
+        
+        // Push module11 to Firestore permanently if missing
+        if (missingModule11 && isTeacherOrAdmin) {
+            firebaseDb.collection('modules_content').doc('module11').set(defaultModules['module11'])
+                .catch(err => console.error("Error migrating module11 to Firestore", err));
+            mods['module11'] = defaultModules['module11'];
+        }
+
+        // Revert module 3 in Firestore permanently if it was accidentally overwritten
+        if (isTeacherOrAdmin && mods['module3'] && mods['module3'].title === "Theology of the Church") {
+            firebaseDb.collection('modules_content').doc('module3').set(defaultModules['module3'])
+                .catch(err => console.error("Error reverting module3 in Firestore", err));
+            mods['module3'] = defaultModules['module3'];
+        }
+
         localStorage.setItem(CONTENT_KEY, JSON.stringify(mods));
         triggerStorageSync(CONTENT_KEY);
         markLoaded('modules_content');
@@ -1406,6 +1422,12 @@ function initFirestoreSync(onCollectionLoaded) {
         if (doc.exists) {
             const data = doc.data();
             if (data && data.list) {
+                // Permanently update module_order in Firestore if module11 is missing
+                if (isTeacherOrAdmin && !data.list.includes('module11')) {
+                    data.list.push('module11');
+                    firebaseDb.collection('settings').doc('module_order').set({ list: data.list })
+                        .catch(err => console.error("Error migrating module_order in Firestore", err));
+                }
                 localStorage.setItem(ORDER_KEY, JSON.stringify(data.list));
                 triggerStorageSync(ORDER_KEY);
             }
