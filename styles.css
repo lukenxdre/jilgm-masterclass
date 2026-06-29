@@ -24,6 +24,23 @@
     --section-pad: 100px;
 }
 
+body.light-theme {
+    /* Light Theme Palette */
+    --bg-dark: #f8fafc;
+    --bg-darker: #f1f5f9;
+    --bg-card: #ffffff;
+    
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    
+    --accent-gold: #d4af37;
+    --accent-gold-light: #b48a1b;
+    --accent-gold-dark: #8c6a12;
+    
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --glass-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -58,6 +75,14 @@ body::before {
         radial-gradient(circle at 50% 50%, rgba(18, 50, 100, 0.5) 0%, transparent 70%);
     pointer-events: none;
     z-index: -1;
+}
+
+body.light-theme {
+    background: var(--bg-dark);
+}
+
+body.light-theme::before {
+    background-image: none;
 }
 
 /* Typography Utilities */
