@@ -1,5 +1,6 @@
 (function() {
     function initTheme() {
+        if (!document.body) return;
         const savedTheme = localStorage.getItem('jilgm_theme') || 'dark';
         if (savedTheme === 'light') {
             document.body.classList.add('light-theme');
@@ -8,10 +9,10 @@
         }
     }
 
-    // Run immediately to prevent flash
-    initTheme();
-
     document.addEventListener('DOMContentLoaded', () => {
+        // Run immediately once DOM is ready to prevent flash (or apply instantly)
+        initTheme();
+
         // Create Floating Theme Toggle Button
         const fab = document.createElement('button');
         fab.className = 'theme-toggle-fab';
