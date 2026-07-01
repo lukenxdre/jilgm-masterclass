@@ -27,22 +27,22 @@
 }
 
 body.light-theme {
-    /* Light Theme Palette */
-    --bg-dark: #f8fafc;
-    --bg-darker: #f1f5f9;
-    --bg-card: #ffffff;
+    /* Light Theme Palette - Sunset Orange & Peach */
+    --bg-dark: #faf8f5;
+    --bg-darker: #f4edd9;
+    --bg-card: rgba(255, 255, 255, 0.9);
     
-    --text-primary: #1e293b;
-    --text-secondary: #475569;
+    --text-primary: #2d1810;
+    --text-secondary: #6b4c3a;
     
     --accent-gold: #d4af37;
     --accent-gold-light: #b48a1b;
     --accent-gold-dark: #8c6a12;
     
-    --glass-border: rgba(0, 0, 0, 0.1);
+    --glass-border: rgba(212, 175, 55, 0.2);
     --glass-shadow: 0 4px 20px rgba(0,0,0,0.05);
     
-    --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+    --bg-gradient: linear-gradient(135deg, #faf8f5 0%, #f4edd9 50%, #fcdab7 100%);
 }
 
 * {
