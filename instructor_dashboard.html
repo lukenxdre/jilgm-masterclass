@@ -635,36 +635,68 @@
                     qaBoardContainer.innerHTML = '';
                     let questionCount = 0;
 
+                    // Sort modules and collect questions
+                    const questionsByModule = {};
+
                     cohortList.forEach(student => {
-                        const questions = student.questions || [];
-                        if (questions.length === 0) return;
-                        
-                        const studentSection = document.createElement('div');
-                        studentSection.style.marginBottom = '2rem';
-                        studentSection.style.padding = '1.5rem';
-                        studentSection.style.borderRadius = '12px';
-                        studentSection.style.background = 'rgba(255, 255, 255, 0.02)';
-                        studentSection.style.border = '1px solid rgba(255,255,255,0.05)';
-
-                        const studentHeader = document.createElement('h3');
-                        studentHeader.style.color = 'var(--accent-gold)';
-                        studentHeader.style.margin = '0 0 1rem 0';
-                        studentHeader.style.borderBottom = '1px solid rgba(212,175,55,0.3)';
-                        studentHeader.style.paddingBottom = '0.5rem';
-                        studentHeader.innerText = `${student.firstName} ${student.lastName}`;
-                        studentSection.appendChild(studentHeader);
-
-                        questions.forEach(q => {
+                        const studentQuestions = student.questions || [];
+                        studentQuestions.forEach(q => {
                             questionCount++;
-                            const modIdx = modIds.indexOf(q.moduleId) + 1;
-                            const modNum = modIdx > 0 ? `Module ${modIdx}: ` : '';
-                            const mod = modsContent[q.moduleId] || { title: q.moduleId };
-                            
+                            const mId = q.moduleId || 'misc';
+                            if (!questionsByModule[mId]) {
+                                questionsByModule[mId] = [];
+                            }
+                            questionsByModule[mId].push({
+                                question: q,
+                                student: student
+                            });
+                        });
+                    });
+
+                    function renderModuleGroup(moduleId, questions) {
+                        const modIdx = modIds.indexOf(moduleId) + 1;
+                        const modTitle = modsContent[moduleId]?.title || (moduleId === 'misc' ? 'General Questions' : moduleId);
+                        const displayTitle = modIdx > 0 ? `Module ${modIdx}: ${modTitle}` : modTitle;
+
+                        // Create module container
+                        const modSection = document.createElement('div');
+                        modSection.style.marginBottom = '3rem';
+
+                        // Module header
+                        const modHeader = document.createElement('div');
+                        modHeader.style.display = 'flex';
+                        modHeader.style.alignItems = 'center';
+                        modHeader.style.gap = '1rem';
+                        modHeader.style.marginBottom = '1.5rem';
+                        modHeader.style.borderBottom = '2px solid var(--accent-gold)';
+                        modHeader.style.paddingBottom = '0.6rem';
+
+                        modHeader.innerHTML = `
+                            <div style="font-size: 1.5rem; line-height: 1;">📘</div>
+                            <div style="flex: 1; text-align: left;">
+                                <h3 style="margin: 0; font-family: var(--font-serif); font-size: 1.35rem; color: var(--accent-gold);">${displayTitle}</h3>
+                                <span style="font-size: 0.8rem; color: var(--text-secondary);">${questions.length} Question${questions.length === 1 ? '' : 's'}</span>
+                            </div>
+                        `;
+                        modSection.appendChild(modHeader);
+
+                        // Grid for cards
+                        const cardsGrid = document.createElement('div');
+                        cardsGrid.style.display = 'grid';
+                        cardsGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(340px, 1fr))';
+                        cardsGrid.style.gap = '1.5rem';
+
+                        questions.forEach(({ question: q, student: student }) => {
                             const card = document.createElement('div');
                             card.className = 'glass-card';
                             card.style.padding = '1.5rem';
-                            card.style.marginBottom = '1rem';
-                            card.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                            card.style.display = 'flex';
+                            card.style.flexDirection = 'column';
+                            card.style.height = '100%';
+                            card.style.boxSizing = 'border-box';
+                            card.style.border = '1px solid var(--glass-border)';
+                            card.style.boxShadow = 'var(--glass-shadow)';
+                            card.style.background = 'var(--bg-card)';
 
                             let repliesHtml = '';
                             if (q.replies && q.replies.length > 0) {
@@ -675,29 +707,60 @@
                                     </div>
                                 `).join('');
                             } else {
-                                repliesHtml = '<p style="font-size: 0.8rem; color: var(--text-secondary); font-style: italic; margin-top: 0.5rem;">No replies yet.</p>';
+                                repliesHtml = '<p style="font-size: 0.8rem; color: var(--text-secondary); font-style: italic; margin-top: 0.5rem; text-align: left;">No replies yet.</p>';
                             }
 
+                            const initials = ((student.firstName?.charAt(0) || '') + (student.lastName?.charAt(0) || '')).toUpperCase() || 'S';
+
                             card.innerHTML = `
-                                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(249,115,22,0.12); padding-bottom: 0.5rem; margin-bottom: 0.8rem;">
-                                    <div>
-                                        <a href="module.html?id=${q.moduleId}&preview=true&from=instructor" style="font-size: 0.85rem; color: var(--accent-gold); text-decoration: none; border-bottom: 1px dashed rgba(212,175,55,0.4); font-weight: bold;">${modNum}${mod.title}</a>
+                                <div style="display: flex; align-items: center; gap: 0.8rem; border-bottom: 1px solid rgba(249,115,22,0.12); padding-bottom: 0.8rem; margin-bottom: 0.8rem; text-align: left;">
+                                    <div class="dash-avatar" style="width: 38px; height: 38px; font-size: 0.9rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; box-shadow: none; border: none;">
+                                        ${initials}
                                     </div>
-                                    <span style="font-size: 0.72rem; color: var(--text-secondary);">${new Date(q.date).toLocaleString()}</span>
+                                    <div style="flex: 1; min-width: 0;">
+                                        <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${student.firstName} ${student.lastName}</h4>
+                                        <span style="font-size: 0.7rem; color: var(--text-secondary); display: block;">${new Date(q.date).toLocaleString()}</span>
+                                    </div>
                                 </div>
-                                <p style="margin: 0; font-size: 0.95rem; color: var(--text-primary); font-weight: 500; text-align: left;">Q: "${q.question}"</p>
-                                <div style="margin-top: 0.8rem; padding-left: 1rem; border-left: 1px dashed rgba(249,115,22,0.25); text-align: left;">
-                                    ${repliesHtml}
-                                </div>
-                                <div style="margin-top: 1.2rem; display: flex; gap: 0.5rem;">
-                                    <input type="text" id="board_reply_input_${q.id}" class="glass-input" style="flex: 1; padding: 0.4rem 0.8rem; font-size: 0.85rem;" placeholder="Type your reply...">
-                                    <button class="btn btn-primary" onclick="submitBoardQAQuestionReply('${student.id}', '${q.id}')" style="padding: 0.4rem 1.2rem; font-size: 0.85rem; height: auto;">Reply</button>
+                                <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div>
+                                        <p style="margin: 0; font-size: 0.95rem; color: var(--text-primary); font-weight: 500; text-align: left; line-height: 1.45;">Q: "${q.question}"</p>
+                                        <div style="margin-top: 0.8rem; padding-left: 0.8rem; border-left: 1px dashed rgba(249,115,22,0.25); max-height: 180px; overflow-y: auto;">
+                                            ${repliesHtml}
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 1.2rem; display: flex; gap: 0.5rem; align-items: center;">
+                                        <input type="text" id="board_reply_input_${q.id}" class="glass-input" style="flex: 1; padding: 0.4rem 0.8rem; font-size: 0.85rem;" placeholder="Type your reply...">
+                                        <button class="btn btn-primary" onclick="submitBoardQAQuestionReply('${student.id}', '${q.id}')" style="padding: 0.4rem 1.2rem; font-size: 0.85rem; height: auto; flex-shrink: 0;">Reply</button>
+                                    </div>
                                 </div>
                             `;
-                            studentSection.appendChild(card);
+                            cardsGrid.appendChild(card);
                         });
-                        qaBoardContainer.appendChild(studentSection);
+
+                        modSection.appendChild(cardsGrid);
+                        qaBoardContainer.appendChild(modSection);
+                    }
+
+                    // Render in order of modIds
+                    modIds.forEach(moduleId => {
+                        const questions = questionsByModule[moduleId];
+                        if (!questions || questions.length === 0) return;
+                        renderModuleGroup(moduleId, questions);
+                        delete questionsByModule[moduleId];
                     });
+
+                    // Render miscellaneous questions if any remain
+                    Object.keys(questionsByModule).forEach(moduleId => {
+                        const questions = questionsByModule[moduleId];
+                        if (!questions || questions.length === 0) return;
+                        renderModuleGroup(moduleId, questions);
+                    });
+
+                    if (questionCount === 0) {
+                        qaBoardContainer.innerHTML = '<div class="glass-card" style="padding: 3rem; text-align: center; color: var(--text-secondary); font-style: italic;">No questions have been posted on the Q&A boards in your outreach yet.</div>';
+                    }
+                }
 
                     if (questionCount === 0) {
                         qaBoardContainer.innerHTML = '<div class="glass-card" style="padding: 3rem; text-align: center; color: var(--text-secondary); font-style: italic;">No questions have been posted on the Q&A boards in your outreach yet.</div>';
