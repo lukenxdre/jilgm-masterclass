@@ -14,8 +14,142 @@
     <script src="transitions.js" defer></script>
     
     <style>
-        /* Fierce Sunset Theme Overrides (Light Mode) */
-        body.dashboard-layout {
+        /* ── Dark Mode (Default) Hero Banner ── */
+        .dash-hero {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg,
+                    rgba(11, 23, 44, 0.97) 0%,
+                    rgba(20, 38, 70, 0.95) 40%,
+                    rgba(11, 23, 44, 0.97) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), inset 0 0 80px rgba(212, 175, 55, 0.03);
+            border-radius: 20px;
+            padding: 2.4rem 2.4rem 1.6rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+        .dash-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 80% at 5% 50%, rgba(212, 175, 55, 0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 95% 20%, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .dash-hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .dash-hero-label {
+            font-family: var(--font-sans, 'Outfit', sans-serif);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent-gold, #d4af37);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .dash-hero-label::before,
+        .dash-hero-label::after {
+            content: '';
+            display: block;
+            width: 28px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold, #d4af37));
+        }
+        .dash-hero-label::before { transform: rotate(180deg); }
+        .dash-hero-welcome {
+            font-family: var(--font-serif, 'Playfair Display', serif);
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-style: italic;
+            font-weight: 600;
+            color: #ffffff !important;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            margin: 0 0 0.4rem;
+            line-height: 1.2;
+        }
+        .dash-hero-welcome span {
+            color: var(--accent-gold-light, #f5d97e) !important;
+            text-shadow: 0 0 30px rgba(245, 217, 126, 0.4) !important;
+        }
+        .dash-hero-sub {
+            font-size: 0.92rem;
+            color: rgba(240, 236, 228, 0.75) !important;
+            margin: 0;
+            line-height: 1.6;
+        }
+        .dash-user-badge {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 14px;
+            padding: 0.9rem 1.3rem;
+            flex-shrink: 0;
+            backdrop-filter: blur(10px);
+        }
+        .dash-user-info { text-align: right; }
+        .dash-user-name {
+            font-family: var(--font-sans, 'Outfit', sans-serif);
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #ffffff !important;
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+        .dash-user-role {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--accent-gold-light, #f5d97e) !important;
+            font-weight: 700;
+        }
+        .dash-avatar {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-gold-light, #f5d97e), var(--accent-gold-dark, #a07728));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            font-family: var(--font-serif, 'Playfair Display', serif);
+            color: #0b172c;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25), 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        .dash-hero-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.4rem 0 1.2rem;
+        }
+        .dash-hero-divider-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+        }
+        .dash-hero-diamond {
+            width: 6px; height: 6px;
+            background: var(--accent-gold, #d4af37);
+            transform: rotate(45deg);
+            flex-shrink: 0;
+        }
+
+        #liveUpdateToast.visible {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+            pointer-events: auto !important;
+        }
+
+        /* ── Fierce Sunset Theme Overrides (Light Mode) ── */
+        body.light-theme.dashboard-layout {
             /* Sunset Theme CSS Variables Overrides */
             --bg-dark: #faf8f5 !important;
             --bg-darker: #f5eae0 !important;
@@ -35,251 +169,161 @@
             color: var(--text-primary) !important;
         }
 
-        body.dashboard-layout::before {
+        body.light-theme.dashboard-layout::before {
             background-image: 
                 radial-gradient(circle at 15% 20%, rgba(249, 115, 22, 0.08) 0%, transparent 45%),
                 radial-gradient(circle at 85% 80%, rgba(220, 38, 38, 0.06) 0%, transparent 50%) !important;
         }
 
-        .sidebar {
+        body.light-theme .sidebar {
             background: linear-gradient(180deg, #fbf6f0 0%, #f4eae0 100%) !important;
             border-right: 2px solid rgba(249, 115, 22, 0.2) !important;
             box-shadow: 10px 0 30px rgba(249, 115, 22, 0.03) !important;
         }
 
-        .sidebar-nav a {
+        body.light-theme .sidebar-nav a {
             color: var(--text-secondary) !important;
         }
 
-        .sidebar-nav a:hover {
+        body.light-theme .sidebar-nav a:hover {
             color: var(--accent-gold) !important;
             background: rgba(249, 115, 22, 0.08) !important;
             border-left: 3px solid rgba(249, 115, 22, 0.4) !important;
             transform: translateX(4px);
         }
 
-        .sidebar-nav a.active {
+        body.light-theme .sidebar-nav a.active {
             color: var(--accent-gold) !important;
             background: linear-gradient(90deg, rgba(249, 115, 22, 0.12) 0%, rgba(249, 115, 22, 0.02) 100%) !important;
             border-left: 3px solid #f97316 !important;
             box-shadow: inset 0 0 10px rgba(249, 115, 22, 0.05) !important;
         }
 
-        .dashboard-content {
+        body.light-theme .dashboard-content {
             background: transparent !important;
         }
 
-        /* Fierce Sunset Hero Banner */
-        .dash-hero {
-            position: relative;
-            overflow: hidden;
+        body.light-theme .dash-hero {
             background: linear-gradient(135deg,
                 #b91c1c 0%,
                 #ea580c 50%,
                 #f59e0b 100%) !important;
             border: 1px solid rgba(255, 255, 255, 0.25) !important;
             box-shadow: 0 12px 40px rgba(234, 88, 12, 0.2), inset 0 0 50px rgba(255, 255, 255, 0.08) !important;
-            border-radius: 20px;
-            padding: 2.4rem 2.4rem 1.6rem;
-            margin-bottom: 2rem;
-            text-align: left;
         }
-        .dash-hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
+
+        body.light-theme .dash-hero::before {
             background:
                 radial-gradient(ellipse 60% 80% at 5% 50%, var(--glass-hover, rgba(200,200,200,0.15)) 0%, transparent 70%),
                 radial-gradient(ellipse 40% 60% at 95% 20%, rgba(255,255,255,0.06) 0%, transparent 70%) !important;
-            pointer-events: none;
         }
-        .dash-hero-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 1.5rem;
-            flex-wrap: wrap;
+
+        body.light-theme .dash-hero-label {
+            color: rgba(255, 255, 255, 0.85) !important;
         }
-        .dash-hero-label {
-            font-family: var(--font-sans, 'Outfit', sans-serif);
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--text-primary) !important;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .dash-hero-label::before,
-        .dash-hero-label::after {
-            content: '';
-            display: block;
-            width: 28px;
-            height: 1px;
+
+        body.light-theme .dash-hero-label::before,
+        body.light-theme .dash-hero-label::after {
             background: linear-gradient(90deg, transparent, #ffe5d9) !important;
         }
-        .dash-hero-label::before { transform: rotate(180deg); }
-        .dash-hero-welcome {
-            font-family: var(--font-serif, 'Playfair Display', serif);
-            font-size: clamp(1.8rem, 4vw, 2.6rem);
-            font-style: italic;
-            font-weight: 600;
-            color: var(--text-primary);
-            text-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            margin: 0 0 0.4rem;
-            line-height: 1.2;
+
+        body.light-theme .dash-hero-welcome {
+            color: #ffffff !important;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
-        .dash-hero-welcome span {
-            color: var(--text-primary) !important;
-            text-shadow: 0 0 30px rgba(255, 251, 223, 0.4) !important;
+
+        body.light-theme .dash-hero-welcome span {
+            color: #fffbdf !important;
+            text-shadow: 0 0 30px rgba(255, 251, 223, 0.5) !important;
         }
-        .dash-hero-sub {
-            font-size: 0.92rem;
-            color: var(--text-primary) !important;
-            margin: 0;
-            line-height: 1.6;
+
+        body.light-theme .dash-hero-sub {
+            color: rgba(255, 255, 255, 0.82) !important;
         }
-        .dash-user-badge {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+
+        body.light-theme .dash-user-badge {
             background: rgba(255, 255, 255, 0.12) !important;
             border: 1px solid rgba(255, 255, 255, 0.25) !important;
-            border-radius: 14px;
-            padding: 0.9rem 1.3rem;
-            flex-shrink: 0;
-            backdrop-filter: blur(10px);
         }
-        .dash-user-info { text-align: right; }
-        .dash-user-name {
-            font-family: var(--font-sans, 'Outfit', sans-serif);
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: var(--text-primary);
-            display: block;
-            margin-bottom: 0.15rem;
+
+        body.light-theme .dash-user-name {
+            color: #ffffff !important;
         }
-        .dash-user-role {
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 0.14em;
-            color: var(--text-primary) !important;
-            font-weight: 700;
+
+        body.light-theme .dash-user-role {
+            color: rgba(255, 255, 255, 0.75) !important;
         }
-        .dash-avatar {
-            width: 48px; height: 48px;
-            border-radius: 50%;
+
+        body.light-theme .dash-avatar {
             background: linear-gradient(135deg, #fffbdf, #ffd0b5) !important;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800;
-            font-size: 1.1rem;
-            font-family: var(--font-serif, 'Playfair Display', serif);
             color: var(--text-secondary) !important;
             box-shadow: 0 0 0 3px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.15) !important;
         }
-        .dash-hero-divider {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin: 1.4rem 0 1.2rem;
-        }
-        .dash-hero-divider-line {
-            flex: 1;
-            height: 1px;
+
+        body.light-theme .dash-hero-divider-line {
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent) !important;
         }
-        .dash-hero-diamond {
-            width: 6px; height: 6px;
+
+        body.light-theme .dash-hero-diamond {
             background: var(--bg-darker) !important;
-            transform: rotate(45deg);
-            flex-shrink: 0;
         }
 
-        /* Headers and Dividers */
-        .dashboard-header {
+        body.light-theme .dashboard-header {
             border-bottom: 1.5px solid rgba(249, 115, 22, 0.25) !important;
-            margin-bottom: 2.5rem !important;
-            padding-bottom: 1.2rem !important;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .dashboard-header h1 {
-            color: var(--text-primary) !important;
-            font-size: 2.2rem !important;
-            font-family: var(--font-serif, 'Playfair Display', serif) !important;
-            font-style: italic !important;
         }
 
-        /* Glass Cards */
-        .glass-card {
+        body.light-theme .dashboard-header h1 {
+            color: var(--text-primary) !important;
+        }
+
+        body.light-theme .glass-card {
             background: rgba(255, 255, 255, 0.8) !important;
-            backdrop-filter: blur(20px) !important;
-            -webkit-backdrop-filter: blur(20px) !important;
             border: 1px solid rgba(249, 115, 22, 0.18) !important;
             box-shadow: 0 12px 40px rgba(249, 115, 22, 0.05) !important;
             color: var(--text-primary) !important;
         }
-        .glass-card:hover {
+
+        body.light-theme .glass-card:hover {
             border-color: rgba(249, 115, 22, 0.35) !important;
         }
 
-        /* Table custom styling for sunset readability */
-        .admin-table-container {
-            background: transparent !important;
-            border: none !important;
-            margin-top: 0 !important;
-        }
-        table {
-            color: var(--text-primary) !important;
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th {
+        body.light-theme th {
             background: rgba(249, 115, 22, 0.06) !important;
             color: #c2410c !important;
             border-bottom: 2px solid rgba(249, 115, 22, 0.25) !important;
-            font-weight: 700 !important;
-            padding: 1rem !important;
-            text-transform: uppercase !important;
-            font-size: 0.8rem !important;
-            letter-spacing: 0.05em !important;
         }
-        td {
+
+        body.light-theme td {
             border-bottom: 1px solid rgba(249, 115, 22, 0.08) !important;
-            padding: 1rem !important;
-            color: #2d2724 !important;
-        }
-        tr:hover td {
-            background: rgba(249, 115, 22, 0.02) !important;
-        }
-        table td, table td strong, table td span {
             color: #2d2724 !important;
         }
 
-        /* Private Counseling Chat (Replaced with Grid View) */
-        .chat-student-item:hover, .chat-student-item.active {
+        body.light-theme tr:hover td {
+            background: rgba(249, 115, 22, 0.02) !important;
+        }
+
+        body.light-theme table td, 
+        body.light-theme table td strong, 
+        body.light-theme table td span {
+            color: #2d2724 !important;
+        }
+
+        body.light-theme .chat-student-item:hover, 
+        body.light-theme .chat-student-item.active {
             background: rgba(249, 115, 22, 0.08) !important;
         }
 
-        /* Glass Input inside cards */
-        .glass-input {
+        body.light-theme .glass-input {
             background: rgba(255, 255, 255, 0.9) !important;
             border: 1px solid rgba(249, 115, 22, 0.25) !important;
             color: var(--text-primary) !important;
         }
-        .glass-input:focus {
+
+        body.light-theme .glass-input:focus {
             border-color: #f97316 !important;
             box-shadow: 0 0 10px rgba(249, 115, 22, 0.15) !important;
         }
 
-        #liveUpdateToast.visible {
-            opacity: 1 !important;
-            transform: translateY(0) !important;
-            pointer-events: auto !important;
-        }
     </style>
     <script src="theme.js?v=1782926021271"></script>
 </head>
