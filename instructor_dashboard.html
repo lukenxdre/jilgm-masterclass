@@ -422,7 +422,7 @@
                 </div>
             </div>
 
-            <div id="chatBoxArea" style="display: none; flex-direction: column; height: 600px; background: rgba(255, 255, 255, 0.8); border-radius: 16px; border: 1px solid rgba(249, 115, 22, 0.2); overflow: hidden; box-shadow: 0 15px 40px rgba(249, 115, 22, 0.04);">
+            <div id="chatBoxArea" class="glass-card" style="display: none; flex-direction: column; height: 600px; border-radius: 16px; overflow: hidden;">
                 <!-- Populated dynamically -->
             </div>
         </div>
@@ -810,8 +810,8 @@
                         item.className = 'glass-card';
                         item.style.padding = '1.5rem';
                         item.style.textAlign = 'left';
-                        item.style.border = '1px solid rgba(249, 115, 22, 0.2)';
-                        item.style.background = 'rgba(255, 255, 255, 0.8)';
+                        item.style.border = '1px solid var(--glass-border)';
+                        item.style.background = 'var(--bg-card)';
                         item.style.cursor = 'pointer';
                         item.style.display = 'flex';
                         item.style.flexDirection = 'column';
@@ -870,20 +870,20 @@
                 }
 
                 function renderChatBox(student) {
-                    chatBoxArea.className = '';
+                    chatBoxArea.className = 'glass-card';
                     chatBoxArea.innerHTML = '';
                     chatBoxArea.style.display = 'flex';
 
                     // Chat header
                     const header = document.createElement('div');
                     header.style.padding = '1.2rem';
-                    header.style.background = 'rgba(255, 255, 255, 0.9)';
-                    header.style.borderBottom = '1px solid rgba(249, 115, 22, 0.15)';
+                    header.style.background = 'var(--bg-darker)';
+                    header.style.borderBottom = '1px solid var(--glass-border)';
                     header.style.display = 'flex';
                     header.style.alignItems = 'center';
                     header.style.gap = '1rem';
                     header.innerHTML = `
-                        <button id="btnChatBack" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; border-color: rgba(249, 115, 22, 0.3);">← Back to Students</button>
+                        <button id="btnChatBack" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; border-color: var(--glass-border);">← Back to Students</button>
                         <div style="flex: 1; text-align: left;">
                             <h4 style="margin: 0; color: var(--accent-gold); font-weight: bold; font-size: 1.1rem;">${student.firstName} ${student.lastName}</h4>
                             <span style="font-size: 0.75rem; color: var(--text-secondary);">${student.email}</span>
@@ -922,7 +922,7 @@
                             bubble.style.maxWidth = '70%';
                             bubble.style.padding = '0.8rem 1.1rem';
                             bubble.style.borderRadius = isMe ? '18px 18px 4px 18px' : '18px 18px 18px 4px';
-                            bubble.style.background = isMe ? 'linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark))' : 'rgba(255, 255, 255, 0.9)';
+                            bubble.style.background = isMe ? 'linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark))' : 'var(--bg-darker)';
                             bubble.style.border = isMe ? 'none' : '1px solid var(--glass-border)';
                             bubble.style.color = isMe ? '#fff' : 'var(--text-primary)';
                             bubble.style.boxShadow = isMe ? '0 4px 12px rgba(249, 115, 22, 0.15)' : '0 3px 10px rgba(0,0,0,0.03)';
@@ -949,7 +949,7 @@
                     const inputArea = document.createElement('div');
                     inputArea.style.padding = '1.2rem';
                     inputArea.style.borderTop = '1px solid var(--glass-border)';
-                    inputArea.style.background = 'rgba(255, 255, 255, 0.9)';
+                    inputArea.style.background = 'var(--bg-darker)';
                     inputArea.style.display = 'flex';
                     inputArea.style.gap = '0.8rem';
                     
@@ -1317,7 +1317,7 @@
                             bubble.style.maxWidth = '70%';
                             bubble.style.padding = '0.8rem 1.1rem';
                             bubble.style.borderRadius = isMe ? '18px 18px 4px 18px' : '18px 18px 18px 4px';
-                            bubble.style.background = isMe ? 'linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark))' : 'rgba(255, 255, 255, 0.9)';
+                            bubble.style.background = isMe ? 'linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark))' : 'var(--bg-darker)';
                             bubble.style.border = isMe ? 'none' : '1px solid var(--glass-border)';
                             bubble.style.color = isMe ? '#fff' : 'var(--text-primary)';
                             bubble.style.boxShadow = isMe ? '0 4px 12px rgba(249, 115, 22, 0.15)' : '0 3px 10px rgba(0,0,0,0.03)';
