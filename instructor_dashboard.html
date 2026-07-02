@@ -1110,13 +1110,13 @@
                         const modNum = modIdx > 0 ? `Module ${modIdx}: ` : '';
                         const mod = modsContent[modId] || { title: 'Unknown Module' };
                         const modSection = document.createElement('div');
-                        modSection.style.border = '1.5px solid rgba(249, 115, 22, 0.2)';
+                        modSection.style.border = '1.5px solid rgba(212, 175, 55, 0.25)';
                         modSection.style.borderRadius = '12px';
                         modSection.style.padding = '1.5rem';
-                        modSection.style.background = 'rgba(255, 255, 255, 0.9)';
+                        modSection.style.background = 'var(--bg-card)'; // Premium dynamic card block
                         modSection.style.marginBottom = '1.5rem';
                         modSection.style.color = 'var(--text-primary)';
-                        modSection.style.boxShadow = '0 8px 30px rgba(249, 115, 22, 0.04)';
+                        modSection.style.boxShadow = 'var(--glass-shadow)';
                         
                         const header = document.createElement('div');
                         header.style.borderBottom = '2px solid rgba(249, 115, 22, 0.25)';
