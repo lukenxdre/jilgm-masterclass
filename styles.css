@@ -125,6 +125,35 @@ body.light-theme::before {
     background-image: none;
 }
 
+/* ── Light-mode overrides for hero glassmorphism panels ── */
+body.light-theme .hero-logo-wrapper {
+    background: rgba(255, 248, 240, 0.88); /* warm frosted peach/cream */
+    border-color: rgba(212, 175, 55, 0.45);
+    box-shadow:
+        0 20px 50px rgba(180, 120, 40, 0.12),
+        0 0 40px rgba(212, 175, 55, 0.12),
+        inset 0 0 20px rgba(255, 255, 255, 0.6);
+}
+
+body.light-theme .hero-text-card {
+    background: rgba(255, 251, 244, 0.92); /* warm near-white card */
+    border-color: rgba(212, 175, 55, 0.35);
+    box-shadow:
+        0 20px 50px rgba(180, 120, 40, 0.1),
+        inset 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+body.light-theme .hero-badge {
+    background: rgba(212, 175, 55, 0.12);
+    border-color: rgba(212, 175, 55, 0.35);
+    color: var(--accent-gold-dark);
+}
+
+body.light-theme .hero-logo-glow-rays {
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.04) 50%, transparent 70%);
+}
+
+
 /* Typography Utilities */
 h1, h2, h3, h4 {
     font-family: var(--font-sans);
@@ -456,18 +485,18 @@ h1, h2, h3, h4 {
 /* Branded dashed certificate card wrapper for hero text */
 .hero-text-card {
     position: relative;
-    background: rgba(11, 23, 44, 0.85); /* Premium dark-navy glass backing */
+    background: var(--surface-bg); /* adapts to dark/light theme */
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1.5px solid rgba(212, 175, 55, 0.45); /* Gold outline border */
+    border: 1.5px solid var(--glass-border);
     border-radius: 24px;
     padding: 3rem 2.5rem;
     margin: 2rem auto 0;
     box-shadow: 
-        0 30px 70px rgba(0, 0, 0, 0.4),
+        0 30px 70px rgba(0, 0, 0, 0.25),
         inset 0 0 30px rgba(255, 255, 255, 0.03);
     max-width: 800px;
-    transition: all 0.4s ease;
+    transition: background 0.4s ease, border-color 0.4s ease, all 0.4s ease;
     z-index: 1;
 }
 
@@ -1346,10 +1375,10 @@ tr:last-child td {
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    background: rgba(11, 23, 44, 0.82); /* Deep dark navy backing */
+    background: var(--surface-bg); /* adapts to dark/light theme */
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1.5px solid rgba(212, 175, 55, 0.6); /* Vibrant gold border */
+    border: 1.5px solid var(--glass-border);
     border-radius: 28px;
     box-shadow: 
         0 30px 65px rgba(0, 0, 0, 0.35),
@@ -1358,6 +1387,7 @@ tr:last-child td {
     animation: float 6s ease-in-out infinite;
     overflow: visible;
     margin: 1rem auto;
+    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 .hero-logo-svg-frame {
