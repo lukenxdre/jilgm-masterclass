@@ -31,8 +31,8 @@
             --glass-border: rgba(249, 115, 22, 0.2) !important;
             --glass-shadow: 0 10px 30px rgba(249, 115, 22, 0.04), 0 1px 3px rgba(0, 0, 0, 0.01) !important;
 
-            background: radial-gradient(circle at 50% 50%, #fffbf7 0%, #faefe4 100%) !important;
-            color: #1e1b18 !important;
+            background: var(--bg-gradient) !important;
+            color: var(--text-primary) !important;
         }
 
         body.dashboard-layout::before {
@@ -48,18 +48,18 @@
         }
 
         .sidebar-nav a {
-            color: #6e5f58 !important;
+            color: var(--text-secondary) !important;
         }
 
         .sidebar-nav a:hover {
-            color: #ea580c !important;
+            color: var(--accent-gold) !important;
             background: rgba(249, 115, 22, 0.08) !important;
             border-left: 3px solid rgba(249, 115, 22, 0.4) !important;
             transform: translateX(4px);
         }
 
         .sidebar-nav a.active {
-            color: #ea580c !important;
+            color: var(--accent-gold) !important;
             background: linear-gradient(90deg, rgba(249, 115, 22, 0.12) 0%, rgba(249, 115, 22, 0.02) 100%) !important;
             border-left: 3px solid #f97316 !important;
             box-shadow: inset 0 0 10px rgba(249, 115, 22, 0.05) !important;
@@ -106,7 +106,7 @@
             font-weight: 700;
             letter-spacing: 0.2em;
             text-transform: uppercase;
-            color: #ffe5d9 !important;
+            color: var(--text-primary) !important;
             margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
@@ -132,12 +132,12 @@
             line-height: 1.2;
         }
         .dash-hero-welcome span {
-            color: #fffbdf !important;
+            color: var(--text-primary) !important;
             text-shadow: 0 0 30px rgba(255, 251, 223, 0.4) !important;
         }
         .dash-hero-sub {
             font-size: 0.92rem;
-            color: #ffe5d9 !important;
+            color: var(--text-primary) !important;
             margin: 0;
             line-height: 1.6;
         }
@@ -165,7 +165,7 @@
             font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 0.14em;
-            color: #fffbdf !important;
+            color: var(--text-primary) !important;
             font-weight: 700;
         }
         .dash-avatar {
@@ -176,7 +176,7 @@
             font-weight: 800;
             font-size: 1.1rem;
             font-family: var(--font-serif, 'Playfair Display', serif);
-            color: #9a3412 !important;
+            color: var(--text-secondary) !important;
             box-shadow: 0 0 0 3px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.15) !important;
         }
         .dash-hero-divider {
@@ -192,7 +192,7 @@
         }
         .dash-hero-diamond {
             width: 6px; height: 6px;
-            background: #fffbdf !important;
+            background: var(--bg-darker) !important;
             transform: rotate(45deg);
             flex-shrink: 0;
         }
@@ -207,7 +207,7 @@
             align-items: center;
         }
         .dashboard-header h1 {
-            color: #1e1b18 !important;
+            color: var(--text-primary) !important;
             font-size: 2.2rem !important;
             font-family: var(--font-serif, 'Playfair Display', serif) !important;
             font-style: italic !important;
@@ -220,7 +220,7 @@
             -webkit-backdrop-filter: blur(20px) !important;
             border: 1px solid rgba(249, 115, 22, 0.18) !important;
             box-shadow: 0 12px 40px rgba(249, 115, 22, 0.05) !important;
-            color: #1e1b18 !important;
+            color: var(--text-primary) !important;
         }
         .glass-card:hover {
             border-color: rgba(249, 115, 22, 0.35) !important;
@@ -233,7 +233,7 @@
             margin-top: 0 !important;
         }
         table {
-            color: #1e1b18 !important;
+            color: var(--text-primary) !important;
             width: 100%;
             border-collapse: collapse;
         }
@@ -268,7 +268,7 @@
         .glass-input {
             background: rgba(255, 255, 255, 0.9) !important;
             border: 1px solid rgba(249, 115, 22, 0.25) !important;
-            color: #1e1b18 !important;
+            color: var(--text-primary) !important;
         }
         .glass-input:focus {
             border-color: #f97316 !important;
@@ -286,7 +286,7 @@
 <body class="dashboard-layout page-loading light-theme">
 
     <!-- Live update toast -->
-    <div id="liveUpdateToast" style="position: fixed; bottom: 1.5rem; right: 1.5rem; background: linear-gradient(135deg, rgba(212,175,55,0.18), rgba(212,175,55,0.08)); border: 1px solid rgba(212,175,55,0.5); color: #f5d97e; padding: 0.6rem 1.1rem; border-radius: 50px; font-size: 0.8rem; font-family: var(--font-sans); font-weight: 500; letter-spacing: 0.03em; backdrop-filter: blur(12px); box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 0.45rem; z-index: 9999; opacity: 0; transform: translateY(12px); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none;">✦ Content updated by admin</div>
+    <div id="liveUpdateToast" style="position: fixed; bottom: 1.5rem; right: 1.5rem; background: linear-gradient(135deg, rgba(212,175,55,0.18), rgba(212,175,55,0.08)); border: 1px solid rgba(212,175,55,0.5); color: var(--accent-gold-light); padding: 0.6rem 1.1rem; border-radius: 50px; font-size: 0.8rem; font-family: var(--font-sans); font-weight: 500; letter-spacing: 0.03em; backdrop-filter: blur(12px); box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 0.45rem; z-index: 9999; opacity: 0; transform: translateY(12px); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none;">✦ Content updated by admin</div>
     
     <aside class="sidebar">
         <a href="index.html" class="logo-sidebar-brand">
@@ -335,7 +335,7 @@
                 <h1 id="cohortHeader">Student Cohort</h1>
             </div>
             
-            <div class="glass-card" style="padding: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card);">
+            <div class="glass-card" style="padding: 2rem; border-color: var(--glass-border); background: var(--bg-card);">
                 <div class="admin-table-container" style="margin-top: 0;">
                     <table>
                         <thead>
@@ -387,7 +387,7 @@
             <div class="dashboard-header">
                 <h1>Co-Instructors Directory</h1>
             </div>
-            <div class="glass-card" style="padding: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card);">
+            <div class="glass-card" style="padding: 2rem; border-color: var(--glass-border); background: var(--bg-card);">
                 <div class="admin-table-container" style="margin-top: 0;">
                     <table>
                         <thead>

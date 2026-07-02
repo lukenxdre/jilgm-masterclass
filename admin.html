@@ -46,8 +46,8 @@
             gap: 1rem;
         }
         .builder-sidebar-card {
-            background: rgba(11, 23, 44, 0.6);
-            border: 1px solid rgba(212, 175, 55, 0.25);
+            background: var(--surface-bg);
+            border: 1px solid var(--surface-border);
             border-radius: 14px;
             padding: 1.4rem 1.2rem;
             display: flex;
@@ -273,7 +273,7 @@
                          <span>➕</span> Add New Module
                      </button>
                  </div>
-                <div class="glass-card" style="padding: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card); overflow: visible;">
+                <div class="glass-card" style="padding: 2rem; border-color: var(--glass-border); background: var(--bg-card); overflow: visible;">
                     <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
                         Control which curriculum modules are released to the enrollees. Students must still complete the prerequisite lessons to progress.
                     </p>
@@ -302,7 +302,7 @@
                     Module Content Editor
                 </h2>
 
-                <div class="glass-card" style="padding: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card); overflow: visible;">
+                <div class="glass-card" style="padding: 2rem; border-color: var(--glass-border); background: var(--bg-card); overflow: visible;">
                     <!-- Top bar: Module Selector + Title/Subtitle -->
                     <div style="margin-bottom: 1.8rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border);">
                         <div style="margin-bottom: 1.2rem;">
@@ -382,7 +382,7 @@
                                 <button class="btn btn-primary" id="btn-save-module" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                                     💾 Save Module
                                 </button>
-                                <a href="module.html?id=module1&preview=true" id="btn-preview-module" target="_blank" class="btn btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; border-color: rgba(255,255,255,0.2); color: var(--text-primary);">
+                                <a href="module.html?id=module1&preview=true" id="btn-preview-module" target="_blank" class="btn btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; border-color: var(--glass-border); color: var(--text-primary);">
                                     👁 Preview Lesson
                                 </a>
                                 <button class="btn btn-secondary" id="btn-ppt-module" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; border-color: var(--accent-gold); color: var(--accent-gold-light); margin-top: 0.5rem; font-weight: bold; background: rgba(212, 175, 55, 0.05);">
@@ -409,7 +409,7 @@
                 <h1>Announcements Manager</h1>
             </div>
             
-            <div class="glass-card" style="padding: 2rem; margin-bottom: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card);">
+            <div class="glass-card" style="padding: 2rem; margin-bottom: 2rem; border-color: var(--glass-border); background: var(--bg-card);">
                 <h3 style="margin-bottom: 1.5rem; color: var(--accent-gold);">Post New Announcement</h3>
                 <form id="adminPostAnnouncementForm" style="display: flex; flex-direction: column; gap: 1rem;">
                     <div>
@@ -424,7 +424,7 @@
                 </form>
             </div>
 
-            <div class="glass-card" style="padding: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card);">
+            <div class="glass-card" style="padding: 2rem; border-color: var(--glass-border); background: var(--bg-card);">
                 <h3 style="margin-bottom: 1.5rem; color: var(--accent-gold);">Announcements History</h3>
                 <div class="admin-table-container" style="margin-top: 0;">
                     <table>
@@ -450,7 +450,7 @@
                 <h1>Resource Repository</h1>
             </div>
             
-            <div class="glass-card" style="padding: 2rem; margin-bottom: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card);">
+            <div class="glass-card" style="padding: 2rem; margin-bottom: 2rem; border-color: var(--glass-border); background: var(--bg-card);">
                 <h3 style="margin-bottom: 1.5rem; color: var(--accent-gold);">Add Resource Link / File</h3>
                 <form id="adminAddResourceForm" style="display: flex; gap: 1rem; flex-direction: column;">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -477,7 +477,7 @@
                 </form>
             </div>
 
-            <div class="glass-card" style="padding: 2rem; border-color: rgba(255,255,255,0.05); background: var(--bg-card);">
+            <div class="glass-card" style="padding: 2rem; border-color: var(--glass-border); background: var(--bg-card);">
                 <h3 style="margin-bottom: 1.5rem; color: var(--accent-gold);">Active Resources</h3>
                 <div class="admin-table-container" style="margin-top: 0;">
                     <table>
@@ -502,12 +502,12 @@
             <div class="dashboard-header">
                 <h1>Settings</h1>
             </div>
-            <div class="glass-card" style="padding: 2.5rem; border-color: rgba(255,255,255,0.05); text-align: center;">
+            <div class="glass-card" style="padding: 2.5rem; border-color: var(--glass-border); text-align: center;">
                 <h3 style="color: var(--accent-gold); margin-bottom: 1rem;">LMS Configuration Controls</h3>
                 <p style="color: var(--text-secondary); margin-bottom: 2rem;">You can reset the database and restore default student profiles and modules here.</p>
                 <button class="btn btn-secondary" onclick="if(confirm('Are you sure you want to reset all students, progress, and modules to default content?')){localStorage.clear(); location.reload();}" style="border-color: #ef4444; color: #ef4444;">Reset Local Database</button>
             </div>
-            <div class="glass-card" style="padding: 2.5rem; border-color: rgba(255,255,255,0.05); margin-top: 2rem;">
+            <div class="glass-card" style="padding: 2.5rem; border-color: var(--glass-border); margin-top: 2rem;">
                 <h3 style="color: var(--accent-gold); margin-bottom: 1rem; text-align: left;">Firebase Shared Cloud Database</h3>
                 <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem; text-align: left;">Paste your Firebase Config JSON code below to activate real-time cross-user synchronization. Leave blank to run locally.</p>
                 <textarea id="firebaseConfigInput" class="glass-input" rows="8" style="width: 100%; font-family: monospace; font-size: 0.85rem; margin-bottom: 1.2rem;" placeholder='{
@@ -577,13 +577,13 @@
                     </div>
                     <div style="display: flex; gap: 1rem;">
                         <button type="submit" class="btn btn-primary" style="padding: 0.8rem 2rem;">Save Account</button>
-                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('addInstructorForm').classList.add('hidden')" style="border-color: rgba(255,255,255,0.15);">Cancel</button>
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('addInstructorForm').classList.add('hidden')" style="border-color: var(--glass-border);">Cancel</button>
                     </div>
                 </form>
             </div>
 
             <!-- Instructors Grid/List -->
-            <div class="glass-card" style="padding: 2rem; border-color: rgba(255,255,255,0.05);">
+            <div class="glass-card" style="padding: 2rem; border-color: var(--glass-border);">
                 <div style="overflow-x: auto;">
                     <table style="width: 100%; border-collapse: collapse; text-align: left;">
                         <thead>
@@ -646,9 +646,9 @@
         function getFormattingToolbarMarkup(index, fieldName) {
             return `
                 <div class="formatting-toolbar" style="display: inline-flex; gap: 0.3rem; margin-bottom: 0.4rem; flex-wrap: wrap; background: rgba(0,0,0,0.3); padding: 0.25rem 0.4rem; border-radius: 6px; border: 1px solid rgba(212,175,55,0.2); align-items: center; justify-content: flex-start; max-width: 100%;">
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="formatFieldText(${index}, '${fieldName}', 'bold')" style="padding: 0.15rem 0.4rem; font-weight: bold; font-size: 0.72rem; border-color: rgba(255,255,255,0.1); height: auto; line-height: 1; font-family: var(--font-sans); background: rgba(255,255,255,0.05); min-width: 24px;">B</button>
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="formatFieldText(${index}, '${fieldName}', 'italic')" style="padding: 0.15rem 0.4rem; font-style: italic; font-size: 0.72rem; border-color: rgba(255,255,255,0.1); height: auto; line-height: 1; font-family: var(--font-sans); background: rgba(255,255,255,0.05); min-width: 24px;">I</button>
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="formatFieldText(${index}, '${fieldName}', 'underline')" style="padding: 0.15rem 0.4rem; text-decoration: underline; font-size: 0.72rem; border-color: rgba(255,255,255,0.1); height: auto; line-height: 1; font-family: var(--font-sans); background: rgba(255,255,255,0.05); min-width: 24px;">U</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="formatFieldText(${index}, '${fieldName}', 'bold')" style="padding: 0.15rem 0.4rem; font-weight: bold; font-size: 0.72rem; border-color: var(--glass-border); height: auto; line-height: 1; font-family: var(--font-sans); background: rgba(128,128,128,0.08); min-width: 24px;">B</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="formatFieldText(${index}, '${fieldName}', 'italic')" style="padding: 0.15rem 0.4rem; font-style: italic; font-size: 0.72rem; border-color: var(--glass-border); height: auto; line-height: 1; font-family: var(--font-sans); background: rgba(128,128,128,0.08); min-width: 24px;">I</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="formatFieldText(${index}, '${fieldName}', 'underline')" style="padding: 0.15rem 0.4rem; text-decoration: underline; font-size: 0.72rem; border-color: var(--glass-border); height: auto; line-height: 1; font-family: var(--font-sans); background: rgba(128,128,128,0.08); min-width: 24px;">U</button>
                     
                     <span style="width: 1px; height: 12px; background: rgba(255,255,255,0.15); margin: 0 0.1rem;"></span>
 
@@ -1280,8 +1280,8 @@
                             header.style.paddingBottom = '0.6rem';
                             header.style.marginBottom = '1rem';
                             header.innerHTML = `
-                                <h3 style="margin: 0; font-size: 1.25rem; color: #f5d97e; font-family: var(--font-serif); text-align: left;">${mod.title}</h3>
-                                ${mod.subtitle ? `<p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: #8a9bb0; text-align: left;">${mod.subtitle}</p>` : ''}
+                                <h3 style="margin: 0; font-size: 1.25rem; color: var(--accent-gold-light); font-family: var(--font-serif); text-align: left;">${mod.title}</h3>
+                                ${mod.subtitle ? `<p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: var(--text-secondary); text-align: left;">${mod.subtitle}</p>` : ''}
                             `;
                             modSection.appendChild(header);
                             
@@ -1303,7 +1303,7 @@
                                 let remarkFormHtml = '';
                                 
                                 if (ans.answer) {
-                                    contentHtml = `<p style="margin: 0.5rem 0; color: #e2e8f0; line-height: 1.5; font-size: 0.92rem; text-align: left;"><strong>Response:</strong> <span style="font-style: italic; color: var(--text-primary);">"${ans.answer}"</span></p>`;
+                                    contentHtml = `<p style="margin: 0.5rem 0; color: var(--text-primary); line-height: 1.5; font-size: 0.92rem; text-align: left;"><strong>Response:</strong> <span style="font-style: italic; color: var(--text-primary);">"${ans.answer}"</span></p>`;
                                 } else if (ans.file) {
                                     let previewHtml = '';
                                     if (ans.file.url) {
@@ -1317,8 +1317,8 @@
                                         }
                                     }
                                     contentHtml = `
-                                        <div style="margin: 0.5rem 0; font-size: 0.92rem; color: #e2e8f0; text-align: left;">
-                                            <strong>Attached File:</strong> <span style="font-family: monospace; font-size: 0.85rem; color: #f5d97e;">${ans.file.name} (${ans.file.size})</span>
+                                        <div style="margin: 0.5rem 0; font-size: 0.92rem; color: var(--text-primary); text-align: left;">
+                                            <strong>Attached File:</strong> <span style="font-family: monospace; font-size: 0.85rem; color: var(--accent-gold-light);">${ans.file.name} (${ans.file.size})</span>
                                             ${previewHtml}
                                         </div>
                                     `;
@@ -1337,12 +1337,12 @@
                                     const currentRemark = ans.teacherRemarks || '';
                                     remarkFormHtml = `
                                         <div style="margin-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.12); padding-top: 1rem; text-align: left;">
-                                            <label style="display: block; font-size: 0.8rem; color: #f5d97e; font-weight: bold; margin-bottom: 0.4rem;">INSTRUCTOR REMARKS / COMMENTS</label>
+                                            <label style="display: block; font-size: 0.8rem; color: var(--accent-gold-light); font-weight: bold; margin-bottom: 0.4rem;">INSTRUCTOR REMARKS / COMMENTS</label>
                                             <div style="display: flex; gap: 0.6rem;">
                                                 <textarea id="remark_input_${ans.moduleId}_${ans.componentIndex || ''}" class="glass-input" rows="2" style="flex: 1; font-size: 0.85rem; padding: 0.5rem; line-height: 1.4; color: var(--text-primary); background: var(--glass-bg, rgba(200,200,200,0.1));" placeholder="Type your comment/remarks here...">${currentRemark}</textarea>
                                                 <button class="btn btn-primary" style="font-size: 0.8rem; padding: 0.5rem 1rem;" onclick="saveRemarks('${id}', '${ans.moduleId}', ${ans.componentIndex !== null ? ans.componentIndex : 'null'})">Save</button>
                                             </div>
-                                            ${ans.teacherRemarksDate ? `<span style="font-size: 0.7rem; color: #8a9bb0; margin-top: 0.4rem; display: block;">Last comment saved on ${new Date(ans.teacherRemarksDate).toLocaleString()} by ${ans.teacherRemarksAdmin || 'Admin'}</span>` : ''}
+                                            ${ans.teacherRemarksDate ? `<span style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.4rem; display: block;">Last comment saved on ${new Date(ans.teacherRemarksDate).toLocaleString()} by ${ans.teacherRemarksAdmin || 'Admin'}</span>` : ''}
                                         </div>
                                     `;
                                 }
@@ -1350,7 +1350,7 @@
                                 card.innerHTML = `
                                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-hover, rgba(200,200,200,0.15)); padding-bottom: 0.4rem; margin-bottom: 0.6rem;">
                                         <span style="font-weight: bold; font-size: 0.92rem; color: var(--text-primary); text-align: left;">${ans.question}</span>
-                                        <span class="badge" style="background: rgba(212,175,55,0.15); color: #f5d97e; border: 1px solid rgba(212,175,55,0.3); font-size: 0.65rem;">${typeLabel}</span>
+                                        <span class="badge" style="background: rgba(212,175,55,0.15); color: var(--accent-gold-light); border: 1px solid rgba(212,175,55,0.3); font-size: 0.65rem;">${typeLabel}</span>
                                     </div>
                                     ${contentHtml}
                                     ${gradeHtml}
@@ -1531,7 +1531,7 @@
                     .ppt-header-title {
                         font-size: 0.9rem;
                         text-transform: uppercase;
-                        color: #d4af37; /* Accent Gold */
+                        color: var(--accent-gold); /* Accent Gold */
                         font-weight: 700;
                         letter-spacing: 0.1em;
                     }
@@ -1612,7 +1612,7 @@
                         line-height: 1.5;
                     }
                     .ppt-list li::marker {
-                        color: #d4af37;
+                        color: var(--accent-gold);
                     }
                     .ppt-image {
                         max-height: 250px;
@@ -1637,7 +1637,7 @@
                 titleSlide.className = 'ppt-slide ppt-slide-title-page';
                 titleSlide.innerHTML = `
                     <div class="ppt-slide-border"></div>
-                    <div style="font-size: 1.3rem; color: #d4af37; letter-spacing: 0.25em; text-transform: uppercase; font-weight: 700; margin-bottom: 1rem;">
+                    <div style="font-size: 1.3rem; color: var(--accent-gold); letter-spacing: 0.25em; text-transform: uppercase; font-weight: 700; margin-bottom: 1rem;">
                         JILGM Leadership Masterclass
                     </div>
                     <h1 style="font-family: 'Playfair Display', serif; font-size: 3.6rem; color: var(--text-primary); margin: 0 0 1.5rem 0; font-style: italic; line-height: 1.2; text-shadow: 0 4px 12px rgba(0,0,0,0.5);">

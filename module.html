@@ -115,7 +115,7 @@
 
         <div class="module-layout">
             <!-- Left Column: Lesson Content and Embedded Activities -->
-            <div class="glass-card" style="padding: 2.5rem; border-color: rgba(255,255,255,0.05); margin-bottom: 3rem;" id="lessonContentCard">
+            <div class="glass-card" style="padding: 2.5rem; border-color: var(--glass-border); margin-bottom: 3rem;" id="lessonContentCard">
                 <div class="lesson-text" id="lessonTextContainer">
                     <!-- Populated dynamically by JS -->
                 </div>
@@ -562,7 +562,7 @@
                                 if (isImage(uploadedFile.type, uploadedFile.name)) {
                                     renderContainer.innerHTML = `<img src="${uploadedFile.url}" style="max-height: 180px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); object-fit: contain;">`;
                                 } else if (isVideo(uploadedFile.type, uploadedFile.name)) {
-                                    renderContainer.innerHTML = `<video src="${uploadedFile.url}" controls style="max-height: 240px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: #000;"></video>`;
+                                    renderContainer.innerHTML = `<video src="${uploadedFile.url}" controls style="max-height: 240px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: var(--bg-darker);"></video>`;
                                 }
                             }
 
@@ -628,7 +628,7 @@
                                         if (isImage(file.type, file.name)) {
                                             renderContainer.innerHTML = `<img src="${dataUrl}" style="max-height: 180px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); object-fit: contain;">`;
                                         } else if (isVideo(file.type, file.name)) {
-                                            renderContainer.innerHTML = `<video src="${dataUrl}" controls style="max-height: 240px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: #000;"></video>`;
+                                            renderContainer.innerHTML = `<video src="${dataUrl}" controls style="max-height: 240px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: var(--bg-darker);"></video>`;
                                         }
                                     };
                                     reader.readAsDataURL(file);
@@ -669,7 +669,7 @@
                                          if (isImage(fileObj.type, fileObj.name)) {
                                              renderSuccess.innerHTML = `<img src="${base64Url}" style="max-height: 180px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); object-fit: contain;">`;
                                          } else if (isVideo(fileObj.type, fileObj.name)) {
-                                             renderSuccess.innerHTML = `<video src="${base64Url}" controls style="max-height: 240px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: #000;"></video>`;
+                                             renderSuccess.innerHTML = `<video src="${base64Url}" controls style="max-height: 240px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: var(--bg-darker);"></video>`;
                                          }
                                      }
                                      fileSuccess.classList.remove('hidden');
@@ -773,10 +773,10 @@
                                     b.disabled = true;
                                     if (i === correctIdx) {
                                         b.classList.add('correct');
-                                        b.innerHTML += ' <span style="float: right; font-weight: bold; color: #15803d;">✓ Correct</span>';
+                                        b.innerHTML += ' <span style="float: right; font-weight: bold; color: var(--success-color);">✓ Correct</span>';
                                     } else if (i === chosenIdx) {
                                         b.classList.add('wrong');
-                                        b.innerHTML += ' <span style="float: right; font-weight: bold; color: #b91c1c;">✗ Incorrect</span>';
+                                        b.innerHTML += ' <span style="float: right; font-weight: bold; color: var(--danger-color);">✗ Incorrect</span>';
                                     } else {
                                         b.classList.add('dimmed');
                                     }
@@ -793,10 +793,10 @@
                                         b.disabled = true;
                                         if (i === correctIdx) {
                                             b.classList.add('correct');
-                                            b.innerHTML += ' <span style="float: right; font-weight: bold; color: #15803d;">✓ Correct</span>';
+                                            b.innerHTML += ' <span style="float: right; font-weight: bold; color: var(--success-color);">✓ Correct</span>';
                                         } else if (i === chosen) {
                                             b.classList.add('wrong');
-                                            b.innerHTML += ' <span style="float: right; font-weight: bold; color: #b91c1c;">✗ Incorrect</span>';
+                                            b.innerHTML += ' <span style="float: right; font-weight: bold; color: var(--danger-color);">✗ Incorrect</span>';
                                         } else {
                                             b.classList.add('dimmed');
                                         }
