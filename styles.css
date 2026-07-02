@@ -136,11 +136,20 @@ body.light-theme .hero-logo-wrapper {
 }
 
 body.light-theme .hero-text-card {
-    background: rgba(255, 251, 244, 0.92); /* warm near-white card */
+    background: rgba(255, 251, 244, 0.95); /* warm near-white card */
     border-color: rgba(212, 175, 55, 0.35);
     box-shadow:
         0 20px 50px rgba(180, 120, 40, 0.1),
         inset 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+/* ── Hero card text: explicit light-mode colors (bright card = dark text) ── */
+body.light-theme .hero-text-card .hero-title {
+    color: #1a0f08; /* very dark charcoal brown — max contrast on peach card */
+}
+
+body.light-theme .hero-text-card .hero-subtitle {
+    color: #4a3020; /* warm dark brown — clearly readable on cream */
 }
 
 body.light-theme .hero-badge {
@@ -485,7 +494,7 @@ h1, h2, h3, h4 {
 /* Branded dashed certificate card wrapper for hero text */
 .hero-text-card {
     position: relative;
-    background: var(--surface-bg); /* adapts to dark/light theme */
+    background: rgba(8, 18, 38, 0.92); /* Opaque dark navy - guaranteed contrast in night mode */
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1.5px solid var(--glass-border);
@@ -493,11 +502,20 @@ h1, h2, h3, h4 {
     padding: 3rem 2.5rem;
     margin: 2rem auto 0;
     box-shadow: 
-        0 30px 70px rgba(0, 0, 0, 0.25),
+        0 30px 70px rgba(0, 0, 0, 0.4),
         inset 0 0 30px rgba(255, 255, 255, 0.03);
     max-width: 800px;
-    transition: background 0.4s ease, border-color 0.4s ease, all 0.4s ease;
+    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
     z-index: 1;
+}
+
+/* ── Hero card text: explicit dark-mode colors (opaque dark card = cream text) ── */
+.hero-text-card .hero-title {
+    color: #f0ece4; /* warm cream — guaranteed readable on dark navy */
+}
+
+.hero-text-card .hero-subtitle {
+    color: #a8b8cc; /* readable muted slate on dark navy */
 }
 
 .hero-text-card::before {
