@@ -182,6 +182,31 @@ body.light-theme .hero-glow-orb {
     opacity: 0.08;
 }
 
+/* ── Light-mode: navbar ── */
+body.light-theme .navbar {
+    background: rgba(250, 245, 235, 0.96); /* warm cream semi-transparent */
+    border-bottom: 2px solid rgba(212, 175, 55, 0.4);
+    box-shadow: 0 2px 20px rgba(180, 120, 40, 0.08);
+}
+
+body.light-theme .navbar.scrolled {
+    background: rgba(244, 237, 217, 0.98); /* slightly deeper peach when scrolled */
+    box-shadow: 0 4px 30px rgba(180, 120, 40, 0.12);
+}
+
+/* Nav links: dark readable text in light mode */
+body.light-theme .nav-links a:not(.btn) {
+    color: #2d1810; /* dark charcoal brown */
+}
+
+body.light-theme .nav-links a:not(.btn):hover {
+    color: var(--accent-gold-dark);
+}
+
+/* Mobile menu: light mode */
+body.light-theme .mobile-menu .mobile-link {
+    color: #2d1810;
+}
 
 
 /* Typography Utilities */
@@ -323,11 +348,12 @@ h1, h2, h3, h4 {
     top: 0;
     width: 100%;
     height: var(--nav-height);
-    background: rgba(10, 27, 53, 0.95); /* Elegant Riyadh Navy ribbon background */
+    background: rgba(10, 27, 53, 0.95); /* dark mode: Riyadh Navy ribbon */
     backdrop-filter: blur(20px);
-    border-bottom: 2px solid var(--accent-gold); /* Thin gold bottom border */
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 2px solid var(--accent-gold);
     z-index: 1000;
-    transition: all 0.3s ease;
+    transition: background 0.4s ease, box-shadow 0.3s ease;
 }
 
 .navbar.scrolled {
