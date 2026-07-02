@@ -2801,7 +2801,9 @@
                     
                     let pwdColHtml = '';
                     if (currentAdmin) {
-                        pwdColHtml = `<td style="padding: 1rem; color: var(--text-secondary); font-family: monospace;">${inst.password}</td>`;
+                        pwdColHtml = `<td style="padding: 0.5rem 1rem; color: var(--text-secondary); font-family: monospace;">
+                            <input type="text" value="${inst.password}" onchange="handleUpdateInstructorPassword('${inst.id}', this.value)" style="background: transparent; color: var(--text-secondary); border: 1px dashed transparent; border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.9rem; font-family: monospace; width: 100%; box-sizing: border-box; transition: all 0.2s;" onfocus="this.style.borderColor='var(--accent-gold)'; this.style.background='var(--bg-dark)';" onblur="this.style.borderColor='transparent'; this.style.background='transparent';">
+                        </td>`;
                     }
 
                     // Outreach assignment dropdown for admins
@@ -2818,7 +2820,9 @@
                         <td style="padding: 0.5rem 1rem; color: var(--text-primary); font-weight: 500;">
                             <input type="text" value="${inst.name}" onchange="handleUpdateInstructorName('${inst.id}', this.value)" style="background: transparent; color: var(--text-primary); border: 1px dashed transparent; border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.9rem; font-weight: 500; font-family: var(--font-sans); width: 100%; box-sizing: border-box; transition: all 0.2s;" onfocus="this.style.borderColor='var(--accent-gold)'; this.style.background='var(--bg-dark)';" onblur="this.style.borderColor='transparent'; this.style.background='transparent';">
                         </td>
-                        <td style="padding: 1rem; color: var(--accent-gold-light);">${inst.username}</td>
+                        <td style="padding: 0.5rem 1rem; color: var(--accent-gold-light);">
+                            <input type="text" value="${inst.username}" onchange="handleUpdateInstructorUsername('${inst.id}', this.value)" style="background: transparent; color: var(--accent-gold-light); border: 1px dashed transparent; border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.9rem; font-weight: 500; font-family: var(--font-sans); width: 100%; box-sizing: border-box; transition: all 0.2s;" onfocus="this.style.borderColor='var(--accent-gold)'; this.style.background='var(--bg-dark)';" onblur="this.style.borderColor='transparent'; this.style.background='transparent';">
+                        </td>
                         ${pwdColHtml}
                         <td style="padding: 1rem; color: var(--text-secondary);">${outreachHtml}</td>
                         <td style="padding: 1rem; color: var(--text-secondary);">${dateStr}</td>
@@ -2861,6 +2865,40 @@
                     renderInstructorsAdmin();
                 } else {
                     alert("Error: " + (res.error || "Failed to update instructor name."));
+                    renderInstructorsAdmin();
+                }
+            };
+
+            window.handleUpdateInstructorUsername = async (id, username) => {
+                const trimmed = username.trim();
+                if (!trimmed) {
+                    alert("Instructor username cannot be empty.");
+                    renderInstructorsAdmin();
+                    return;
+                }
+                const res = await AuthAPI.updateInstructorUsername(id, trimmed);
+                if (res.success) {
+                    showToast("Instructor username updated!");
+                    renderInstructorsAdmin();
+                } else {
+                    alert("Error: " + (res.error || "Failed to update instructor username."));
+                    renderInstructorsAdmin();
+                }
+            };
+
+            window.handleUpdateInstructorPassword = async (id, password) => {
+                const trimmed = password.trim();
+                if (!trimmed) {
+                    alert("Instructor password cannot be empty.");
+                    renderInstructorsAdmin();
+                    return;
+                }
+                const res = await AuthAPI.updateInstructorPassword(id, trimmed);
+                if (res.success) {
+                    showToast("Instructor password updated!");
+                    renderInstructorsAdmin();
+                } else {
+                    alert("Error: " + (res.error || "Failed to update instructor password."));
                     renderInstructorsAdmin();
                 }
             };

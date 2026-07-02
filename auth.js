@@ -2467,6 +2467,37 @@ const AuthAPI = {
         }
     },
 
+    updateInstructorUsername: async (id, username) => {
+        if (!isFirebaseInitialized || !firebaseDb) {
+            return { error: 'Database is offline or not configured. Operation blocked.' };
+        }
+        try {
+            const list = AuthAPI.getInstructors();
+            const exists = list.some(inst => inst.username.toLowerCase() === username.toLowerCase() && inst.id !== id);
+            if (exists) {
+                return { error: 'Username is already taken by another instructor.' };
+            }
+            await firebaseDb.collection('instructors').doc(id).update({ username });
+            return { success: true };
+        } catch(e) {
+            console.error("Firestore update instructor username error", e);
+            return { error: e.message };
+        }
+    },
+
+    updateInstructorPassword: async (id, password) => {
+        if (!isFirebaseInitialized || !firebaseDb) {
+            return { error: 'Database is offline or not configured. Operation blocked.' };
+        }
+        try {
+            await firebaseDb.collection('instructors').doc(id).update({ password });
+            return { success: true };
+        } catch(e) {
+            console.error("Firestore update instructor password error", e);
+            return { error: e.message };
+        }
+    },
+
     updateStudentOutreach: async (id, outreach) => {
         if (!isFirebaseInitialized || !firebaseDb) {
             return { error: 'Database is offline or not configured. Operation blocked.' };
