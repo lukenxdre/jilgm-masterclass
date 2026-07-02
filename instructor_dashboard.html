@@ -484,8 +484,10 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                // Route authentication enforcement
-                AuthAPI.requireInstructorAuth();
+                // Route authentication enforcement (allow admin or instructor)
+                if (!AuthAPI.getCurrentInstructor() && !AuthAPI.getCurrentAdmin()) {
+                    window.location.href = 'instructor_login.html';
+                }
 
                 const welcomeName = document.getElementById('welcomeInstructorName');
                 const instFullName = document.getElementById('instructorFullName');
@@ -507,8 +509,12 @@
                 let lastInstructorOutreach = null;
 
                 const currentInstructor = AuthAPI.getCurrentInstructor();
-                if (currentInstructor) {
-                    lastInstructorOutreach = currentInstructor.outreach;
+                const currentAdmin = AuthAPI.getCurrentAdmin();
+                const inst = currentInstructor || currentAdmin;
+                const isAdmin = !!currentAdmin || (currentInstructor && (currentInstructor.role === 'admin' || currentInstructor.outreach === 'all'));
+
+                if (inst) {
+                    lastInstructorOutreach = inst.outreach;
                 }
 
                 // Wait for the background cloud sync promise to complete if active
@@ -521,16 +527,22 @@
 
                 // Render dynamic details
                 function updateIdentityUI() {
-                    const inst = AuthAPI.getCurrentInstructor();
                     if (!inst) return;
-                    welcomeName.innerHTML = `Welcome back, <span>${inst.name}!</span>`;
-                    instFullName.innerText = inst.name;
-                    instRole.innerText = inst.outreach ? `Overseer - Outreach ${inst.outreach}` : 'Overseer - Unassigned';
-                    instAvatar.innerText = inst.name.charAt(0).toUpperCase();
+                    const name = inst.name || inst.username || 'Administrator';
+                    welcomeName.innerHTML = `Welcome back, <span>${name}!</span>`;
+                    instFullName.innerText = name;
+                    
+                    if (isAdmin) {
+                        instRole.innerText = 'System Administrator';
+                    } else {
+                        instRole.innerText = inst.outreach ? `Overseer - Outreach ${inst.outreach}` : 'Overseer - Unassigned';
+                    }
+                    instAvatar.innerText = name.charAt(0).toUpperCase();
 
                     const cohortHeader = document.getElementById('cohortHeader');
                     if (cohortHeader) {
-                        cohortHeader.innerHTML = `Student Cohort <span style="font-size: 1.1rem; color: var(--accent-gold); font-weight: normal; margin-left: 1rem; border: 1px solid rgba(212,175,55,0.4); padding: 0.2rem 0.6rem; border-radius: 20px; background: rgba(212,175,55,0.05); white-space: nowrap;">Overseeing: Outreach ${inst.outreach || 'Unassigned'}</span>`;
+                        const overseeingText = isAdmin ? 'All Outreaches (Admin View)' : `Outreach ${inst.outreach || 'Unassigned'}`;
+                        cohortHeader.innerHTML = `Student Cohort <span style="font-size: 1.1rem; color: var(--accent-gold); font-weight: normal; margin-left: 1rem; border: 1px solid rgba(212,175,55,0.4); padding: 0.2rem 0.6rem; border-radius: 20px; background: rgba(212,175,55,0.05); white-space: nowrap;">Overseeing: ${overseeingText}</span>`;
                     }
                 }
 
@@ -585,16 +597,16 @@
 
                 // --- Cohort List Renderer ---
                 function renderCohortTable() {
-                    const inst = AuthAPI.getCurrentInstructor();
                     if (!inst) return;
 
                     const allStudents = AuthAPI.getAllStudents();
-                    // Filter Cohort to same outreach only
-                    const cohortList = allStudents.filter(s => s.status === 'approved' && s.outreach === inst.outreach);
+                    // Filter Cohort to same outreach only, unless admin
+                    const cohortList = allStudents.filter(s => s.status === 'approved' && (isAdmin || s.outreach === inst.outreach));
 
                     cohortTableBody.innerHTML = '';
                     if (cohortList.length === 0) {
-                        cohortTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 3rem;">No apprentices registered in Outreach ${inst.outreach || 'Unassigned'} yet.</td></tr>`;
+                        const scopeText = isAdmin ? 'any outreach' : `Outreach ${inst.outreach || 'Unassigned'}`;
+                        cohortTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 3rem;">No apprentices registered in ${scopeText} yet.</td></tr>`;
                         return;
                     }
 
@@ -624,11 +636,10 @@
 
                 // --- Central Q&A Board Renderer ---
                 function renderQABoard() {
-                    const inst = AuthAPI.getCurrentInstructor();
                     if (!inst || !qaBoardContainer) return;
 
                     const allStudents = AuthAPI.getAllStudents();
-                    const cohortList = allStudents.filter(s => s.status === 'approved' && s.outreach === inst.outreach);
+                    const cohortList = allStudents.filter(s => s.status === 'approved' && (isAdmin || s.outreach === inst.outreach));
                     const modsContent = AuthAPI.getModulesContent();
                     const modIds = AuthAPI.getModuleOrder().filter(id => modsContent[id]);
 
@@ -768,8 +779,7 @@
                     const replyText = input.value.trim();
                     if (!replyText) return;
                     
-                    const inst = AuthAPI.getCurrentInstructor();
-                    const replierName = inst ? inst.name : 'Teacher';
+                    const replierName = inst ? (inst.name || inst.username || 'Admin') : 'Teacher';
                     
                     const res = await AuthAPI.replyToQuestion(studentId, questionId, replyText, replierName);
                     if (res.success) {
@@ -782,15 +792,15 @@
 
                 // --- Counseling Chat Panel Renderer ---
                 function renderChatList() {
-                    const inst = AuthAPI.getCurrentInstructor();
                     if (!inst) return;
 
                     const allStudents = AuthAPI.getAllStudents();
-                    const cohortList = allStudents.filter(s => s.status === 'approved' && s.outreach === inst.outreach);
+                    const cohortList = allStudents.filter(s => s.status === 'approved' && (isAdmin || s.outreach === inst.outreach));
 
                     chatStudentsList.innerHTML = '';
                     if (cohortList.length === 0) {
-                        chatStudentsList.innerHTML = '<div style="color: var(--text-secondary); text-align: center; padding: 2rem; font-size: 0.85rem; grid-column: 1 / -1;">No apprentices registered.</div>';
+                        const scopeText = isAdmin ? 'any outreach' : `Outreach ${inst.outreach || 'Unassigned'}`;
+                        chatStudentsList.innerHTML = `<div style="color: var(--text-secondary); text-align: center; padding: 2rem; font-size: 0.85rem; grid-column: 1 / -1;">No apprentices registered in ${scopeText}.</div>`;
                         return;
                     }
 
@@ -969,11 +979,12 @@
                         const val = input.value.trim();
                         if (!val) return;
                         
-                        const inst = AuthAPI.getCurrentInstructor();
                         if (!inst) return;
                         
                         input.value = '';
-                        const res = await AuthAPI.sendChatMessage(student.id, val, inst.id, inst.name);
+                        const senderId = inst.id || 'admin_riadh';
+                        const senderName = inst.name || inst.username || 'Admin';
+                        const res = await AuthAPI.sendChatMessage(student.id, val, senderId, senderName);
                         if (res.success) {
                             renderChatList();
                         } else {
@@ -1010,11 +1021,10 @@
 
                 // --- Chat Badge Updates ---
                 function updateChatBadge() {
-                    const inst = AuthAPI.getCurrentInstructor();
                     if (!inst) return;
 
                     const students = AuthAPI.getAllStudents();
-                    const cohortList = students.filter(s => s.status === 'approved' && s.outreach === inst.outreach);
+                    const cohortList = students.filter(s => s.status === 'approved' && (isAdmin || s.outreach === inst.outreach));
                     
                     let totalUnread = 0;
                     cohortList.forEach(s => {
@@ -1160,8 +1170,7 @@
                     const remarkText = textarea.value.trim();
                     const scoreVal = scoreInput.value ? parseInt(scoreInput.value) : undefined;
 
-                    const inst = AuthAPI.getCurrentInstructor();
-                    const teacherName = inst ? inst.name : 'Instructor';
+                    const teacherName = inst ? (inst.name || inst.username || 'Admin') : 'Instructor';
 
                     // Save score
                     if (scoreVal !== undefined) {
@@ -1243,8 +1252,7 @@
                     const replyText = input.value.trim();
                     if (!replyText) return;
 
-                    const inst = AuthAPI.getCurrentInstructor();
-                    const replierName = inst ? inst.name : 'Teacher';
+                    const replierName = inst ? (inst.name || inst.username || 'Admin') : 'Teacher';
 
                     const res = await AuthAPI.replyToQuestion(studentId, questionId, replyText, replierName);
                     if (res.success) {
@@ -1356,11 +1364,12 @@
                         const val = input.value.trim();
                         if (!val) return;
                         
-                        const inst = AuthAPI.getCurrentInstructor();
                         if (!inst) return;
                         
                         input.value = '';
-                        const res = await AuthAPI.sendChatMessage(student.id, val, inst.id, inst.name);
+                        const senderId = inst.id || 'admin_riadh';
+                        const senderName = inst.name || inst.username || 'Admin';
+                        const res = await AuthAPI.sendChatMessage(student.id, val, senderId, senderName);
                         if (res.success) {
                             renderModalChat();
                         } else {
@@ -1449,6 +1458,8 @@
                                     if (activePanel === 'chat') renderChatList();
                                     if (activePanel === 'qa') renderQABoard();
                                 }
+                            } else if (AuthAPI.getCurrentAdmin()) {
+                                updateIdentityUI();
                             }
                         }
                     }
