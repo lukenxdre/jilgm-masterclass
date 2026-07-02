@@ -162,6 +162,27 @@ body.light-theme .hero-logo-glow-rays {
     background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.04) 50%, transparent 70%);
 }
 
+/* ── Light-mode: hero section background ── */
+body.light-theme .hero {
+    background:
+        radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(252, 218, 183, 0.6) 0%, transparent 50%),
+        linear-gradient(rgba(212, 175, 55, 0.07) 1.5px, transparent 1.5px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.07) 1.5px, transparent 1.5px),
+        linear-gradient(135deg, #faf8f5 0%, #f4edd9 50%, #fcdab7 100%);
+    background-size: auto, auto, 50px 50px, 50px 50px;
+    color: var(--text-primary);
+}
+
+body.light-theme .hero-bg-glow {
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+}
+
+body.light-theme .hero-glow-orb {
+    opacity: 0.08;
+}
+
+
 
 /* Typography Utilities */
 h1, h2, h3, h4 {
@@ -393,7 +414,7 @@ h1, h2, h3, h4 {
     width: 80%;
     max-width: 300px;
     height: 100vh;
-    background: #050e1d; /* Dark navy mobile menu overlay */
+    background: var(--bg-darker);
     border-left: 1px solid rgba(212, 175, 55, 0.25);
     display: flex;
     flex-direction: column;
@@ -424,7 +445,7 @@ h1, h2, h3, h4 {
     justify-content: flex-start;
     text-align: center;
     position: relative;
-    padding-top: calc(var(--nav-height) + 5.5rem); /* Increased spacing to completely clear the fixed navbar */
+    padding-top: calc(var(--nav-height) + 5.5rem);
     padding-bottom: 5.5rem;
     box-sizing: border-box;
     overflow: hidden;
@@ -435,7 +456,8 @@ h1, h2, h3, h4 {
         linear-gradient(90deg, rgba(212, 175, 55, 0.05) 1.5px, transparent 1.5px),
         linear-gradient(135deg, #0b172c 0%, #050e1e 100%);
     background-size: auto, auto, 50px 50px, 50px 50px;
-    color: #ffffff;
+    color: var(--text-primary);
+    transition: background 0.4s ease, color 0.4s ease;
 }
 
 .hero-bg-glow {
