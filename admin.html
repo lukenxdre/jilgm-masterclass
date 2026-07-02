@@ -2815,7 +2815,9 @@
                     `;
                     
                     row.innerHTML = `
-                        <td style="padding: 1rem; color: var(--text-primary); font-weight: 500;">${inst.name}</td>
+                        <td style="padding: 0.5rem 1rem; color: var(--text-primary); font-weight: 500;">
+                            <input type="text" value="${inst.name}" onchange="handleUpdateInstructorName('${inst.id}', this.value)" style="background: transparent; color: var(--text-primary); border: 1px dashed transparent; border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.9rem; font-weight: 500; font-family: var(--font-sans); width: 100%; box-sizing: border-box; transition: all 0.2s;" onfocus="this.style.borderColor='var(--accent-gold)'; this.style.background='var(--bg-dark)';" onblur="this.style.borderColor='transparent'; this.style.background='transparent';">
+                        </td>
                         <td style="padding: 1rem; color: var(--accent-gold-light);">${inst.username}</td>
                         ${pwdColHtml}
                         <td style="padding: 1rem; color: var(--text-secondary);">${outreachHtml}</td>
@@ -2845,6 +2847,23 @@
                     }
                 });
             }
+
+            window.handleUpdateInstructorName = async (id, name) => {
+                const trimmed = name.trim();
+                if (!trimmed) {
+                    alert("Instructor name cannot be empty.");
+                    renderInstructorsAdmin();
+                    return;
+                }
+                const res = await AuthAPI.updateInstructorName(id, trimmed);
+                if (res.success) {
+                    showToast("Instructor name updated!");
+                    renderInstructorsAdmin();
+                } else {
+                    alert("Error: " + (res.error || "Failed to update instructor name."));
+                    renderInstructorsAdmin();
+                }
+            };
 
             window.handleUpdateInstructorOutreach = async (id, outreach) => {
                 const res = await AuthAPI.updateInstructorOutreach(id, outreach);

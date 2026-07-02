@@ -2454,6 +2454,19 @@ const AuthAPI = {
         }
     },
 
+    updateInstructorName: async (id, name) => {
+        if (!isFirebaseInitialized || !firebaseDb) {
+            return { error: 'Database is offline or not configured. Operation blocked.' };
+        }
+        try {
+            await firebaseDb.collection('instructors').doc(id).update({ name });
+            return { success: true };
+        } catch(e) {
+            console.error("Firestore update instructor name error", e);
+            return { error: e.message };
+        }
+    },
+
     updateStudentOutreach: async (id, outreach) => {
         if (!isFirebaseInitialized || !firebaseDb) {
             return { error: 'Database is offline or not configured. Operation blocked.' };
