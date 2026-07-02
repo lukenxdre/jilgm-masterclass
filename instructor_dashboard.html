@@ -760,6 +760,7 @@
                     if (questionCount === 0) {
                         qaBoardContainer.innerHTML = '<div class="glass-card" style="padding: 3rem; text-align: center; color: var(--text-secondary); font-style: italic;">No questions have been posted on the Q&A boards in your outreach yet.</div>';
                     }
+                }
 
                 window.submitBoardQAQuestionReply = async (studentId, questionId) => {
                     const input = document.getElementById(`board_reply_input_${questionId}`);
