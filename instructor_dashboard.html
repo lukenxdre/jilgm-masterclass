@@ -999,8 +999,14 @@
                     const list = AuthAPI.getInstructors();
                     coInstructorsTableBody.innerHTML = '';
                     
+                    const usernameTh = document.querySelector('#panel-instructors th:nth-child(2)');
+                    if (usernameTh) {
+                        usernameTh.style.display = isAdmin ? '' : 'none';
+                    }
+
                     if (list.length === 0) {
-                        coInstructorsTableBody.innerHTML = `<tr><td colspan="4" style="padding: 3rem; text-align: center; color: var(--text-secondary); font-style: italic;">No other instructors registered.</td></tr>`;
+                        const colspan = isAdmin ? 4 : 3;
+                        coInstructorsTableBody.innerHTML = `<tr><td colspan="${colspan}" style="padding: 3rem; text-align: center; color: var(--text-secondary); font-style: italic;">No other instructors registered.</td></tr>`;
                         return;
                     }
 
@@ -1010,9 +1016,13 @@
                         row.style.fontSize = '0.9rem';
                         const dateStr = inst.dateAdded ? new Date(inst.dateAdded).toLocaleDateString() : 'N/A';
                         
+                        const usernameTdHtml = isAdmin 
+                            ? `<td style="padding: 1rem; color: var(--accent-gold-light);">${inst.username}</td>` 
+                            : '';
+
                         row.innerHTML = `
                             <td style="padding: 1rem; color: var(--text-primary); font-weight: 500;">${inst.name}</td>
-                            <td style="padding: 1rem; color: var(--accent-gold-light);">${inst.username}</td>
+                            ${usernameTdHtml}
                             <td style="padding: 1rem; color: var(--text-secondary); font-weight: 600;">${inst.outreach ? 'Outreach ' + inst.outreach : 'Unassigned'}</td>
                             <td style="padding: 1rem; color: var(--text-secondary);">${dateStr}</td>
                         `;
