@@ -715,7 +715,7 @@
                                 <h3 style="margin:0;font-family:var(--font-serif);color:var(--accent-gold-light);">${ann.title}</h3>
                                 <span style="font-size:0.8rem;color:var(--text-secondary);">${new Date(ann.date).toLocaleDateString()}</span>
                             </div>
-                            <div style="font-size:0.95rem;line-height:1.6;color:var(--text-primary);">${ann.content}</div>
+                            <div style="font-size:0.95rem;line-height:1.6;color:var(--text-primary);white-space:pre-wrap;">${ann.content}</div>
                         `;
                         announcementsList.appendChild(card);
                     });
