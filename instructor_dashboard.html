@@ -341,6 +341,7 @@
             <a href="#" id="nav-cohort" class="active">Student Cohort</a>
             <a href="#" id="nav-qa">Q&A Board</a>
             <a href="#" id="nav-chat">Private Messages <span id="chat-nav-badge" class="badge" style="background: #ef4444; color: #fff; display: none; padding: 0.15rem 0.4rem; font-size: 0.65rem; border-radius: 10px; border: none; box-shadow: none; margin-left: 0.3rem;">0</span></a>
+            <a href="#" id="nav-preview">Module Preview</a>
             <a href="#" id="nav-instructors">Co-Instructors</a>
             <a href="#" onclick="AuthAPI.logoutInstructor(); return false;" style="margin-top: auto; color: #ef4444; border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05);">Sign Out</a>
             <a href="index.html">Return to Site</a>
@@ -423,6 +424,15 @@
             </div>
 
             <div id="chatBoxArea" class="glass-card" style="display: none; flex-direction: column; height: 600px; border-radius: 16px; overflow: hidden;">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+        <!-- 5. MODULE PREVIEW PANEL -->
+        <div id="panel-preview" class="hidden">
+            <div class="dashboard-header">
+                <h1>Module Preview</h1>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 2rem;" id="modulePreviewList">
                 <!-- Populated dynamically -->
             </div>
         </div>
@@ -554,6 +564,7 @@
                     cohort: { nav: document.getElementById('nav-cohort'), panel: document.getElementById('panel-cohort') },
                     qa: { nav: document.getElementById('nav-qa'), panel: document.getElementById('panel-qa') },
                     chat: { nav: document.getElementById('nav-chat'), panel: document.getElementById('panel-chat') },
+                    preview: { nav: document.getElementById('nav-preview'), panel: document.getElementById('panel-preview') },
                     instructors: { nav: document.getElementById('nav-instructors'), panel: document.getElementById('panel-instructors') }
                 };
 
@@ -575,6 +586,7 @@
                     if (panelId === 'cohort') renderCohortTable();
                     if (panelId === 'qa') renderQABoard();
                     if (panelId === 'chat') renderChatList();
+                    if (panelId === 'preview') renderModulePreview();
                     if (panelId === 'instructors') renderInstructorsTable();
                 }
 
@@ -1030,6 +1042,53 @@
                     });
                 }
 
+                // --- Module Preview Renderer ---
+                function renderModulePreview() {
+                    const previewList = document.getElementById('modulePreviewList');
+                    if (!previewList) return;
+                    
+                    const modsContent = AuthAPI.getModulesContent();
+                    const modIds = AuthAPI.getModuleOrder().filter(id => modsContent[id]);
+                    
+                    previewList.innerHTML = '';
+                    
+                    if (modIds.length === 0) {
+                        previewList.innerHTML = `<div class="glass-card" style="grid-column: 1 / -1; padding: 3rem; text-align: center; color: var(--text-secondary); font-style: italic;">No modules available to preview.</div>`;
+                        return;
+                    }
+                    
+                    modIds.forEach((id, idx) => {
+                        const mod = modsContent[id];
+                        const card = document.createElement('div');
+                        card.className = 'glass-card';
+                        card.style.padding = '2rem';
+                        card.style.display = 'flex';
+                        card.style.flexDirection = 'column';
+                        card.style.justifyContent = 'space-between';
+                        card.style.gap = '1.2rem';
+                        card.style.transition = 'transform 0.2s, box-shadow 0.2s';
+                        
+                        card.onmouseover = () => { 
+                            card.style.transform = 'translateY(-4px)'; 
+                            card.style.boxShadow = '0 12px 30px rgba(0,0,0,0.15)'; 
+                        };
+                        card.onmouseout = () => { 
+                            card.style.transform = 'translateY(0)'; 
+                            card.style.boxShadow = 'var(--glass-shadow)'; 
+                        };
+                        
+                        card.innerHTML = `
+                            <div style="text-align: left;">
+                                <span style="font-family: var(--font-sans); font-size: 0.72rem; font-weight: 700; color: var(--accent-gold); letter-spacing: 1px; text-transform: uppercase;">Module ${idx + 1}</span>
+                                <h3 style="margin: 0.4rem 0 0.6rem; font-family: var(--font-serif); color: var(--text-primary); font-size: 1.25rem;">${mod.title || 'Untitled Module'}</h3>
+                                <p style="margin: 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">${mod.subtitle || 'No description available.'}</p>
+                            </div>
+                            <a href="module.html?id=${id}&preview=true&from=instructor" class="btn btn-primary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem; text-align: center; text-decoration: none; width: 100%; box-sizing: border-box; display: block; height: auto;">Preview Module</a>
+                        `;
+                        previewList.appendChild(card);
+                    });
+                }
+
                 // --- Chat Badge Updates ---
                 function updateChatBadge() {
                     if (!inst) return;
@@ -1440,11 +1499,12 @@
 
                 // --- Real-time updates sync ---
                 window.addEventListener('storage', (e) => {
-                    if (e.key === 'jilgm_students' || e.key === 'jilgm_instructors') {
+                    if (e.key === 'jilgm_students' || e.key === 'jilgm_instructors' || e.key === 'jilgm_modules_content') {
                         // Refresh data lists
                         if (activePanel === 'cohort') renderCohortTable();
                         if (activePanel === 'qa') renderQABoard();
                         if (activePanel === 'chat') renderChatList();
+                        if (activePanel === 'preview') renderModulePreview();
                         if (activePanel === 'instructors') renderInstructorsTable();
                         
                         updateChatBadge();
