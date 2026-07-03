@@ -2397,12 +2397,22 @@ const AuthAPI = {
         return true;
     },
 
-    loginInstructor: (username, password) => {
-        const list = AuthAPI.getInstructors();
-        const inst = list.find(i => i.username === username && i.password === password);
-        if (inst) {
-            localStorage.setItem('jilgm_current_instructor', JSON.stringify(inst));
-            return true;
+    loginInstructor: async (username, password) => {
+        if (!isFirebaseInitialized || !firebaseDb) return false;
+        try {
+            const snapshotPromise = firebaseDb.collection('instructors')
+                .where('username', '==', username)
+                .where('password', '==', password)
+                .get();
+            const snapshot = await withTimeout(snapshotPromise, 8000, "Login timed out. Please try again.");
+            if (!snapshot.empty) {
+                const doc = snapshot.docs[0];
+                const inst = { id: doc.id, ...doc.data() };
+                localStorage.setItem('jilgm_current_instructor', JSON.stringify(inst));
+                return true;
+            }
+        } catch(e) {
+            console.error("Firestore loginInstructor error", e);
         }
         return false;
     },
