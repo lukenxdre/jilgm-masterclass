@@ -1376,12 +1376,7 @@ function initFirestoreSync(onCollectionLoaded) {
             mods['module11'] = defaultModules['module11'];
         }
 
-        // Revert module 3 in Firestore permanently if it was accidentally overwritten
-        if (isTeacherOrAdmin && mods['module3'] && mods['module3'].title === "Theology of the Church") {
-            firebaseDb.collection('modules_content').doc('module3').set(defaultModules['module3'])
-                .catch(err => console.error("Error reverting module3 in Firestore", err));
-            mods['module3'] = defaultModules['module3'];
-        }
+
 
         localStorage.setItem(CONTENT_KEY, JSON.stringify(mods));
         triggerStorageSync(CONTENT_KEY);

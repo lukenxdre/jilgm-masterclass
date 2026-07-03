@@ -162,10 +162,11 @@
             const moduleId = urlParams.get('id') || 'module1';
             const isPreview = urlParams.get('preview') === 'true';
 
+            if (window.syncPromise) {
+                try { await window.syncPromise; } catch(err) { console.warn(err); }
+            }
+
             if (!isPreview) {
-                if (window.syncPromise) {
-                    try { await window.syncPromise; } catch(err) { console.warn(err); }
-                }
                 AuthAPI.requireAuth();
                 if (!AuthAPI.isModuleUnlocked(moduleId)) {
                     window.location.href = 'dashboard.html';
