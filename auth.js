@@ -1056,60 +1056,7 @@ const defaultModules = {
     }
 };
 
-// --- Automatic Migration & Injection of Module 11 ---
-(function() {
-    try {
-        let currentContentStr = localStorage.getItem('jilgm_modules_content');
-        if (currentContentStr) {
-            let currentContent = JSON.parse(currentContentStr);
-            let modified = false;
-            
-            // Revert Module 3 if it was accidentally overwritten
-            if (currentContent['module3'] && currentContent['module3'].title === "Theology of the Church") {
-                currentContent['module3'] = defaultModules['module3'];
-                modified = true;
-            }
-            
-            // Inject Module 11 if missing
-            if (!currentContent['module11']) {
-                currentContent['module11'] = defaultModules['module11'];
-                modified = true;
-            }
-            
-            if (modified) {
-                localStorage.setItem('jilgm_modules_content', JSON.stringify(currentContent));
-                
-                // Fire and forget background sync if URL is available
-                if (typeof SYNC_URL !== 'undefined') {
-                    fetch(SYNC_URL + 'modules', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(currentContent)
-                    }).catch(e => {});
-                }
-            }
-            
-            // Fix module order array to include module 11 if missing
-            let orderStr = localStorage.getItem('jilgm_module_order');
-            if (orderStr) {
-                let order = JSON.parse(orderStr);
-                if (!order.includes('module11')) {
-                    order.push('module11');
-                    localStorage.setItem('jilgm_module_order', JSON.stringify(order));
-                    if (typeof SYNC_URL !== 'undefined') {
-                        fetch(SYNC_URL + 'module_order', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(order)
-                        }).catch(e => {});
-                    }
-                }
-            }
-        }
-    } catch(e) {
-        console.warn('Migration failed', e);
-    }
-})();
+// --- Local database initializations ---
 
 // Initialize DB if empty
 if (!localStorage.getItem(DB_KEY)) {
@@ -1363,18 +1310,9 @@ function initFirestoreSync(onCollectionLoaded) {
             return;
         }
         const mods = {};
-        let missingModule11 = true;
         snapshot.forEach(doc => {
             mods[doc.id] = doc.data();
-            if (doc.id === 'module11') missingModule11 = false;
         });
-        
-        // Push module11 to Firestore permanently if missing
-        if (missingModule11 && isTeacherOrAdmin) {
-            firebaseDb.collection('modules_content').doc('module11').set(defaultModules['module11'])
-                .catch(err => console.error("Error migrating module11 to Firestore", err));
-            mods['module11'] = defaultModules['module11'];
-        }
 
 
 
