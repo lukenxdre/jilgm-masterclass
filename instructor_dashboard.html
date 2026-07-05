@@ -1273,46 +1273,86 @@
                     }
 
                     const modsContent = AuthAPI.getModulesContent();
-                    const modIds = AuthAPI.getModuleOrder().filter(id => modsContent[id]);
+                    const order = AuthAPI.getModuleOrder();
+
+                    // Group questions by moduleId
+                    const grouped = {};
                     questions.forEach(q => {
-                        const modIdx = modIds.indexOf(q.moduleId) + 1;
-                        const modNum = modIdx > 0 ? `Module ${modIdx}: ` : '';
-                        const mod = modsContent[q.moduleId] || { title: q.moduleId };
-                        const card = document.createElement('div');
-                        card.style.background = 'var(--bg-card, rgba(255, 255, 255, 0.85))';
-                        card.style.border = '1px solid var(--glass-border)';
-                        card.style.borderRadius = '8px';
-                        card.style.padding = '1.2rem';
-                        card.style.marginBottom = '1rem';
-                        card.style.boxShadow = 'var(--glass-shadow)';
-
-                        let repliesHtml = '';
-                        if (q.replies && q.replies.length > 0) {
-                            repliesHtml = q.replies.map(r => `
-                                <div style="background: rgba(249,115,22,0.04); border-left: 2px solid var(--accent-gold); padding: 0.5rem 0.8rem; margin-top: 0.5rem; border-radius: 4px; text-align: left;">
-                                    <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: bold;">${r.senderName} (${new Date(r.date).toLocaleString()}):</span>
-                                    <p style="margin: 0.2rem 0 0; font-size: 0.88rem; color: var(--text-primary);">${r.message}</p>
-                                </div>
-                            `).join('');
-                        } else {
-                            repliesHtml = '<p style="font-size: 0.8rem; color: var(--text-secondary); font-style: italic; margin-top: 0.5rem; text-align: left;">No replies yet.</p>';
+                        if (!grouped[q.moduleId]) {
+                            grouped[q.moduleId] = [];
                         }
+                        grouped[q.moduleId].push(q);
+                    });
 
-                        card.innerHTML = `
-                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.4rem; margin-bottom: 0.6rem;">
-                                <a href="module.html?id=${q.moduleId}&preview=true&from=instructor" style="font-weight: bold; color: var(--accent-gold); font-size: 0.9rem; text-decoration: none; border-bottom: 1px dashed rgba(212,175,55,0.4);">${modNum}${mod.title}</a>
-                                <span style="font-size: 0.75rem; color: var(--text-secondary);">${new Date(q.date).toLocaleString()}</span>
-                            </div>
-                            <p style="margin: 0; font-size: 0.95rem; color: var(--text-primary); font-weight: 500; text-align: left;">Q: "${q.question}"</p>
-                            <div style="margin-top: 0.8rem; padding-left: 1rem; border-left: 1px dashed var(--glass-border);">
-                                ${repliesHtml}
-                            </div>
-                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
-                                <input type="text" id="modal_reply_input_${q.id}" class="glass-input" style="flex: 1; padding: 0.4rem 0.8rem; font-size: 0.85rem;" placeholder="Type your reply here...">
-                                <button class="btn btn-primary" onclick="submitModalQAQuestionReply('${student.id}', '${q.id}')" style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">Reply</button>
-                            </div>
+                    Object.keys(grouped).forEach(modId => {
+                        const modIdx = order.indexOf(modId) + 1;
+                        const modNum = modIdx > 0 ? `Module ${modIdx}: ` : '';
+                        const mod = modsContent[modId] || { title: modId, subtitle: '' };
+
+                        // Create section container for the module Q&A
+                        const modSection = document.createElement('div');
+                        modSection.style.border = '1.5px solid rgba(212, 175, 55, 0.25)';
+                        modSection.style.borderRadius = '12px';
+                        modSection.style.padding = '1.5rem';
+                        modSection.style.background = 'var(--bg-card)';
+                        modSection.style.marginBottom = '1.5rem';
+                        modSection.style.color = 'var(--text-primary)';
+                        modSection.style.boxShadow = 'var(--glass-shadow)';
+
+                        const header = document.createElement('div');
+                        header.style.borderBottom = '2px solid rgba(249, 115, 22, 0.25)';
+                        header.style.paddingBottom = '0.6rem';
+                        header.style.marginBottom = '1rem';
+                        header.innerHTML = `
+                            <h4 style="margin: 0; font-size: 1.15rem; font-family: var(--font-serif); font-style: italic; text-align: left;">
+                                <a href="module.html?id=${modId}&preview=true&from=instructor" style="color: var(--accent-gold); text-decoration: none; border-bottom: 1px dashed rgba(212,175,55,0.4);">${modNum}${mod.title}</a>
+                            </h4>
+                            ${mod.subtitle ? `<p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: var(--text-secondary); text-align: left;">${mod.subtitle}</p>` : ''}
                         `;
-                        paneQA.appendChild(card);
+                        modSection.appendChild(header);
+
+                        const itemsContainer = document.createElement('div');
+                        itemsContainer.style.display = 'flex';
+                        itemsContainer.style.flexDirection = 'column';
+                        itemsContainer.style.gap = '1.2rem';
+
+                        grouped[modId].forEach(q => {
+                            const card = document.createElement('div');
+                            card.style.background = 'rgba(255,255,255,0.04)';
+                            card.style.padding = '1.2rem';
+                            card.style.borderRadius = '8px';
+                            card.style.border = '1px solid var(--glass-hover, rgba(200,200,200,0.15))';
+
+                            let repliesHtml = '';
+                            if (q.replies && q.replies.length > 0) {
+                                repliesHtml = q.replies.map(r => `
+                                    <div style="background: rgba(249,115,22,0.04); border-left: 2px solid var(--accent-gold); padding: 0.5rem 0.8rem; margin-top: 0.5rem; border-radius: 4px; text-align: left;">
+                                        <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: bold;">${r.senderName} (${new Date(r.date).toLocaleString()}):</span>
+                                        <p style="margin: 0.2rem 0 0; font-size: 0.88rem; color: var(--text-primary);">${r.message}</p>
+                                    </div>
+                                `).join('');
+                            } else {
+                                repliesHtml = '<p style="font-size: 0.8rem; color: var(--text-secondary); font-style: italic; margin-top: 0.5rem; text-align: left;">No replies yet.</p>';
+                            }
+
+                            card.innerHTML = `
+                                <div style="display: flex; justify-content: flex-end; margin-bottom: 0.4rem;">
+                                    <span style="font-size: 0.72rem; color: var(--text-secondary);">${new Date(q.date).toLocaleString()}</span>
+                                </div>
+                                <p style="margin: 0; font-size: 0.95rem; color: var(--text-primary); font-weight: 500; text-align: left;">Q: "${q.question}"</p>
+                                <div style="margin-top: 0.8rem; padding-left: 1rem; border-left: 1px dashed var(--glass-border);">
+                                    ${repliesHtml}
+                                </div>
+                                <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                                    <input type="text" id="modal_reply_input_${q.id}" class="glass-input" style="flex: 1; padding: 0.4rem 0.8rem; font-size: 0.85rem;" placeholder="Type your reply here...">
+                                    <button class="btn btn-primary" onclick="submitModalQAQuestionReply('${student.id}', '${q.id}')" style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">Reply</button>
+                                </div>
+                            `;
+                            itemsContainer.appendChild(card);
+                        });
+
+                        modSection.appendChild(itemsContainer);
+                        paneQA.appendChild(modSection);
                     });
                 }
 
