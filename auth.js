@@ -1710,7 +1710,7 @@ const AuthAPI = {
     },
     
     // Step 1: Enrollee registers (Pending Status)
-    registerStudent: async (firstName, lastName, email, outreach = "") => {
+    registerStudent: async (firstName, lastName, email, outreach = "", isSitIn = false) => {
         if (!isFirebaseInitialized || !firebaseDb) {
             alert('Database is offline or not configured. Operation blocked.');
             return { error: 'Database is offline or not configured. Operation blocked.' };
@@ -1735,7 +1735,8 @@ const AuthAPI = {
                 password: null,
                 progress: 0,
                 answers: [],
-                dateAdded: new Date().toISOString()
+                dateAdded: new Date().toISOString(),
+                isSitIn: !!isSitIn
             };
             
             const docRef = firebaseDb.collection('students').doc();
@@ -1981,7 +1982,7 @@ const AuthAPI = {
             }
         }
     },
-    login: async (username, password) => {
+    login: async (username, password, expectSitIn = false) => {
         if (!isFirebaseInitialized || !firebaseDb) return false;
         try {
             const snapshotPromise = firebaseDb.collection('students')
@@ -1993,6 +1994,10 @@ const AuthAPI = {
             if (!snapshot.empty) {
                 const doc = snapshot.docs[0];
                 const user = { id: doc.id, ...doc.data() };
+                const isUserSitIn = !!user.isSitIn;
+                if (isUserSitIn !== expectSitIn) {
+                    return false;
+                }
                 localStorage.setItem(SESSION_KEY, JSON.stringify(user));
                 return true;
             }
@@ -2004,8 +2009,10 @@ const AuthAPI = {
 
     
     logout: () => {
+        const user = AuthAPI.getCurrentUser();
+        const isSitIn = user && user.isSitIn;
         localStorage.removeItem(SESSION_KEY);
-        window.location.href = 'login.html';
+        window.location.href = isSitIn ? 'sitin_login.html' : 'login.html';
     },
     
     getCurrentUser: () => {
@@ -2018,10 +2025,10 @@ const AuthAPI = {
         }
     },
     
-    requireAuth: () => {
+    requireAuth: (expectSitIn = false) => {
         const user = AuthAPI.getCurrentUser();
         if (!user) {
-            window.location.href = 'login.html';
+            window.location.href = expectSitIn ? 'sitin_login.html' : 'login.html';
             return;
         }
         const students = AuthAPI.getAllStudents();

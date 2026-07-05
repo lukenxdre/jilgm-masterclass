@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard - JILGM Masterclass</title>
+    <title>Sit-In Student Dashboard - JILGM Masterclass</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
         rel="stylesheet">
@@ -508,13 +508,13 @@
             }
 
             // Protect this route
-            AuthAPI.requireAuth();
+            AuthAPI.requireAuth(true);
 
             let lastStudentOutreach = null;
             const initialUser = AuthAPI.getCurrentUser();
             if (initialUser) {
-                if (initialUser.isSitIn) {
-                    window.location.href = 'sitin_dashboard.html';
+                if (!initialUser.isSitIn) {
+                    window.location.href = 'dashboard.html';
                     return;
                 }
                 lastStudentOutreach = initialUser.outreach;
@@ -529,10 +529,9 @@
                 document.getElementById('userFullName').innerText = `${user.firstName} ${user.lastName}`;
                 document.getElementById('userAvatar').innerText = user.firstName.charAt(0).toUpperCase();
 
-                const outreachText = user.outreach ? ` (Outreach ${user.outreach})` : '';
                 const userRoleEl = document.getElementById('userRole');
                 if (userRoleEl) {
-                    userRoleEl.innerText = `Ministry Apprentice${outreachText}`;
+                    userRoleEl.innerText = `Sit-In Student`;
                 }
 
                 // Dynamic Progress Calculations
