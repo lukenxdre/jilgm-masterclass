@@ -1418,7 +1418,8 @@ function initFirestoreSync(onCollectionLoaded) {
                 const newMain = {
                     username: 'JILGM RiyadhRC',
                     password: '061577D',
-                    isMain: true
+                    isMain: true,
+                    displayName: 'JILGM RiyadhRC'
                 };
                 list.push(newMain);
                 firebaseDb.collection('admins').doc('JILGM RiyadhRC').set(newMain).catch(e => console.error("Firestore set new admin error", e));
@@ -2265,11 +2266,22 @@ const AuthAPI = {
     },
 
     getAdmins: () => {
-        return [{
-            username: 'JILGM RiyadhRC',
-            password: '061577D',
-            isMain: true
-        }];
+        try {
+            const data = localStorage.getItem('jilgm_admins');
+            return data ? JSON.parse(data) : [{
+                username: 'JILGM RiyadhRC',
+                password: '061577D',
+                isMain: true,
+                displayName: 'JILGM RiyadhRC'
+            }];
+        } catch(e) {
+            return [{
+                username: 'JILGM RiyadhRC',
+                password: '061577D',
+                isMain: true,
+                displayName: 'JILGM RiyadhRC'
+            }];
+        }
     },
 
     loginAdmin: (username, password) => {
@@ -2298,10 +2310,53 @@ const AuthAPI = {
                 localStorage.removeItem('jilgm_current_admin');
                 return null;
             }
+            if (parsed) {
+                const adminsCache = localStorage.getItem('jilgm_admins');
+                if (adminsCache) {
+                    const list = JSON.parse(adminsCache);
+                    const fresh = list.find(a => a.username === parsed.username);
+                    if (fresh) {
+                        return { ...parsed, ...fresh };
+                    }
+                }
+            }
             return parsed;
         } catch(e) {
             return null;
         }
+    },
+
+    updateAdminDisplayName: (newDisplayName) => {
+        const admin = AuthAPI.getCurrentAdmin();
+        if (!admin) return Promise.resolve({ error: 'Not authenticated as admin' });
+        
+        admin.displayName = newDisplayName;
+        localStorage.setItem('jilgm_current_admin', JSON.stringify(admin));
+        
+        // Update list cache
+        const data = localStorage.getItem('jilgm_admins');
+        if (data) {
+            const list = JSON.parse(data);
+            const idx = list.findIndex(a => a.username === 'JILGM RiyadhRC');
+            if (idx !== -1) {
+                list[idx].displayName = newDisplayName;
+                localStorage.setItem('jilgm_admins', JSON.stringify(list));
+            }
+        }
+        
+        triggerStorageSync('jilgm_current_admin');
+        triggerStorageSync('jilgm_admins');
+        
+        if (isFirebaseInitialized && firebaseDb) {
+            return firebaseDb.collection('admins').doc('JILGM RiyadhRC').update({
+                displayName: newDisplayName
+            }).then(() => ({ success: true }))
+              .catch(err => {
+                  console.error("Firestore update admin display name error", err);
+                  return { error: err.message };
+              });
+        }
+        return Promise.resolve({ success: true });
     },
 
     logoutAdmin: () => {

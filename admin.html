@@ -511,6 +511,19 @@
             <div class="dashboard-header">
                 <h1>Settings</h1>
             </div>
+            <div class="glass-card" style="padding: 2.5rem; border-color: var(--glass-border); margin-bottom: 2rem;">
+                <h3 style="color: var(--accent-gold); margin-bottom: 1rem; text-align: left;">Admin Account Settings</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem; text-align: left;">Configure your personal display name shown to instructors and students across the platform.</p>
+                <div style="display: flex; flex-direction: column; gap: 0.8rem; text-align: left; max-width: 450px;">
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem;">Display Name</label>
+                        <input type="text" id="adminDisplayNameInput" class="glass-input" style="width: 100%;" placeholder="e.g. Lead Pastor / Administrator">
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" id="btn-save-admin-profile" style="padding: 0.8rem 2rem;">Save Profile Settings</button>
+                    </div>
+                </div>
+            </div>
             <div class="glass-card" style="padding: 2.5rem; border-color: var(--glass-border); text-align: center;">
                 <h3 style="color: var(--accent-gold); margin-bottom: 1rem;">LMS Configuration Controls</h3>
                 <p style="color: var(--text-secondary); margin-bottom: 2rem;">You can reset the database and restore default student profiles and modules here.</p>
@@ -1139,7 +1152,7 @@
                 
                 const currentAdmin = AuthAPI.getCurrentAdmin();
                 const currentInstructor = AuthAPI.getCurrentInstructor();
-                const replierName = currentAdmin ? currentAdmin.username : (currentInstructor ? currentInstructor.name : 'Teacher');
+                const replierName = currentAdmin ? (currentAdmin.displayName || currentAdmin.username) : (currentInstructor ? currentInstructor.name : 'Teacher');
                 
                 const res = await AuthAPI.replyToQuestion(studentId, questionId, replyText, replierName);
                 if (res.success) {
@@ -1254,7 +1267,7 @@
                     const currentInstructor = AuthAPI.getCurrentInstructor();
                     
                     const senderId = currentAdmin ? 'admin' : currentInstructor.id;
-                    const senderName = currentAdmin ? currentAdmin.username : currentInstructor.name;
+                    const senderName = currentAdmin ? (currentAdmin.displayName || currentAdmin.username) : currentInstructor.name;
                     
                     input.value = '';
                     const res = await AuthAPI.sendChatMessage(student.id, val, senderId, senderName);
@@ -1429,7 +1442,7 @@
                 
                 const currentAdmin = AuthAPI.getCurrentAdmin();
                 const currentInstructor = AuthAPI.getCurrentInstructor();
-                const adminName = currentAdmin ? currentAdmin.username : (currentInstructor ? currentInstructor.name : 'Instructor');
+                const adminName = currentAdmin ? (currentAdmin.displayName || currentAdmin.username) : (currentInstructor ? currentInstructor.name : 'Instructor');
                 
                 const res = AuthAPI.saveTeacherRemark(studentId, moduleId, componentIndex, remarkText, adminName);
                 if (res.success) {
@@ -2747,8 +2760,14 @@
 
              // Real-time synchronization event listener
              window.addEventListener('storage', (e) => {
-                 if (e.key === 'jilgm_students' || e.key === 'jilgm_unlocked_modules' || e.key === 'jilgm_instructors') {
+                 if (e.key === 'jilgm_students' || e.key === 'jilgm_unlocked_modules' || e.key === 'jilgm_instructors' || e.key === 'jilgm_admins' || e.key === 'jilgm_current_admin') {
                      renderDashboard();
+                     if ((e.key === 'jilgm_admins' || e.key === 'jilgm_current_admin') && typeof adminDisplayNameInput !== 'undefined' && adminDisplayNameInput) {
+                         const freshAdmin = AuthAPI.getCurrentAdmin();
+                         if (freshAdmin) {
+                             adminDisplayNameInput.value = freshAdmin.displayName || freshAdmin.username || '';
+                         }
+                     }
                      // If the answers modal is open for a student, refresh it in place
                      if (activeModalStudentId) {
                          if (activeModalTab === 'submissions') {
@@ -2820,6 +2839,32 @@
                         btnClearFirebase.innerText = "Disconnecting...";
                         await AuthAPI.clearFirebaseConfig();
                         location.reload();
+                    }
+                });
+            }
+
+            // Admin Display Name handler
+            const adminDisplayNameInput = document.getElementById('adminDisplayNameInput');
+            const btnSaveAdminProfile = document.getElementById('btn-save-admin-profile');
+            if (adminDisplayNameInput && currentAdmin) {
+                adminDisplayNameInput.value = currentAdmin.displayName || currentAdmin.username || '';
+            }
+            if (btnSaveAdminProfile) {
+                btnSaveAdminProfile.addEventListener('click', async () => {
+                    const nameVal = adminDisplayNameInput.value.trim();
+                    if (!nameVal) {
+                        alert("Display name cannot be empty.");
+                        return;
+                    }
+                    btnSaveAdminProfile.innerText = "Saving Profile...";
+                    btnSaveAdminProfile.disabled = true;
+                    const res = await AuthAPI.updateAdminDisplayName(nameVal);
+                    btnSaveAdminProfile.innerText = "Save Profile Settings";
+                    btnSaveAdminProfile.disabled = false;
+                    if (res.success) {
+                        showToast("Admin display name updated successfully!");
+                    } else {
+                        alert("Error: " + (res.error || "Failed to update profile settings."));
                     }
                 });
             }
