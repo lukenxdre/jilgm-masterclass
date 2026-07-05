@@ -2708,12 +2708,12 @@
                      renderDashboard();
                      // If the answers modal is open for a student, refresh it in place
                      if (activeModalStudentId) {
-                         const students = AuthAPI.getAllStudents();
-                         const student = students.find(s => s.id === activeModalStudentId);
-                         if (student && student.answers && student.answers.length > 0) {
+                         if (activeModalTab === 'submissions') {
                              window.viewStudentAnswers(activeModalStudentId);
-                         } else {
-                             window.closeAnswersModal();
+                         } else if (activeModalTab === 'qa') {
+                             renderModalQA();
+                         } else if (activeModalTab === 'chat') {
+                             renderModalChat();
                          }
                      }
                      if (typeof renderInstructorsAdmin === 'function') {
