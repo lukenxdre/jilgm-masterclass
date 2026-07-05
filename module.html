@@ -1056,7 +1056,7 @@
                     noticeCard.style.textAlign = 'center';
                     noticeCard.style.marginTop = '2.5rem';
                     
-                    const hasFinished = studentAnswers.some(a => a.moduleId === moduleId);
+                    const hasFinished = AuthAPI.isModuleCompleted(studentAnswers, moduleId);
                     
                     noticeCard.innerHTML = `
                         <h3 style="margin-bottom: 1rem; color: var(--accent-gold);">Study Completed</h3>

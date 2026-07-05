@@ -565,8 +565,8 @@
 
                 modulesData.forEach((mod) => {
                     const isReleasedGlobally = unlockedModules.includes(mod.id);
-                    const hasPrereq = mod.prereq ? studentAnswers.some(a => a.moduleId === mod.prereq) : true;
-                    const isCompleted = studentAnswers.some(a => a.moduleId === mod.id);
+                    const hasPrereq = mod.prereq ? AuthAPI.isModuleCompleted(studentAnswers, mod.prereq) : true;
+                    const isCompleted = AuthAPI.isModuleCompleted(studentAnswers, mod.id);
 
                     // Build richer card
                     const card = document.createElement('div');
@@ -892,7 +892,7 @@
                                     <p style="margin: 0; font-size: 0.88rem; line-height: 1.4; font-style: italic; color: var(--text-primary);">${ans.teacherRemarks}</p>
                                 </div>
                             `;
-                        } else if (ans.type === 'reflection' || ans.type === 'file_upload') {
+                        } else if (ans.type === 'reflection' || ans.type === 'essay' || ans.type === 'file_upload') {
                             remarkBubble = `
                                 <div style="background: rgba(0,0,0,0.02); border-left: 3px solid rgba(0,0,0,0.1); padding: 0.8rem 1.2rem; border-radius: 4px; margin-top: 0.8rem; font-size: 0.82rem; color: var(--text-secondary);">
                                     ⏳ Awaiting instructor feedback and comments.

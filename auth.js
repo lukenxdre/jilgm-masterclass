@@ -2023,6 +2023,20 @@ const AuthAPI = {
         return unlocked.includes(moduleId);
     },
 
+    isModuleCompleted: (studentAnswers, moduleId) => {
+        if (!studentAnswers) return false;
+        const modsContent = AuthAPI.getModulesContent();
+        const mod = modsContent[moduleId];
+        if (!mod || !mod.components) {
+            return studentAnswers.some(a => a.moduleId === moduleId);
+        }
+        const hasReflection = mod.components.some(c => c.type === 'question');
+        if (hasReflection) {
+            return studentAnswers.some(a => a.moduleId === moduleId && a.type === 'reflection');
+        }
+        return studentAnswers.some(a => a.moduleId === moduleId);
+    },
+
     getModulesContent: () => {
         try {
             const data = localStorage.getItem(CONTENT_KEY);

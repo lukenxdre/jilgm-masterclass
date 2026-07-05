@@ -364,7 +364,8 @@
                                         <option value="toggle_list">Toggle List</option>
                                         <option value="divider">Horizontal Divider</option>
                                         <option value="image">Lesson Image</option>
-                                        <option value="question">Reflection Question</option>
+                                        <option value="question">Reflection Question (Ends Module)</option>
+                                        <option value="essay">📝 Essay Question (Does Not End Module)</option>
                                         <option value="file_upload">File Upload Bin</option>
                                         <option value="flip_card">🃏 Flip Card (Click to Reveal)</option>
                                         <option value="multiple_choice">🧠 Multiple Choice Quiz</option>
@@ -1340,8 +1341,8 @@
                                     `;
                                 }
                                 
-                                // Let reflection and file upload have a remark form
-                                if (ans.type === 'reflection' || ans.type === 'file_upload' || !ans.type) {
+                                // Let reflection, essay, and file upload have a remark form
+                                if (ans.type === 'reflection' || ans.type === 'essay' || ans.type === 'file_upload' || !ans.type) {
                                     const currentRemark = ans.teacherRemarks || '';
                                     remarkFormHtml = `
                                         <div style="margin-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.12); padding-top: 1rem; text-align: left;">
@@ -1754,6 +1755,14 @@
                         blockHTML = `
                             <div class="ppt-question-card">
                                 <h4 style="color: var(--text-primary); margin: 0 0 0.5rem 0; font-size: 1.2rem;">Discussion / Reflection Question:</h4>
+                                <p class="ppt-p" style="font-size: 1.15rem; font-style: italic;">${comp.content}</p>
+                            </div>
+                        `;
+                        elementsOnSlide += 2;
+                    } else if (comp.type === 'essay') {
+                        blockHTML = `
+                            <div class="ppt-question-card" style="border-left-color: #f59e0b;">
+                                <h4 style="color: var(--text-primary); margin: 0 0 0.5rem 0; font-size: 1.2rem; display: flex; align-items: center; gap: 0.4rem;"><span>📝</span> Essay Question:</h4>
                                 <p class="ppt-p" style="font-size: 1.15rem; font-style: italic;">${comp.content}</p>
                             </div>
                         `;
@@ -2339,6 +2348,14 @@
                     newComp = { type: 'accordion', items: [{title: '', content: ''}, {title: '', content: ''}], color: 'default', bg: 'none' };
                 } else if (type === 'matching') {
                     newComp = { type: 'matching', pairs: [{left: '', right: ''}, {left: '', right: ''}, {left: '', right: ''}], color: 'default', bg: 'none' };
+                } else if (type === 'essay') {
+                    newComp = {
+                        type: 'essay',
+                        content: '',
+                        color: 'default',
+                        bg: 'none',
+                        title: 'Essay Question'
+                    };
                 } else {
                     newComp = {
                         type: type,
