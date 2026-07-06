@@ -2301,9 +2301,20 @@ const AuthAPI = {
         try {
             const admin = localStorage.getItem('jilgm_current_admin');
             const parsed = admin ? JSON.parse(admin) : null;
-            if (parsed && parsed.username !== 'JILGM RiyadhRC') {
-                localStorage.removeItem('jilgm_current_admin');
-                return null;
+            if (parsed) {
+                const uName = (parsed.username || '').toLowerCase();
+                const roleVal = (parsed.ROLE || parsed.role || '').toLowerCase();
+                const isValidAdmin = uName === 'jilgm riyadhrc' || 
+                                     uName === 'master_root' || 
+                                     uName === 'masterroot' || 
+                                     roleVal === 'master_root' || 
+                                     roleVal === 'masterroot' || 
+                                     parsed.isAdmin === true;
+                
+                if (!isValidAdmin) {
+                    localStorage.removeItem('jilgm_current_admin');
+                    return null;
+                }
             }
             if (parsed) {
                 const adminsCache = localStorage.getItem('jilgm_admins');

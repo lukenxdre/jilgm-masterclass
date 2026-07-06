@@ -127,6 +127,146 @@
             cursor: text;
             display: block;
         }
+
+        /* Matrix Table and Dot Styles */
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            text-align: left;
+        }
+        .matrix-table th {
+            padding: 0.6rem 0.8rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            border-bottom: 1.5px solid var(--glass-border);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+        }
+        .matrix-table td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .matrix-table tr:hover td {
+            background: rgba(212, 175, 55, 0.03);
+        }
+        .matrix-cell {
+            text-align: center;
+        }
+        .matrix-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .matrix-dot.complete {
+            background: #22c55e;
+            box-shadow: 0 0 6px #22c55e;
+        }
+        .matrix-dot.incomplete {
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .matrix-dot.locked {
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.05);
+            position: relative;
+        }
+        .matrix-dot.locked::after {
+            content: '×';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            color: #ef4444;
+            font-weight: bold;
+            line-height: 12px;
+        }
+
+        /* Sticky Note board styles */
+        .reflection-sticky-note {
+            background: var(--surface-bg, rgba(200, 200, 200, 0.05));
+            border: 1px dashed var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .reflection-sticky-note:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.08);
+            border-style: solid;
+            border-color: var(--accent-gold);
+        }
+        .reflection-note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .reflection-note-author {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .reflection-note-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-light));
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .reflection-note-content {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+            font-style: italic;
+            border-left: 3px solid var(--accent-gold);
+            padding-left: 0.8rem;
+            margin: 0.5rem 0;
+            word-break: break-word;
+        }
+        .reflection-note-timestamp {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+        }
+        .reflection-note-comments-section {
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .reflection-comment-bubble {
+            background: rgba(128, 128, 128, 0.05);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .reflection-comment-author {
+            font-weight: bold;
+            color: var(--accent-gold);
+            margin-bottom: 0.15rem;
+        }
+        .reflection-comment-text {
+            color: var(--text-primary);
+            word-break: break-word;
+        }
     </style>
     <script src="theme.js?v=1782926021265"></script>
 </head>
@@ -137,11 +277,13 @@
             <img src="hero_logo.png" alt="JILGM Riyadh Logo" class="sidebar-logo">
         </a>
         <nav class="sidebar-nav">
-            <a href="#" id="nav-students" class="active">Student Management</a>
+            <a href="#" id="nav-dashboard" class="active">Dashboard</a>
+            <a href="#" id="nav-students">Student Management</a>
             <a href="#" id="nav-builder">Course Builder</a>
             <a href="#" id="nav-announcements">Announcements</a>
             <a href="#" id="nav-resources">Resource Repository</a>
             <a href="#" id="nav-instructors">Instructors</a>
+            <a href="#" id="nav-peer-reflections">Peer Reflections Board</a>
             <a href="#" id="nav-settings">Settings</a>
             <a href="#" id="nav-logout" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); margin-top: auto;">Sign Out</a>
             <a href="index.html">Return to Site</a>
@@ -150,8 +292,115 @@
     </aside>
 
     <main class="dashboard-content">
+        <!-- 0. DASHBOARD PANEL -->
+        <div id="panel-dashboard">
+            <div class="dashboard-header">
+                <h1>Overview Dashboard</h1>
+                <div class="heartbeat-container" style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: bold; color: var(--accent-gold);">
+                    <span style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 8px #22c55e;"></span>
+                    <span>ONLINE TELEMETRY</span>
+                </div>
+            </div>
+
+            <!-- KPI Metric Summary Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="glass-card" style="padding: 1.5rem; border-color: var(--glass-border); text-align: left;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Approved Apprentices</div>
+                    <div id="kpi-total-students" style="font-size: 2.2rem; font-weight: 800; color: var(--accent-gold); margin-top: 0.5rem;">0</div>
+                </div>
+                <div class="glass-card" style="padding: 1.5rem; border-color: var(--glass-border); text-align: left;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Pending Registrations</div>
+                    <div id="kpi-pending-students" style="font-size: 2.2rem; font-weight: 800; color: var(--accent-gold); margin-top: 0.5rem;">0</div>
+                </div>
+                <div class="glass-card" style="padding: 1.5rem; border-color: var(--glass-border); text-align: left;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Active Instructors</div>
+                    <div id="kpi-total-instructors" style="font-size: 2.2rem; font-weight: 800; color: var(--accent-gold); margin-top: 0.5rem;">0</div>
+                </div>
+                <div class="glass-card" style="padding: 1.5rem; border-color: var(--glass-border); text-align: left;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Released Modules</div>
+                    <div id="kpi-released-modules" style="font-size: 2.2rem; font-weight: 800; color: var(--accent-gold); margin-top: 0.5rem;">0 / 11</div>
+                </div>
+            </div>
+
+            <!-- Double-column dashboard details -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; margin-bottom: 2rem; flex-wrap: wrap;">
+                
+                <!-- Column 1: Release Switchboard -->
+                <div class="glass-card" style="padding: 2rem; border-color: var(--glass-border);">
+                    <h3 style="color: var(--accent-gold); font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; border-bottom: 1.5px solid var(--glass-border); padding-bottom: 0.6rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>📡</span> Module Switchboard
+                    </h3>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.2rem;">Quick toggle to release modules globally. Unreleased modules are locked for all apprentices.</p>
+                    <div id="dashboardModuleReleaseGrid" style="display: flex; flex-direction: column; gap: 0.8rem;">
+                        <div style="color: var(--text-secondary); text-align: center; font-style: italic;">Synchronizing switchboard...</div>
+                    </div>
+                </div>
+
+                <!-- Column 2: Roster Matrix -->
+                <div class="glass-card" style="padding: 2rem; border-color: var(--glass-border);">
+                    <h3 style="color: var(--accent-gold); font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; border-bottom: 1.5px solid var(--glass-border); padding-bottom: 0.6rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>📊</span> Cohort Matrix Summary
+                    </h3>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.2rem;">Completion states of apprentices across curriculum modules.</p>
+                    
+                    <div style="overflow-x: auto; width: 100%;">
+                        <table class="matrix-table" id="dashboardMatrixTable" style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left;">
+                            <thead>
+                                <tr id="dashboardMatrixHeaders">
+                                    <th style="padding: 0.6rem 0.8rem; font-weight: 700; color: var(--accent-gold); border-bottom: 1.5px solid var(--glass-border);">Apprentice</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboardMatrixBody">
+                                <tr>
+                                    <td colspan="12" style="text-align: center; color: var(--text-secondary); padding: 2rem;">Roster matrix synchronizing...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. PEER REFLECTIONS BOARD PANEL -->
+        <div id="panel-peer-reflections" class="hidden">
+            <div class="dashboard-header">
+                <h1>Peer Reflections Clipboard Board</h1>
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: bold; color: var(--accent-gold);">
+                    <span>📋 BOARD ADMIN MANAGER</span>
+                </div>
+            </div>
+
+            <!-- VIEW A: List of Modules Cards -->
+            <div id="reflectionModulesView" class="glass-card" style="padding: 2.5rem; border-color: var(--glass-border);">
+                <h3 style="color: var(--accent-gold); font-size: 1.3rem; margin-bottom: 0.5rem;">Select Curriculum Lesson Module</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem;">Select a module to view, delete, or comment on enrollees' posted takeaways and peer reflection sticky notes.</p>
+                
+                <div id="reflectionModulesGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+
+            <!-- VIEW B: Clipboard Sticky Notes view (hidden by default) -->
+            <div id="reflectionNotesView" class="glass-card hidden" style="padding: 2.5rem; border-color: var(--glass-border); position: relative;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--glass-border); padding-bottom: 1rem; margin-bottom: 2rem;">
+                    <div>
+                        <button type="button" class="btn btn-secondary" onclick="backToReflectionModules()" style="padding: 0.4rem 1rem; font-size: 0.85rem; margin-bottom: 0.5rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                            ⬅ Back to Modules
+                        </button>
+                        <h2 id="reflectionBoardModuleTitle" style="color: var(--accent-gold); font-size: 1.6rem; font-weight: 800;">Module Reflections</h2>
+                    </div>
+                    <span id="reflectionBoardNotesCount" class="badge" style="background: rgba(212, 175, 55, 0.15); color: var(--accent-gold); border: 1px solid var(--accent-gold); font-size: 0.9rem; padding: 0.3rem 0.8rem; border-radius: 20px;">0 Takeaways</span>
+                </div>
+
+                <!-- Sticky notes grid styled as a clipboard board -->
+                <div id="reflectionClipboardNotesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; align-items: start;">
+                    <!-- Dynamic Notes -->
+                </div>
+            </div>
+        </div>
+
         <!-- 1. STUDENTS PANEL -->
-        <div id="panel-students">
+        <div id="panel-students" class="hidden">
             <div class="dashboard-header">
                 <h1 id="studentManagementHeader">Student Management</h1>
                 <button id="btn-add-student-manual" class="btn btn-primary" onclick="document.getElementById('addStudentForm').classList.toggle('hidden')">+ Add Student Manually</button>
@@ -666,7 +915,7 @@
         </div>
     </main>
 
-    <script>
+    <script type="module">
         function getFormattingToolbarMarkup(index, fieldName) {
             return `
                 <div class="formatting-toolbar" style="display: inline-flex; gap: 0.3rem; margin-bottom: 0.4rem; flex-wrap: wrap; background: rgba(0,0,0,0.3); padding: 0.25rem 0.4rem; border-radius: 6px; border: 1px solid rgba(212,175,55,0.2); align-items: center; justify-content: flex-start; max-width: 100%;">
@@ -853,12 +1102,34 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Wait for auth.js and Firebase sync to resolve first!
+            if (window.syncPromise) {
+                try {
+                    await window.syncPromise;
+                } catch (err) {
+                    console.warn("Firebase sync error in admin.html:", err);
+                }
+            }
+            if (window.firebaseSyncPromise) {
+                try {
+                    await window.firebaseSyncPromise;
+                } catch (err) {
+                    console.warn("Firebase sync error in admin.html:", err);
+                }
+            }
+
             try {
                 // Secure page check immediately for admin only
-                AuthAPI.requireAdminAuth();
+                if (window.AuthAPI) {
+                    window.AuthAPI.requireAdminAuth();
+                } else {
+                    console.error("AuthAPI is missing. Blocking entry.");
+                    window.location.href = 'admin_login.html';
+                    return;
+                }
 
-                const currentAdmin = AuthAPI.getCurrentAdmin();
+                const currentAdmin = window.AuthAPI.getCurrentAdmin();
 
                 // Bind sub-tabs inside answersModal
                 const modalTabSub = document.getElementById('modal-tab-submissions');
@@ -868,17 +1139,6 @@
                 if (modalTabSub) modalTabSub.addEventListener('click', () => switchModalTab('submissions'));
                 if (modalTabQA) modalTabQA.addEventListener('click', () => switchModalTab('qa'));
                 if (modalTabChat) modalTabChat.addEventListener('click', () => switchModalTab('chat'));
-
-                // Wait for the background cloud sync promise to complete if active (non-blocking)
-                (async () => {
-                    if (window.syncPromise) {
-                        try { await window.syncPromise; } catch(err) { console.warn(err); }
-                    }
-                    if (window.firebaseSyncPromise) {
-                        try { await window.firebaseSyncPromise; } catch(err) { console.warn(err); }
-                    }
-                    renderDashboard();
-                })();
 
                 const form = document.getElementById('adminAddForm');
             const pendingTableBody = document.getElementById('pendingTableBody');
@@ -890,11 +1150,13 @@
             const toastMsg = document.getElementById('toastMsg');
 
             // --- Navigation ---
+            const navDashboard = document.getElementById('nav-dashboard');
             const navStudents = document.getElementById('nav-students');
             const navBuilder = document.getElementById('nav-builder');
             const navAnnouncements = document.getElementById('nav-announcements');
             const navResources = document.getElementById('nav-resources');
             const navInstructors = document.getElementById('nav-instructors');
+            const navPeerReflections = document.getElementById('nav-peer-reflections');
             const navSettings = document.getElementById('nav-settings');
             const navLogout = document.getElementById('nav-logout');
 
@@ -909,28 +1171,42 @@
                 });
             }
             
+            const panelDashboard = document.getElementById('panel-dashboard');
             const panelStudents = document.getElementById('panel-students');
             const panelBuilder = document.getElementById('panel-builder');
             const panelAnnouncements = document.getElementById('panel-announcements');
             const panelResources = document.getElementById('panel-resources');
             const panelInstructors = document.getElementById('panel-instructors');
+            const panelPeerReflections = document.getElementById('panel-peer-reflections');
             const panelSettings = document.getElementById('panel-settings');
             
             function clearAllTabs() {
+                navDashboard.classList.remove('active');
                 navStudents.classList.remove('active');
                 navBuilder.classList.remove('active');
                 navAnnouncements.classList.remove('active');
                 navResources.classList.remove('active');
                 if (navInstructors) navInstructors.classList.remove('active');
+                if (navPeerReflections) navPeerReflections.classList.remove('active');
                 navSettings.classList.remove('active');
 
+                panelDashboard.classList.add('hidden');
                 panelStudents.classList.add('hidden');
                 panelBuilder.classList.add('hidden');
                 panelAnnouncements.classList.add('hidden');
                 panelResources.classList.add('hidden');
                 if (panelInstructors) panelInstructors.classList.add('hidden');
+                if (panelPeerReflections) panelPeerReflections.classList.add('hidden');
                 panelSettings.classList.add('hidden');
             }
+
+            navDashboard.addEventListener('click', (e) => {
+                e.preventDefault();
+                clearAllTabs();
+                navDashboard.classList.add('active');
+                panelDashboard.classList.remove('hidden');
+                renderDashboardSummary();
+            });
 
             navStudents.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -938,6 +1214,16 @@
                 navStudents.classList.add('active');
                 panelStudents.classList.remove('hidden');
             });
+
+            if (navPeerReflections) {
+                navPeerReflections.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    clearAllTabs();
+                    navPeerReflections.classList.add('active');
+                    panelPeerReflections.classList.remove('hidden');
+                    renderPeerReflectionsBoard();
+                });
+            }
             
             navBuilder.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -3051,7 +3337,373 @@
                 }
             };
 
+            // --- Dashboard Metrics & Rendering Helpers ---
+            function renderDashboardSummary() {
+                const db = firebase.firestore();
+                
+                // 1. Fetch Students
+                db.collection('students').onSnapshot((snapshot) => {
+                    let totalApproved = 0;
+                    let totalPending = 0;
+                    const students = [];
+
+                    snapshot.forEach(doc => {
+                        const s = doc.data();
+                        s.id = doc.id;
+                        if (s.isApproved) {
+                            totalApproved++;
+                            students.push(s);
+                        } else {
+                            totalPending++;
+                        }
+                    });
+
+                    const totalStEl = document.getElementById('kpi-total-students');
+                    const pendStEl = document.getElementById('kpi-pending-students');
+                    if (totalStEl) totalStEl.innerText = totalApproved;
+                    if (pendStEl) pendStEl.innerText = totalPending;
+
+                    // Update Cohort Matrix
+                    renderDashboardMatrix(students);
+                }, (err) => {
+                    console.error("Dashboard students snap error:", err);
+                });
+
+                // 2. Fetch Instructors
+                db.collection('instructors').onSnapshot((snapshot) => {
+                    const instEl = document.getElementById('kpi-total-instructors');
+                    if (instEl) instEl.innerText = snapshot.size;
+                }, (err) => {
+                    console.error("Dashboard instructors snap error:", err);
+                });
+
+                // 3. Fetch Settings (unlocked modules)
+                db.collection('settings').doc('unlocked_modules').onSnapshot((doc) => {
+                    const data = doc.exists ? doc.data() : { list: ['module1'] };
+                    const unlockedList = data.list || ['module1'];
+                    
+                    const modsContent = AuthAPI.getModulesContent();
+                    const moduleOrder = AuthAPI.getModuleOrder().filter(id => modsContent[id]);
+                    const releasedCount = moduleOrder.filter(id => unlockedList.includes(id)).length;
+
+                    const relModEl = document.getElementById('kpi-released-modules');
+                    if (relModEl) relModEl.innerText = `${releasedCount} / ${moduleOrder.length}`;
+
+                    // Update Module Release Switchboard Grid
+                    renderDashboardSwitchboard(moduleOrder, unlockedList);
+                }, (err) => {
+                    console.error("Dashboard settings snap error:", err);
+                });
+            }
+
+            function renderDashboardSwitchboard(moduleOrder, unlockedList) {
+                const container = document.getElementById('dashboardModuleReleaseGrid');
+                if (!container) return;
+                container.innerHTML = '';
+
+                const modsContent = AuthAPI.getModulesContent();
+
+                moduleOrder.forEach((id, index) => {
+                    const isReleased = unlockedList.includes(id);
+                    const title = modsContent[id]?.title || id;
+
+                    const row = document.createElement('div');
+                    row.className = 'switch-row';
+                    row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px dashed rgba(255, 255, 255, 0.05);';
+                    row.innerHTML = `
+                        <div>
+                            <div class="switch-label" style="font-size: 0.88rem; font-weight: 600; color: var(--text-primary);">Module ${index + 1}: ${title}</div>
+                            <div class="switch-sub" style="font-size: 0.72rem; color: var(--text-secondary);">${isReleased ? 'Released Globally' : 'Locked'}</div>
+                        </div>
+                        <button type="button" class="btn btn-sm ${isReleased ? 'btn-danger' : 'btn-primary'}" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" onclick="toggleDashboardModuleRelease('${id}', ${isReleased})">
+                            ${isReleased ? 'Lock' : 'Release'}
+                        </button>
+                    `;
+                    container.appendChild(row);
+                });
+            }
+
+            window.toggleDashboardModuleRelease = async (id, isReleased) => {
+                if (confirm(`Are you sure you want to ${isReleased ? 'LOCK' : 'RELEASE'} Module ${id} globally?`)) {
+                    await AuthAPI.setModuleUnlocked(id, !isReleased);
+                    showToast(`Module ${isReleased ? 'locked' : 'released'} successfully.`);
+                }
+            };
+
+            function renderDashboardMatrix(students) {
+                const headersRow = document.getElementById('dashboardMatrixHeaders');
+                const matrixBody = document.getElementById('dashboardMatrixBody');
+                if (!headersRow || !matrixBody) return;
+
+                const modsContent = AuthAPI.getModulesContent();
+                const moduleOrder = AuthAPI.getModuleOrder().filter(id => modsContent[id]);
+                const unlockedList = AuthAPI.getUnlockedModules();
+
+                // 1. Build headers (Apprentice, M1, M2, ..., M11)
+                headersRow.innerHTML = '<th style="padding: 0.6rem 0.8rem; font-weight: 700; color: var(--accent-gold); border-bottom: 1.5px solid var(--glass-border);">Apprentice</th>';
+                moduleOrder.forEach((id, index) => {
+                    const th = document.createElement('th');
+                    th.style.cssText = 'padding: 0.6rem 0.8rem; font-weight: 700; color: var(--accent-gold); border-bottom: 1.5px solid var(--glass-border); text-align: center; font-size: 0.75rem;';
+                    th.innerText = `M${index + 1}`;
+                    th.title = modsContent[id]?.title || id;
+                    headersRow.appendChild(th);
+                });
+
+                // 2. Build rows
+                matrixBody.innerHTML = '';
+                if (students.length === 0) {
+                    matrixBody.innerHTML = `<tr><td colspan="${moduleOrder.length + 1}" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No approved apprentices.</td></tr>`;
+                    return;
+                }
+
+                students.forEach(student => {
+                    const tr = document.createElement('tr');
+                    
+                    // Student Name cell
+                    const nameTd = document.createElement('td');
+                    nameTd.style.cssText = 'padding: 0.6rem 0.8rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-weight: 600; color: var(--text-primary);';
+                    nameTd.innerText = `${student.firstName} ${student.lastName}`;
+                    tr.appendChild(nameTd);
+
+                    // Module cells with dots
+                    moduleOrder.forEach(modId => {
+                        const cell = document.createElement('td');
+                        cell.className = 'matrix-cell';
+                        cell.style.cssText = 'padding: 0.6rem 0.8rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: center;';
+
+                        const isUnlocked = unlockedList.includes(modId);
+                        const isCompleted = (student.answers || []).some(a => a.moduleId === modId && a.type === 'lesson_completion');
+
+                        const dot = document.createElement('span');
+                        dot.className = 'matrix-dot';
+                        if (isCompleted) {
+                            dot.classList.add('complete');
+                            dot.title = `Completed`;
+                        } else if (!isUnlocked) {
+                            dot.classList.add('locked');
+                            dot.title = `Locked (Not Released)`;
+                        } else {
+                            dot.classList.add('incomplete');
+                            dot.title = `Not Completed`;
+                        }
+                        cell.appendChild(dot);
+                        tr.appendChild(cell);
+                    });
+
+                    matrixBody.appendChild(tr);
+                });
+            }
+
+            // --- Peer Reflections Board Managers ---
+            window.renderPeerReflectionsBoard = () => {
+                const grid = document.getElementById('reflectionModulesGrid');
+                if (!grid) return;
+                grid.innerHTML = '<div style="text-align: center; color: var(--text-secondary); width: 100%; grid-column: 1/-1;">Loading modules...</div>';
+
+                const modsContent = AuthAPI.getModulesContent();
+                const moduleOrder = AuthAPI.getModuleOrder().filter(id => modsContent[id]);
+                const db = firebase.firestore();
+
+                // Fetch counts first
+                db.collection('module_reflections').get().then(snapshot => {
+                    const counts = {};
+                    snapshot.forEach(doc => {
+                        const r = doc.data();
+                        counts[r.moduleId] = (counts[r.moduleId] || 0) + 1;
+                    });
+
+                    grid.innerHTML = '';
+                    moduleOrder.forEach((id, index) => {
+                        const count = counts[id] || 0;
+                        const title = modsContent[id]?.title || id;
+
+                        const card = document.createElement('div');
+                        card.className = 'glass-card';
+                        card.style.cssText = 'padding: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; border-color: var(--glass-border); position: relative; transition: all 0.2s;';
+                        card.innerHTML = `
+                            <div style="font-size: 0.8rem; color: var(--accent-gold); font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">Module ${index + 1}</div>
+                            <h4 style="font-size: 1.1rem; color: var(--text-primary); margin: 0; min-height: 2.8rem; line-height: 1.4;">${title}</h4>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem; margin-top: auto;">
+                                <span>💬</span> <strong>${count}</strong> takeaways posted
+                            </div>
+                            <button class="btn btn-primary" onclick="openModuleReflectionsClipboard('${id}')" style="margin-top: 0.5rem; justify-content: center; font-size: 0.85rem; padding: 0.45rem 1rem;">
+                                📋 Open Clipboard Board
+                            </button>
+                        `;
+                        grid.appendChild(card);
+                    });
+                }).catch(err => {
+                    console.error("Error fetching reflections count:", err);
+                    grid.innerHTML = '<div style="text-align: center; color: #ef4444; width: 100%; grid-column: 1/-1;">Failed to load reflection modules.</div>';
+                });
+            };
+
+            window.backToReflectionModules = () => {
+                const modulesView = document.getElementById('reflectionModulesView');
+                const notesView = document.getElementById('reflectionNotesView');
+                if (modulesView && notesView) {
+                    modulesView.classList.remove('hidden');
+                    notesView.classList.add('hidden');
+                    renderPeerReflectionsBoard();
+                }
+            };
+
+            window.openModuleReflectionsClipboard = (moduleId) => {
+                const modulesView = document.getElementById('reflectionModulesView');
+                const notesView = document.getElementById('reflectionNotesView');
+                const titleHeader = document.getElementById('reflectionBoardModuleTitle');
+                const notesGrid = document.getElementById('reflectionClipboardNotesGrid');
+                
+                if (!modulesView || !notesView || !notesGrid) return;
+                
+                modulesView.classList.add('hidden');
+                notesView.classList.remove('hidden');
+                notesGrid.innerHTML = '<div style="text-align: center; color: var(--text-secondary); width: 100%; grid-column: 1/-1; padding: 3rem;">Loading takeaways clipboard...</div>';
+
+                const modsContent = AuthAPI.getModulesContent();
+                const moduleName = modsContent[moduleId]?.title || moduleId;
+                if (titleHeader) titleHeader.innerText = moduleName;
+
+                const db = firebase.firestore();
+
+                // Listen in real-time to takeaways for this moduleId
+                if (window.reflectionBoardUnsubscribe) {
+                    window.reflectionBoardUnsubscribe();
+                }
+
+                window.reflectionBoardUnsubscribe = db.collection('module_reflections')
+                    .where('moduleId', '==', moduleId)
+                    .onSnapshot(snapshot => {
+                        const countEl = document.getElementById('reflectionBoardNotesCount');
+                        if (countEl) countEl.innerText = `${snapshot.size} Takeaway${snapshot.size === 1 ? '' : 's'}`;
+
+                        notesGrid.innerHTML = '';
+                        if (snapshot.size === 0) {
+                            notesGrid.innerHTML = '<div style="text-align: center; color: var(--text-secondary); width: 100%; grid-column: 1/-1; padding: 4rem; font-style: italic;">No student reflections posted for this lesson yet.</div>';
+                            return;
+                        }
+
+                        // Map and sort client-side to avoid composite indexing requirements
+                        const docsList = [];
+                        snapshot.forEach(doc => {
+                            const data = doc.data();
+                            data.id = doc.id;
+                            docsList.push(data);
+                        });
+
+                        docsList.sort((a, b) => {
+                            const tA = (a.timestamp && a.timestamp.seconds) ? a.timestamp.seconds : 0;
+                            const tB = (b.timestamp && b.timestamp.seconds) ? b.timestamp.seconds : 0;
+                            return tB - tA; // descending
+                        });
+
+                        docsList.forEach(r => {
+                            const initials = r.initials || r.studentName?.charAt(0).toUpperCase() || 'S';
+                            const dateStr = r.timestamp ? new Date(r.timestamp.seconds * 1000).toLocaleString() : 'Just now';
+
+                            // Compile comments HTML
+                            const comments = r.comments || [];
+                            let commentsHtml = '';
+                            if (comments.length > 0) {
+                                commentsHtml = comments.map(c => `
+                                    <div class="reflection-comment-bubble">
+                                        <div class="reflection-comment-author">${c.authorName || 'Instructor'}</div>
+                                        <div class="reflection-comment-text">${c.text}</div>
+                                    </div>
+                                `).join('');
+                            }
+
+                            const note = document.createElement('div');
+                            note.className = 'reflection-sticky-note';
+                            note.innerHTML = `
+                                <div class="reflection-note-header">
+                                    <div class="reflection-note-author">
+                                        <span class="reflection-note-avatar">${initials}</span>
+                                        <span>${r.studentName || 'Anonymous Student'}</span>
+                                    </div>
+                                    <button class="btn btn-secondary" onclick="deleteRefNote('${r.id}', '${moduleId}')" style="padding: 0.25rem 0.5rem; font-size: 0.72rem; border-color: #ef4444; color: #ef4444; background: transparent; height: auto;">
+                                        🗑 Delete
+                                    </button>
+                                </div>
+                                <div class="reflection-note-content">${r.content}</div>
+                                <div class="reflection-note-timestamp">${dateStr}</div>
+                                
+                                <div class="reflection-note-comments-section">
+                                    <div style="font-size: 0.75rem; color: var(--accent-gold); font-weight: bold; margin-bottom: 0.2rem;">Coaching Feed:</div>
+                                    <div id="comments-list-${r.id}" style="display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.4rem;">
+                                        ${commentsHtml || '<div style="font-size: 0.75rem; color: var(--text-secondary); font-style: italic;">No instructor feedback posted yet.</div>'}
+                                    </div>
+                                    <div style="display: flex; gap: 0.4rem; margin-top: 0.3rem;">
+                                        <input type="text" id="comment-input-${r.id}" class="glass-input" placeholder="Type coaching comment..." style="flex: 1; padding: 0.3rem 0.6rem; font-size: 0.8rem; height: 32px; background: rgba(0,0,0,0.15);">
+                                        <button class="btn btn-primary" onclick="submitRefComment('${r.id}', '${moduleId}')" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; height: 32px; font-family: var(--font-sans);">
+                                            Post
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            // Map Enter key inside input to Post button trigger
+                            const inputEl = note.querySelector(`#comment-input-${r.id}`);
+                            if (inputEl) {
+                                inputEl.addEventListener('keydown', (e) => {
+                                    if (e.key === 'Enter') {
+                                        submitRefComment(r.id, moduleId);
+                                    }
+                                });
+                            }
+
+                            notesGrid.appendChild(note);
+                        });
+                    }, err => {
+                        console.error("Realtime snap error on takeaways board:", err);
+                    });
+            };
+
+            window.deleteRefNote = async (reflectionId, moduleId) => {
+                if (confirm("Are you sure you want to permanently delete this student reflection from the database?")) {
+                    try {
+                        const db = firebase.firestore();
+                        await db.collection('module_reflections').doc(reflectionId).delete();
+                        showToast("Reflection deleted successfully.");
+                    } catch (e) {
+                        console.error("Error deleting reflection:", e);
+                        alert("Failed to delete reflection: " + e.message);
+                    }
+                }
+            };
+
+            window.submitRefComment = async (reflectionId, moduleId) => {
+                const input = document.getElementById(`comment-input-${reflectionId}`);
+                if (!input) return;
+                const text = input.value.trim();
+                if (!text) return;
+
+                input.disabled = true;
+                try {
+                    const db = firebase.firestore();
+                    const commentObj = {
+                        authorName: 'Admin / Instructor',
+                        text: text,
+                        timestamp: new Date()
+                    };
+
+                    await db.collection('module_reflections').doc(reflectionId).update({
+                        comments: firebase.firestore.FieldValue.arrayUnion(commentObj)
+                    });
+
+                    input.value = '';
+                    showToast("Coaching comment posted!");
+                } catch (e) {
+                    console.error("Error saving comment:", e);
+                    alert("Failed to save comment: " + e.message);
+                } finally {
+                    input.disabled = false;
+                    input.focus();
+                }
+            };
+
             // Initial render
+            renderDashboardSummary();
             populateModuleSelect();
             renderDashboard();
             loadBuilderModule();

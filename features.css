@@ -2,6 +2,14 @@
    JILGM Masterclass Modular Features CSS System
    ───────────────────────────────────────────────────────────────────────────── */
 
+:root {
+    --bg-overlay: rgba(5, 14, 30, 0.85);
+}
+
+body.light-theme {
+    --bg-overlay: rgba(244, 237, 217, 0.85);
+}
+
 /* ── Global Glassmorphic Base Tokens (matching navy/gold/mint-green) ── */
 .glass-panel {
     background: var(--bg-card, rgba(15, 30, 55, 0.75));
@@ -62,7 +70,7 @@
     position: fixed;
     inset: 0;
     z-index: 10000;
-    background: rgba(5, 14, 30, 0.85);
+    background: var(--bg-overlay);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     display: flex;
@@ -79,9 +87,11 @@
 }
 
 .milestone-modal {
-    background: linear-gradient(145deg, rgba(15, 30, 55, 0.95), rgba(5, 14, 30, 0.98));
-    border: 1px solid rgba(212, 175, 55, 0.4);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(212, 175, 55, 0.15);
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
     border-radius: 24px;
     padding: 3rem 2rem;
     max-width: 480px;
@@ -143,12 +153,12 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 0.8rem;
-    background: rgba(11, 23, 44, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-radius: 40px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--glass-shadow);
     transition: all 0.3s ease;
 }
 
@@ -206,9 +216,9 @@
     bottom: 130%;
     left: 50%;
     transform: translateX(-50%) scale(0.9);
-    background: rgba(11, 23, 44, 0.95);
-    color: #f0ece4;
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border);
     padding: 0.3rem 0.6rem;
     border-radius: 6px;
     font-size: 0.68rem;
@@ -216,7 +226,7 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease, transform 0.2s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--glass-shadow);
 }
 
 [data-tooltip]:hover::before {
@@ -345,12 +355,14 @@
 }
 
 .live-toast {
-    background: linear-gradient(135deg, rgba(20, 38, 70, 0.95), rgba(11, 23, 44, 0.98));
-    border: 1px solid rgba(212, 175, 55, 0.4);
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
     color: var(--text-primary);
     padding: 0.8rem 1.3rem;
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--glass-shadow);
     font-size: 0.85rem;
     display: flex;
     align-items: center;
@@ -451,4 +463,56 @@
     font-size: 0.75rem;
     font-weight: 700;
     box-shadow: 0 0 8px rgba(212, 175, 55, 0.15);
+}
+
+/* ── Landscape Slide Deck Print Styles ── */
+@media print {
+    /* Explicitly command the printer to switch orientation layout */
+    @page {
+        size: landscape !important;
+        margin: 0 !important;
+    }
+    
+    /* Hide the entire original app frame completely when printing is active */
+    body.masterclass-printing-active > :not(#dynamic-presentation-print-deck) {
+        display: none !important;
+    }
+    
+    /* Force the root levels to take up space */
+    html, body.masterclass-printing-active {
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: #0b132b !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        overflow: visible !important;
+    }
+    
+    #dynamic-presentation-print-deck {
+        display: block !important;
+        background-color: #0b132b !important;
+    }
+    
+    /* Simplify the slide dimensions to use fluid print percentages */
+    #dynamic-presentation-print-deck .slide {
+        display: flex !important;
+        flex-direction: column;
+        width: 100vw !important;
+        height: 100vh !important;
+        page-break-after: always !important;
+        page-break-inside: avoid !important;
+        box-sizing: border-box;
+        background-color: #0b132b !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact !important; /* Force browser to print the dark background color */
+        print-color-adjust: exact !important;
+        padding: 25mm 20mm;
+        position: relative;
+    }
+}
+
+#dynamic-presentation-print-deck {
+    display: none;
 }

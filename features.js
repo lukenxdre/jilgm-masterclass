@@ -37,8 +37,10 @@
                     this.initStudentDashboard(currentUser);
                 }
             } else if (path.includes('module.html')) {
-                if (currentUser) {
-                    this.initModuleView(currentUser);
+                const urlParams = new URLSearchParams(window.location.search);
+                const isPreview = urlParams.get('preview') === 'true';
+                if (currentUser || currentInstructor || isPreview) {
+                    this.initModuleView(currentUser || currentInstructor || { id: 'preview', firstName: 'Preview', lastName: 'Mode' });
                 }
             } else if (path.includes('instructor_dashboard.html') || path.includes('admin.html')) {
                 if (currentInstructor || (window.AuthAPI && window.AuthAPI.getCurrentAdmin())) {
@@ -191,6 +193,9 @@
 
             // 3. Notification & Bell for module pages
             this.initNotificationCenter(user);
+
+            // 4. Setup PowerPoint Slides Presentation Exporter (Instructor-only link)
+            this.initPPTExporter(moduleId);
         },
 
         initReflectionBoard: function (user, moduleId) {
@@ -307,84 +312,116 @@
         },
 
         initCompleteLessonBtn: function (user, moduleId) {
-            const completeBtn = document.getElementById('btn-complete-lesson');
-            if (!completeBtn) return;
+            const self = this;
 
-            const hasFinished = window.AuthAPI.isModuleCompleted(user.answers, moduleId);
-            if (hasFinished) {
-                const order = window.AuthAPI.getModuleOrder();
-                const currIdx = order.indexOf(moduleId);
-                const nextModuleId = currIdx !== -1 && currIdx < order.length - 1 ? order[currIdx + 1] : null;
-                const isNextReleased = nextModuleId ? window.AuthAPI.isModuleUnlocked(nextModuleId) : false;
-
-                if (isNextReleased) {
-                    completeBtn.innerText = "Proceed to Next Module";
-                    completeBtn.addEventListener('click', () => {
-                        window.location.href = `module.html?id=${nextModuleId}`;
-                    });
-                } else {
-                    completeBtn.innerText = "Completed (Back to Dashboard)";
-                    completeBtn.addEventListener('click', () => {
-                        window.location.href = 'dashboard.html';
-                    });
-                }
-            } else {
-                completeBtn.addEventListener('click', async () => {
-                    completeBtn.disabled = true;
-                    completeBtn.innerText = "Verifying activities...";
+            // Global event delegation on body
+            document.body.addEventListener('click', async function (event) {
+                const target = event.target;
+                if (target && (target.id === 'btn-complete-lesson' || target.closest('#btn-complete-lesson'))) {
+                    event.preventDefault();
+                    console.log('Complete Lesson button click intercepted successfully!');
 
                     try {
-                        const checkResult = await this.verifyLessonCompleteness(user, moduleId);
-                        if (checkResult.success) {
-                            completeBtn.innerText = "Submitting completion...";
-                            const res = await window.AuthAPI.submitAnswer(
-                                user.id,
-                                moduleId,
-                                'Lesson Completion',
-                                'Completed',
-                                null,
-                                9999,
-                                { type: 'lesson_completion' }
-                            );
+                        console.log("Checking user validation state...");
+                        const btn = document.getElementById('btn-complete-lesson');
+                        if (!btn || btn.disabled) {
+                            console.log("Button is disabled or not found.");
+                            return;
+                        }
 
-                            if (res.success) {
-                                // Reload user to capture updated answers list
-                                const freshUser = window.AuthAPI.getCurrentUser();
-                                const order = window.AuthAPI.getModuleOrder();
-                                const currIdx = order.indexOf(moduleId);
-                                const nextModuleId = currIdx !== -1 && currIdx < order.length - 1 ? order[currIdx + 1] : null;
-                                const isNextReleased = nextModuleId ? window.AuthAPI.isModuleUnlocked(nextModuleId) : false;
+                        const hasFinished = window.AuthAPI.isModuleCompleted(user.answers, moduleId);
+                        console.log("Is module already completed?", hasFinished);
 
-                                if (isNextReleased) {
-                                    completeBtn.innerText = "Proceed to Next Module";
-                                    completeBtn.disabled = false;
-                                    completeBtn.addEventListener('click', () => {
-                                        window.location.href = `module.html?id=${nextModuleId}`;
-                                    });
-                                } else {
-                                    completeBtn.innerText = "Completed (Back to Dashboard)";
-                                    completeBtn.disabled = false;
-                                    completeBtn.addEventListener('click', () => {
-                                        window.location.href = 'dashboard.html';
-                                    });
-                                }
-                                this.triggerMilestoneModal(moduleId);
+                        if (hasFinished) {
+                            const order = window.AuthAPI.getModuleOrder();
+                            const currIdx = order.indexOf(moduleId);
+                            const nextModuleId = currIdx !== -1 && currIdx < order.length - 1 ? order[currIdx + 1] : null;
+                            const isNextReleased = nextModuleId ? window.AuthAPI.isModuleUnlocked(nextModuleId) : false;
+
+                            console.log("Redirecting to next module:", nextModuleId, "Released globally?", isNextReleased);
+                            if (isNextReleased) {
+                                window.location.href = `module.html?id=${nextModuleId}`;
                             } else {
-                                alert("Failed to save completion: " + (res.error || "unknown error"));
-                                completeBtn.disabled = false;
-                                completeBtn.innerText = "Complete Lesson";
+                                window.location.href = 'dashboard.html';
                             }
                         } else {
-                            this.spawnToast("Tasks Incomplete", checkResult.reason);
-                            completeBtn.innerText = "Complete Lesson";
-                            completeBtn.disabled = false;
+                            btn.disabled = true;
+                            btn.innerText = "Verifying activities...";
+
+                            console.log("Verifying lesson completeness...");
+                            const checkResult = await self.verifyLessonCompleteness(user, moduleId);
+                            console.log("Lesson completeness result:", checkResult);
+
+                            if (checkResult.success) {
+                                console.log("Reflection verified successfully.");
+                                btn.innerText = "Submitting completion...";
+                                
+                                console.log("Attempting Firestore progress write...");
+                                const res = await window.AuthAPI.submitAnswer(
+                                    user.id,
+                                    moduleId,
+                                    'Lesson Completion',
+                                    'Completed',
+                                    null,
+                                    9999,
+                                    { type: 'lesson_completion' }
+                                );
+                                console.log("Firestore database write resolved successfully! Result:", res);
+
+                                if (res.success) {
+                                    // Reload user to capture updated answers list
+                                    const freshUser = window.AuthAPI.getCurrentUser();
+                                    const order = window.AuthAPI.getModuleOrder();
+                                    const currIdx = order.indexOf(moduleId);
+                                    const nextModuleId = currIdx !== -1 && currIdx < order.length - 1 ? order[currIdx + 1] : null;
+                                    const isNextReleased = nextModuleId ? window.AuthAPI.isModuleUnlocked(nextModuleId) : false;
+
+                                    if (isNextReleased) {
+                                        btn.innerText = "Proceed to Next Module";
+                                        btn.disabled = false;
+                                    } else {
+                                        btn.innerText = "Completed (Back to Dashboard)";
+                                        btn.disabled = false;
+                                    }
+                                    
+                                    console.log("Attempting to trigger milestone modal UI...");
+                                    self.triggerMilestoneModal(moduleId);
+                                    console.log("Milestone modal triggered successfully.");
+                                } else {
+                                    alert("Failed to save completion: " + (res.error || "unknown error"));
+                                    btn.disabled = false;
+                                    btn.innerText = "Complete Lesson";
+                                }
+                            } else {
+                                console.log("Validation failed:", checkResult.reason);
+                                self.spawnToast("Tasks Incomplete", checkResult.reason);
+                                btn.innerText = "Complete Lesson";
+                                btn.disabled = false;
+                            }
                         }
-                    } catch (err) {
-                        console.error("Verification error:", err);
-                        completeBtn.disabled = false;
-                        completeBtn.innerText = "Complete Lesson";
+                    } catch (error) {
+                        console.error("❌ CRITICAL UNCAUGHT BLOCK ERROR:", error);
+                        alert("Engine Error: " + error.message);
                     }
-                });
+                }
+            });
+
+            // Also check and set the initial text on page load if the button is already present
+            const completeBtn = document.getElementById('btn-complete-lesson');
+            if (completeBtn) {
+                const hasFinished = window.AuthAPI.isModuleCompleted(user.answers, moduleId);
+                if (hasFinished) {
+                    const order = window.AuthAPI.getModuleOrder();
+                    const currIdx = order.indexOf(moduleId);
+                    const nextModuleId = currIdx !== -1 && currIdx < order.length - 1 ? order[currIdx + 1] : null;
+                    const isNextReleased = nextModuleId ? window.AuthAPI.isModuleUnlocked(nextModuleId) : false;
+
+                    if (isNextReleased) {
+                        completeBtn.innerText = "Proceed to Next Module";
+                    } else {
+                        completeBtn.innerText = "Completed (Back to Dashboard)";
+                    }
+                }
             }
         },
 
@@ -394,33 +431,43 @@
             const moduleData = modsContent[moduleId];
             if (!moduleData || !moduleData.components) return { success: true };
 
-            const staticTypes = ['header', 'header_h1', 'header_h2', 'header_h3', 'text', 'quote', 'image', 'callout', 'bullet_list', 'toggle_list', 'divider'];
+            const interactiveTypes = ['question', 'essay', 'file_upload', 'quiz', 'true_false', 'matching'];
             const interactiveComponents = moduleData.components.map((comp, index) => {
                 return { ...comp, originalIndex: index };
-            }).filter(comp => !staticTypes.includes(comp.type));
+            }).filter(comp => interactiveTypes.includes(comp.type));
 
             const studentAnswers = user.answers || [];
 
             // Check if every interactive component has a corresponding answer by index
-            const allActivitiesDone = interactiveComponents.every(comp => {
-                return studentAnswers.some(a => a.moduleId === moduleId && a.componentIndex === comp.originalIndex);
+            const missingTasks = [];
+            interactiveComponents.forEach(comp => {
+                const hasAnswer = studentAnswers.some(a => a.moduleId === moduleId && a.componentIndex === comp.originalIndex);
+                if (!hasAnswer) {
+                    const label = comp.title || comp.question || (comp.type === 'question' ? 'Reflection Question' : 'Activity');
+                    missingTasks.push(label);
+                }
             });
 
-            if (!allActivitiesDone) {
-                return { success: false, reason: "Please complete all interactive reflections and essay questions inside this module." };
+            if (missingTasks.length > 0) {
+                return { 
+                    success: false, 
+                    reason: `Please complete all interactive tasks first: Missing "${missingTasks.join(', ')}".` 
+                };
             }
 
             // Check 2: Verify they have posted a takeaway to the Peer Reflection Board in Firestore
             if (!this.db) return { success: true }; // Fail-soft fallback
 
+            console.log("Checking reflections for user:", user.id, "and module:", moduleId);
             try {
                 const snapshot = await this.db.collection('module_reflections')
                     .where('moduleId', '==', moduleId)
                     .where('studentId', '==', user.id)
                     .get();
 
+                console.log("Found reflection docs count:", snapshot.size);
                 if (snapshot.empty) {
-                    return { success: false, reason: "Please share a short takeaway on the Peer Reflection Board before marking this lesson as complete!" };
+                    return { success: false, reason: "Please post a takeaway on the Reflection Board first!" };
                 }
                 return { success: true };
             } catch (err) {
@@ -492,8 +539,14 @@
             `;
             document.body.appendChild(dock);
 
-            const name = isInstructor ? user.name : `${user.firstName} ${user.lastName}`;
-            const initials = isInstructor ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : user.firstName.charAt(0).toUpperCase();
+            const name = isInstructor ? (user.name || user.username || "Instructor") : `${user.firstName || ''} ${user.lastName || ''}`.trim() || "Apprentice";
+            let initials = "S";
+            if (isInstructor) {
+                const nameString = user && user.name ? user.name : (user && user.username ? user.username : "Instructor");
+                initials = nameString.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            } else {
+                initials = (user && user.firstName) ? user.firstName.charAt(0).toUpperCase() : "A";
+            }
 
             // 2. Setup heartbeat writing
             const presenceRef = this.db.collection('presence').doc(user.id);
@@ -700,8 +753,13 @@
         },
 
         spawnToast: function (title, msg) {
-            const container = document.getElementById('toastCenter');
-            if (!container) return;
+            let container = document.getElementById('toastCenter');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toastCenter';
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
 
             const toast = document.createElement('div');
             toast.className = 'live-toast';
@@ -878,6 +936,147 @@
                     }
                 }
             });
+        },
+
+        initPPTExporter: function (moduleId) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const fromInst = urlParams.get('from') === 'instructor' || urlParams.get('from') === 'admin' || urlParams.get('preview') === 'true';
+            
+            if (!fromInst) return;
+
+            // Wait for sidebar-nav to exist
+            setTimeout(() => {
+                const nav = document.querySelector('.sidebar-nav');
+                if (!nav) return;
+
+                // Check if button already exists
+                if (document.getElementById('btn-generate-ppt')) return;
+
+                const pptBtn = document.createElement('a');
+                pptBtn.href = '#';
+                pptBtn.id = 'btn-generate-ppt';
+                pptBtn.innerHTML = '📊 Generate PPT';
+                pptBtn.className = 'btn-ppt-sidebar-trigger';
+                pptBtn.style.cssText = 'color: var(--accent-gold); font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;';
+                
+                pptBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.exportModulePPT(moduleId);
+                });
+
+                // Insert before the theme toggle
+                const themeToggle = nav.querySelector('.theme-toggle');
+                if (themeToggle) {
+                    nav.insertBefore(pptBtn, themeToggle);
+                } else {
+                    nav.appendChild(pptBtn);
+                }
+            }, 300);
+        },
+
+        exportModulePPT: function (moduleId) {
+            console.log("🚀 Starting Unstoppable Presentation Export Engine...");
+            const mod = window.AuthAPI ? window.AuthAPI.getModule(moduleId) : null;
+            if (!mod) {
+                alert('Module data is not ready or not found.');
+                return;
+            }
+
+            // 1. Create a completely isolated, high-priority print container
+            const printContainer = document.createElement('div');
+            printContainer.id = 'dynamic-presentation-print-deck';
+
+            const title = mod.title || 'Untitled Module';
+            const subtitle = mod.subtitle || '';
+            const comps = mod.components || [];
+
+            // 2. Compile slide markup directly from memory
+            let slideHTML = `
+                <div class="slide" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-color: #0b132b; color: #ffffff;">
+                    <div style="border: 2px solid var(--accent-gold, #d4af37); padding: 3rem 4rem; border-radius: 12px; background: rgba(255,255,255,0.02); max-width: 80%;">
+                        <div style="font-size: 1.2rem; text-transform: uppercase; letter-spacing: 3px; color: var(--accent-gold, #d4af37); font-weight: bold; margin-bottom: 1rem;">JILGM Riyadh Leadership Masterclass</div>
+                        <div style="font-size: 2.8rem; font-family: var(--font-serif, serif); margin: 0 0 1rem 0; line-height: 1.3; font-weight: bold;">${title}</div>
+                        <div style="font-size: 1.3rem; color: #a0aec0; margin: 0; font-style: italic;">${subtitle}</div>
+                    </div>
+                </div>
+            `;
+
+            // Extract content blocks
+            const contentItems = [];
+            comps.forEach(c => {
+                if (!c) return;
+                if (c.type === 'header_h1' || c.type === 'header_h2' || c.type === 'header_h3' || c.type === 'header') {
+                    contentItems.push({ type: 'header', text: c.content });
+                } else if (c.type === 'text' || c.type === 'quote' || c.type === 'callout') {
+                    contentItems.push({ type: 'text', text: c.content });
+                } else if (c.type === 'bullet_list' || c.type === 'toggle_list') {
+                    if (Array.isArray(c.items)) {
+                        c.items.forEach(item => {
+                            if (item) contentItems.push({ type: 'list_item', text: item.text || item });
+                        });
+                    } else if (c.content) {
+                        contentItems.push({ type: 'list_item', text: c.content });
+                    }
+                }
+            });
+
+            // Distribute items into slide boxes (4 items per slide)
+            const itemsPerSlide = 4;
+            for (let i = 0; i < contentItems.length; i += itemsPerSlide) {
+                const chunk = contentItems.slice(i, i + itemsPerSlide);
+                
+                let listHtml = '';
+                chunk.forEach(item => {
+                    if (item.type === 'header') {
+                        listHtml += `<li style="font-size: 18pt; font-weight: bold; color: var(--accent-gold, #d4af37); margin-bottom: 1.5rem; list-style-type: none; border-left: 4px solid var(--accent-gold, #d4af37); padding-left: 0.8rem; text-align: left;">${item.text}</li>`;
+                    } else {
+                        listHtml += `<li style="font-size: 16pt; line-height: 1.6; color: #e2e8f0; margin-bottom: 1.2rem; list-style-type: square; margin-left: 1.5rem; text-align: left;">${item.text}</li>`;
+                    }
+                });
+
+                slideHTML += `
+                    <div class="slide" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: #0b132b; color: #ffffff;">
+                        <div style="font-size: 0.85rem; text-transform: uppercase; color: var(--accent-gold, #d4af37); letter-spacing: 2px; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between;">
+                            <span>${title}</span>
+                            <span>Slide ${Math.floor(i / itemsPerSlide) + 2}</span>
+                        </div>
+                        <ul style="padding: 0; margin: 0; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                            ${listHtml}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            // Final Slide: CTA
+            slideHTML += `
+                <div class="slide" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-color: #0b132b; color: #ffffff;">
+                    <div style="border: 2px dashed var(--accent-gold, #d4af37); padding: 4rem; border-radius: 12px; background: rgba(212,175,55,0.02); max-width: 80%;">
+                        <div style="font-size: 3rem; margin-bottom: 1.5rem;">👥</div>
+                        <div style="font-size: 2.2rem; font-family: var(--font-serif, serif); color: var(--accent-gold, #d4af37); margin: 0 0 1.5rem 0; line-height: 1.3; font-weight: bold;">Face-to-Face Engagement</div>
+                        <p style="font-size: 1.5rem; color: #e2e8f0; margin: 0; line-height: 1.5; font-weight: 500;">
+                            Log into the Apprentice Portal now and post your key takeaway to the Peer Reflection Board.
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            printContainer.innerHTML = slideHTML;
+
+            // 3. Inject the container directly into the root body
+            document.body.appendChild(printContainer);
+
+            // 4. Add a temporary class to the body to force-hide everything else completely
+            document.body.classList.add('masterclass-printing-active');
+
+            // 5. Short timeout to give the browser a single frame to register the DOM change
+            setTimeout(() => {
+                window.print();
+
+                // 6. CLEANUP immediately after print dialog closes
+                document.body.classList.remove('masterclass-printing-active');
+                printContainer.remove();
+                console.log("🛡️ Print engine safely unmounted.");
+            }, 500);
         }
     };
 
