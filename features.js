@@ -1043,7 +1043,7 @@
                         .bullet-list li strong { color: #d4af37; }
                     </style>
                 </head>
-                <body>
+                <body onload="setTimeout(function() { window.print(); window.close(); }, 300);">
                     <!-- Slide 1: Cover -->
                     <div class="slide">
                         <div class="header-bar"></div>
@@ -1116,13 +1116,7 @@
             // 5. Write content to the isolated frame, wait for rendering, print, and self-destruct
             printWindow.document.write(slideHTML);
             printWindow.document.close();
-
-            // Give the new window a solid half-second to paint completely independent of the dashboard script
-            setTimeout(() => {
-                printWindow.print();
-                printWindow.close();
-                console.log("🛡️ Pop-up print job resolved and window closed successfully.");
-            }, 500);
+            console.log("🛡️ Document stream closed. Internal body layout paint trigger initiated.");
         }
     };
 
