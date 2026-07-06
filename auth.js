@@ -1822,8 +1822,12 @@ const AuthAPI = {
             // Dynamic progress calculation based on unique modules completed relative to total modules
             const mods = AuthAPI.getModulesContent();
             const totalModules = Object.keys(mods).length || 1;
-            const uniqueModules = [...new Set(student.answers.map(a => a.moduleId))].filter(id => mods[id]);
-            student.progress = Math.round(Math.min(100, (uniqueModules.length / totalModules) * 100));
+            const completedModuleIds = [...new Set(
+                student.answers
+                    .filter(a => a.type === 'lesson_completion')
+                    .map(a => a.moduleId)
+            )].filter(id => mods[id]);
+            student.progress = Math.round(Math.min(100, (completedModuleIds.length / totalModules) * 100));
             
             firebaseDb.collection('students').doc(userId).update({
                 answers: student.answers,
@@ -2009,7 +2013,7 @@ const AuthAPI = {
             snapshot.forEach(doc => {
                 const student = doc.data();
                 const completedCount = unlocked.filter(modId => 
-                    (student.answers || []).some(a => a.moduleId === modId)
+                    (student.answers || []).some(a => a.moduleId === modId && a.type === 'lesson_completion')
                 ).length;
                 const progress = unlocked.length > 0 ? Math.round((completedCount / unlocked.length) * 100) : 0;
                 batch.update(doc.ref, { progress });
@@ -2026,16 +2030,7 @@ const AuthAPI = {
 
     isModuleCompleted: (studentAnswers, moduleId) => {
         if (!studentAnswers) return false;
-        const modsContent = AuthAPI.getModulesContent();
-        const mod = modsContent[moduleId];
-        if (!mod || !mod.components) {
-            return studentAnswers.some(a => a.moduleId === moduleId);
-        }
-        const hasReflection = mod.components.some(c => c.type === 'question');
-        if (hasReflection) {
-            return studentAnswers.some(a => a.moduleId === moduleId && a.type === 'reflection');
-        }
-        return studentAnswers.some(a => a.moduleId === moduleId);
+        return studentAnswers.some(a => a.moduleId === moduleId && a.type === 'lesson_completion');
     },
 
     getModulesContent: () => {

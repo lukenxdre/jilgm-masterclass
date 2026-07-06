@@ -120,7 +120,7 @@
         },
 
         renderProgressRing: function (user) {
-            const progressCard = document.querySelector('.dash-card.glass-card');
+            const progressCard = document.getElementById('overallProgressCard') || document.querySelector('.dash-card.glass-card');
             if (!progressCard) return;
 
             // Calculate completed modules
@@ -186,8 +186,8 @@
             // 1. Setup Reflection Board Below Lesson Card
             this.initReflectionBoard(user, moduleId);
 
-            // 2. Intercept submitAnswer for completions
-            this.interceptSubmissions(user, moduleId);
+            // 2. Setup Complete Lesson Button Event Listener
+            this.initCompleteLessonBtn(user, moduleId);
 
             // 3. Notification & Bell for module pages
             this.initNotificationCenter(user);
@@ -210,27 +210,42 @@
                     <button class="btn btn-primary" id="btnPostReflection" style="padding: 0.6rem 1.6rem; font-size: 0.9rem; border-radius: 24px; height: auto;">Post Takeaway</button>
                 </div>
             `;
-            // Append below lesson content card
-            card.parentNode.insertBefore(board, card.nextSibling);
+            // Append into sidebar if available, else below lesson content card
+            const sidebar = document.getElementById('moduleSidebar');
+            if (sidebar) {
+                sidebar.appendChild(board);
+            } else {
+                card.parentNode.insertBefore(board, card.nextSibling);
+            }
 
             const reflectionList = document.getElementById('reflectionList');
             const reflectionInput = document.getElementById('reflectionInput');
             const postBtn = document.getElementById('btnPostReflection');
 
-            // Set up real-time listener for reflections
+            // Set up real-time listener for reflections (sorted client-side to avoid composite index requirements)
             if (this.db) {
                 this.db.collection('module_reflections')
                     .where('moduleId', '==', moduleId)
-                    .orderBy('timestamp', 'asc')
                     .onSnapshot(snapshot => {
                         reflectionList.innerHTML = '';
                         if (snapshot.empty) {
-                            reflectionList.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 2rem 0; font-size: 0.85rem; font-style: italic;">No takeaways posted yet. Be the first to share!</div>';
+                            reflectionList.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 2rem 0; font-size: 0.85rem; font-style: italic;">Be the first to share your takeaway from this module!</div>';
                             return;
                         }
 
+                        const docs = [];
                         snapshot.forEach(doc => {
-                            const data = doc.data();
+                            docs.push({ id: doc.id, ...doc.data() });
+                        });
+
+                        // Sort client-side: oldest first (ascending order)
+                        docs.sort((a, b) => {
+                            const tA = a.timestamp ? (a.timestamp.toMillis ? a.timestamp.toMillis() : new Date(a.timestamp).getTime()) : 0;
+                            const tB = b.timestamp ? (b.timestamp.toMillis ? b.timestamp.toMillis() : new Date(b.timestamp).getTime()) : 0;
+                            return tA - tB;
+                        });
+
+                        docs.forEach(data => {
                             const timeStr = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just now';
                             const initials = data.initials || 'A';
 
@@ -244,7 +259,7 @@
                                     </div>
                                     <span class="reflection-date">${timeStr}</span>
                                 </div>
-                                <p style="margin: 0; color: var(--text-primary); font-size: 0.88rem; line-height: 1.4; word-break: break-word;">${data.content}</p>
+                                <p style="margin: 0; color: var(--text-primary); font-size: 0.88rem; line-height: 1.4; word-break: break-word; white-space: pre-wrap;">${data.content}</p>
                             `;
                             reflectionList.appendChild(item);
                         });
@@ -291,34 +306,147 @@
             });
         },
 
-        interceptSubmissions: function (user, moduleId) {
-            const self = this;
-            if (!window.AuthAPI || !window.AuthAPI.submitAnswer) return;
+        initCompleteLessonBtn: function (user, moduleId) {
+            const completeBtn = document.getElementById('btn-complete-lesson');
+            if (!completeBtn) return;
 
-            const originalSubmitAnswer = window.AuthAPI.submitAnswer;
-            window.AuthAPI.submitAnswer = function (userId, mId, question, answerText, fileData, compIdx, extra) {
-                const userBefore = window.AuthAPI.getCurrentUser();
-                const wasCompleted = userBefore ? window.AuthAPI.isModuleCompleted(userBefore.answers, moduleId) : false;
+            const hasFinished = window.AuthAPI.isModuleCompleted(user.answers, moduleId);
+            if (hasFinished) {
+                const order = window.AuthAPI.getModuleOrder();
+                const currIdx = order.indexOf(moduleId);
+                const nextModuleId = currIdx !== -1 && currIdx < order.length - 1 ? order[currIdx + 1] : null;
+                const isNextReleased = nextModuleId ? window.AuthAPI.isModuleUnlocked(nextModuleId) : false;
 
-                const res = originalSubmitAnswer.apply(this, [userId, mId, question, answerText, fileData, compIdx, extra]);
-
-                if (res && res.success) {
-                    // Check if completion status changed
-                    setTimeout(() => {
-                        const userAfter = window.AuthAPI.getCurrentUser();
-                        const isCompleted = userAfter ? window.AuthAPI.isModuleCompleted(userAfter.answers, moduleId) : false;
-                        
-                        if (!wasCompleted && isCompleted) {
-                            self.isMilestoneTriggered = true;
-                            self.triggerMilestoneModal(moduleId);
-                        }
-                    }, 200);
+                if (isNextReleased) {
+                    completeBtn.innerText = "Proceed to Next Module";
+                    completeBtn.addEventListener('click', () => {
+                        window.location.href = `module.html?id=${nextModuleId}`;
+                    });
+                } else {
+                    completeBtn.innerText = "Completed (Back to Dashboard)";
+                    completeBtn.addEventListener('click', () => {
+                        window.location.href = 'dashboard.html';
+                    });
                 }
-                return res;
-            };
+            } else {
+                completeBtn.addEventListener('click', async () => {
+                    completeBtn.disabled = true;
+                    completeBtn.innerText = "Verifying activities...";
+
+                    try {
+                        const checkResult = await this.verifyLessonCompleteness(user, moduleId);
+                        if (checkResult.success) {
+                            completeBtn.innerText = "Submitting completion...";
+                            const res = await window.AuthAPI.submitAnswer(
+                                user.id,
+                                moduleId,
+                                'Lesson Completion',
+                                'Completed',
+                                null,
+                                9999,
+                                { type: 'lesson_completion' }
+                            );
+
+                            if (res.success) {
+                                // Reload user to capture updated answers list
+                                const freshUser = window.AuthAPI.getCurrentUser();
+                                const order = window.AuthAPI.getModuleOrder();
+                                const currIdx = order.indexOf(moduleId);
+                                const nextModuleId = currIdx !== -1 && currIdx < order.length - 1 ? order[currIdx + 1] : null;
+                                const isNextReleased = nextModuleId ? window.AuthAPI.isModuleUnlocked(nextModuleId) : false;
+
+                                if (isNextReleased) {
+                                    completeBtn.innerText = "Proceed to Next Module";
+                                    completeBtn.disabled = false;
+                                    completeBtn.addEventListener('click', () => {
+                                        window.location.href = `module.html?id=${nextModuleId}`;
+                                    });
+                                } else {
+                                    completeBtn.innerText = "Completed (Back to Dashboard)";
+                                    completeBtn.disabled = false;
+                                    completeBtn.addEventListener('click', () => {
+                                        window.location.href = 'dashboard.html';
+                                    });
+                                }
+                                this.triggerMilestoneModal(moduleId);
+                            } else {
+                                alert("Failed to save completion: " + (res.error || "unknown error"));
+                                completeBtn.disabled = false;
+                                completeBtn.innerText = "Complete Lesson";
+                            }
+                        } else {
+                            this.spawnToast("Tasks Incomplete", checkResult.reason);
+                            completeBtn.innerText = "Complete Lesson";
+                            completeBtn.disabled = false;
+                        }
+                    } catch (err) {
+                        console.error("Verification error:", err);
+                        completeBtn.disabled = false;
+                        completeBtn.innerText = "Complete Lesson";
+                    }
+                });
+            }
+        },
+
+        verifyLessonCompleteness: async function (user, moduleId) {
+            // Check 1: Verify all mandatory interactive tasks inside the module are completed
+            const modsContent = window.AuthAPI.getModulesContent();
+            const moduleData = modsContent[moduleId];
+            if (!moduleData || !moduleData.components) return { success: true };
+
+            const staticTypes = ['header', 'header_h1', 'header_h2', 'header_h3', 'text', 'quote', 'image', 'callout', 'bullet_list', 'toggle_list', 'divider'];
+            const interactiveComponents = moduleData.components.map((comp, index) => {
+                return { ...comp, originalIndex: index };
+            }).filter(comp => !staticTypes.includes(comp.type));
+
+            const studentAnswers = user.answers || [];
+
+            // Check if every interactive component has a corresponding answer by index
+            const allActivitiesDone = interactiveComponents.every(comp => {
+                return studentAnswers.some(a => a.moduleId === moduleId && a.componentIndex === comp.originalIndex);
+            });
+
+            if (!allActivitiesDone) {
+                return { success: false, reason: "Please complete all interactive reflections and essay questions inside this module." };
+            }
+
+            // Check 2: Verify they have posted a takeaway to the Peer Reflection Board in Firestore
+            if (!this.db) return { success: true }; // Fail-soft fallback
+
+            try {
+                const snapshot = await this.db.collection('module_reflections')
+                    .where('moduleId', '==', moduleId)
+                    .where('studentId', '==', user.id)
+                    .get();
+
+                if (snapshot.empty) {
+                    return { success: false, reason: "Please share a short takeaway on the Peer Reflection Board before marking this lesson as complete!" };
+                }
+                return { success: true };
+            } catch (err) {
+                console.error("Error checking reflection board completeness:", err);
+                return { success: true }; // Fail-soft fallback
+            }
         },
 
         triggerMilestoneModal: function (moduleId) {
+            const order = window.AuthAPI.getModuleOrder();
+            const currIdx = order.indexOf(moduleId);
+            const nextModuleId = currIdx !== -1 && currIdx < order.length - 1 ? order[currIdx + 1] : null;
+
+            let isNextReleased = false;
+            let nextTitle = '';
+            if (nextModuleId) {
+                isNextReleased = window.AuthAPI.isModuleUnlocked(nextModuleId);
+                const modsContent = window.AuthAPI.getModulesContent();
+                if (modsContent[nextModuleId]) {
+                    nextTitle = modsContent[nextModuleId].title;
+                }
+            }
+
+            const buttonText = isNextReleased ? "Proceed to Next Module" : "Proceed to Dashboard";
+            const targetUrl = isNextReleased ? `module.html?id=${nextModuleId}` : "dashboard.html";
+
             const overlay = document.createElement('div');
             overlay.className = 'milestone-overlay';
             overlay.innerHTML = `
@@ -328,8 +456,9 @@
                     <h2 style="font-family: var(--font-serif); font-style: italic; color: var(--accent-gold-light); margin-bottom: 0.8rem; font-size: 1.8rem;">Module Milestone!</h2>
                     <p style="color: var(--text-primary); font-size: 1rem; line-height: 1.5; margin-bottom: 1.8rem;">
                         Congratulations! You have successfully completed all lessons and activities for this study module. Your progression badge is unlocked!
+                        ${isNextReleased ? `<br><span style="font-size: 0.85rem; color: var(--accent-gold-light);">Next Module: <strong>${nextTitle}</strong> is ready for you!</span>` : ''}
                     </p>
-                    <button class="btn btn-primary" id="btnCloseMilestone" style="width: 100%; border-radius: 50px; padding: 0.75rem;">Proceed to Dashboard</button>
+                    <button class="btn btn-primary" id="btnCloseMilestone" style="width: 100%; border-radius: 50px; padding: 0.75rem;">${buttonText}</button>
                 </div>
             `;
             document.body.appendChild(overlay);
@@ -341,7 +470,7 @@
                 overlay.classList.remove('active');
                 setTimeout(() => {
                     overlay.remove();
-                    window.location.href = 'dashboard.html';
+                    window.location.href = targetUrl;
                 }, 400);
             });
         },
@@ -488,7 +617,6 @@
             let isFirstLoad = true;
             this.db.collection('notifications')
                 .where('userId', '==', user.id)
-                .orderBy('timestamp', 'desc')
                 .onSnapshot(snapshot => {
                     list.innerHTML = '';
                     let unread = 0;
@@ -499,9 +627,20 @@
                         return;
                     }
 
+                    const docs = [];
                     snapshot.forEach(doc => {
-                        const data = doc.data();
-                        const id = doc.id;
+                        docs.push({ id: doc.id, ...doc.data() });
+                    });
+
+                    // Sort client-side: newest first (descending order)
+                    docs.sort((a, b) => {
+                        const tA = a.timestamp ? (a.timestamp.toMillis ? a.timestamp.toMillis() : new Date(a.timestamp).getTime()) : 0;
+                        const tB = b.timestamp ? (b.timestamp.toMillis ? b.timestamp.toMillis() : new Date(b.timestamp).getTime()) : 0;
+                        return tB - tA;
+                    });
+
+                    docs.forEach(data => {
+                        const id = data.id;
                         if (!data.read) unread++;
 
                         // Build dropdown item

@@ -226,9 +226,8 @@
 
 /* ── Reflection Board ── */
 .reflection-board {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px dashed rgba(212, 175, 55, 0.2);
+    height: auto !important;
+    overflow: visible !important;
 }
 
 .reflection-item {
