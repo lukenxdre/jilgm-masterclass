@@ -975,30 +975,81 @@
         },
 
         exportModulePPT: function (moduleId) {
-            console.log("🚀 Starting Unstoppable Presentation Export Engine...");
+            console.log("🚀 Initializing Isolated Pop-Up Presentation Print Pipeline...");
             const mod = window.AuthAPI ? window.AuthAPI.getModule(moduleId) : null;
             if (!mod) {
                 alert('Module data is not ready or not found.');
                 return;
             }
 
-            // 1. Create a completely isolated, high-priority print container
-            const printContainer = document.createElement('div');
-            printContainer.id = 'dynamic-presentation-print-deck';
+            // 1. Open a clean, isolated blank browser tab
+            const printWindow = window.open('', '_blank', 'width=1200,height=800');
+            if (!printWindow) {
+                alert("Pop-up blocked! Please allow pop-ups for this site to export the presentation deck.");
+                return;
+            }
 
             const title = mod.title || 'Untitled Module';
             const subtitle = mod.subtitle || '';
             const comps = mod.components || [];
 
-            // 2. Compile slide markup directly from memory
+            // 2. Build out the standalone HTML slide structure directly into the new window document
             let slideHTML = `
-                <div class="slide" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-color: #0b132b; color: #ffffff;">
-                    <div style="border: 2px solid var(--accent-gold, #d4af37); padding: 3rem 4rem; border-radius: 12px; background: rgba(255,255,255,0.02); max-width: 80%;">
-                        <div style="font-size: 1.2rem; text-transform: uppercase; letter-spacing: 3px; color: var(--accent-gold, #d4af37); font-weight: bold; margin-bottom: 1rem;">JILGM Riyadh Leadership Masterclass</div>
-                        <div style="font-size: 2.8rem; font-family: var(--font-serif, serif); margin: 0 0 1rem 0; line-height: 1.3; font-weight: bold;">${title}</div>
-                        <div style="font-size: 1.3rem; color: #a0aec0; margin: 0; font-style: italic;">${subtitle}</div>
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <title>${title} - Presentation Deck</title>
+                    <style>
+                        @page {
+                            size: landscape !important;
+                            margin: 0 !important;
+                        }
+                        html, body {
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            width: 100% !important;
+                            height: 100% !important;
+                            background-color: #0b132b !important;
+                            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                            color: #ffffff;
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                            overflow: hidden !important;
+                        }
+                        .slide {
+                            width: 100vw !important;
+                            height: 100vh !important;
+                            page-break-after: always !important;
+                            page-break-inside: avoid !important;
+                            box-sizing: border-box;
+                            padding: 60px 80px;
+                            background-color: #0b132b !important;
+                            position: relative;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: flex-start;
+                        }
+                        .header-bar {
+                            position: absolute;
+                            top: 0; left: 0; right: 0; height: 10px;
+                            background: linear-gradient(90deg, #d4af37, #10b981);
+                        }
+                        .cover-title { font-size: 38pt; font-weight: 700; color: #d4af37; margin-top: 80px; margin-bottom: 20px; line-height: 1.2; }
+                        .cover-subtitle { font-size: 18pt; color: #e2e8f0; font-weight: 300; margin: 0; }
+                        .slide-title { font-size: 26pt; font-weight: 600; color: #ffffff; border-left: 5px solid #d4af37; padding-left: 15px; margin-bottom: 30px; }
+                        .bullet-list { padding: 0; margin: 0; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+                        .bullet-list li { font-size: 16pt; line-height: 1.6; margin-bottom: 15px; color: #e2e8f0; list-style-type: square; margin-left: 20px; }
+                        .bullet-list li strong { color: #d4af37; }
+                    </style>
+                </head>
+                <body>
+                    <!-- Slide 1: Cover -->
+                    <div class="slide">
+                        <div class="header-bar"></div>
+                        <h1 class="cover-title">${title}</h1>
+                        <p class="cover-subtitle">${subtitle || 'JILGM Riyadh Leadership Masterclass'}</p>
                     </div>
-                </div>
             `;
 
             // Extract content blocks
@@ -1020,7 +1071,7 @@
                 }
             });
 
-            // Distribute items into slide boxes (4 items per slide)
+            // 3. Dynamically append core content slides here from in-memory snapshot
             const itemsPerSlide = 4;
             for (let i = 0; i < contentItems.length; i += itemsPerSlide) {
                 const chunk = contentItems.slice(i, i + itemsPerSlide);
@@ -1028,54 +1079,49 @@
                 let listHtml = '';
                 chunk.forEach(item => {
                     if (item.type === 'header') {
-                        listHtml += `<li style="font-size: 18pt; font-weight: bold; color: var(--accent-gold, #d4af37); margin-bottom: 1.5rem; list-style-type: none; border-left: 4px solid var(--accent-gold, #d4af37); padding-left: 0.8rem; text-align: left;">${item.text}</li>`;
+                        listHtml += `<li style="font-size: 18pt; font-weight: bold; color: #d4af37; margin-bottom: 1.5rem; list-style-type: none; border-left: 4px solid #d4af37; padding-left: 0.8rem; margin-left: 0; text-align: left;">${item.text}</li>`;
                     } else {
-                        listHtml += `<li style="font-size: 16pt; line-height: 1.6; color: #e2e8f0; margin-bottom: 1.2rem; list-style-type: square; margin-left: 1.5rem; text-align: left;">${item.text}</li>`;
+                        listHtml += `<li style="text-align: left;">${item.text}</li>`;
                     }
                 });
 
                 slideHTML += `
-                    <div class="slide" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: #0b132b; color: #ffffff;">
-                        <div style="font-size: 0.85rem; text-transform: uppercase; color: var(--accent-gold, #d4af37); letter-spacing: 2px; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between;">
+                    <div class="slide">
+                        <div class="header-bar"></div>
+                        <div style="font-size: 0.85rem; text-transform: uppercase; color: #d4af37; letter-spacing: 2px; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between;">
                             <span>${title}</span>
                             <span>Slide ${Math.floor(i / itemsPerSlide) + 2}</span>
                         </div>
-                        <ul style="padding: 0; margin: 0; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                        <ul class="bullet-list">
                             ${listHtml}
                         </ul>
                     </div>
                 `;
             }
 
-            // Final Slide: CTA
+            // 4. Final Slide: Face-to-Face CTA
             slideHTML += `
-                <div class="slide" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-color: #0b132b; color: #ffffff;">
-                    <div style="border: 2px dashed var(--accent-gold, #d4af37); padding: 4rem; border-radius: 12px; background: rgba(212,175,55,0.02); max-width: 80%;">
-                        <div style="font-size: 3rem; margin-bottom: 1.5rem;">👥</div>
-                        <div style="font-size: 2.2rem; font-family: var(--font-serif, serif); color: var(--accent-gold, #d4af37); margin: 0 0 1.5rem 0; line-height: 1.3; font-weight: bold;">Face-to-Face Engagement</div>
-                        <p style="font-size: 1.5rem; color: #e2e8f0; margin: 0; line-height: 1.5; font-weight: 500;">
-                            Log into the Apprentice Portal now and post your key takeaway to the Peer Reflection Board.
-                        </p>
+                    <div class="slide">
+                        <div class="header-bar"></div>
+                        <h2 class="slide-title">Face-to-Face Engagement</h2>
+                        <ul class="bullet-list">
+                            <li><strong>Apprentice Action:</strong> Log into your personal dashboard device right now.</li>
+                            <li><strong>Reflection Board:</strong> Post your primary key takeaway from this session to the live Peer Reflection Board below the viewport!</li>
+                        </ul>
                     </div>
-                </div>
+                </body>
+                </html>
             `;
 
-            printContainer.innerHTML = slideHTML;
+            // 5. Write content to the isolated frame, wait for rendering, print, and self-destruct
+            printWindow.document.write(slideHTML);
+            printWindow.document.close();
 
-            // 3. Inject the container directly into the root body
-            document.body.appendChild(printContainer);
-
-            // 4. Add a temporary class to the body to force-hide everything else completely
-            document.body.classList.add('masterclass-printing-active');
-
-            // 5. Short timeout to give the browser a single frame to register the DOM change
+            // Give the new window a solid half-second to paint completely independent of the dashboard script
             setTimeout(() => {
-                window.print();
-
-                // 6. CLEANUP immediately after print dialog closes
-                document.body.classList.remove('masterclass-printing-active');
-                printContainer.remove();
-                console.log("🛡️ Print engine safely unmounted.");
+                printWindow.print();
+                printWindow.close();
+                console.log("🛡️ Pop-up print job resolved and window closed successfully.");
             }, 500);
         }
     };
