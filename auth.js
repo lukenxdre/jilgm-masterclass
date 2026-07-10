@@ -183,68 +183,71 @@ const defaultModules = {
         ]
     },
     module3: {
-        title: "Conflict Resolution in Ministry",
-        subtitle: "Biblical approaches to handling disputes, fostering unity, and maintaining peace.",
+        title: "Theology of the Church",
+        subtitle: "Understanding the church as Christ's body and the role of pastors in equipping the saints.",
         components: [
-            { type: 'header_h1', content: 'Week 3: Conflict Resolution in Ministry' },
-            { type: 'callout', emoji: '🎯', bg: 'soft-gold', content: '<strong>Learning Objectives:</strong> By the end of this session, participants will:<br>1. Understand the biblical basis and process for resolving conflict in the church.<br>2. Recognize common sources of ministry conflict and how to address them wisely.<br>3. Apply Matthew 18 and other scriptural frameworks to real-world pastoral situations.<br>4. Develop personal skills for peacekeeping, confrontation, and reconciliation.' },
+            { type: 'header_h1', content: 'Week 3: Theology of the Church' },
+            { type: 'callout', emoji: '🎯', bg: 'soft-gold', content: '<strong>Learning Objectives:</strong> By the end of this session, participants will:<br>1. Understand the church as Christ’s body under His authority and headship<br>2. Explain the biblical role of pastors as equippers of the saints<br>3. Recognize that spiritual unity and maturity are central goals of church ministry<br>4. Evaluate whether their ministry model is building dependence on the pastor or maturity in the body' },
             { type: 'divider' },
-            { type: 'header_h2', content: 'Introduction' },
-            { type: 'text', content: 'Conflict is not a sign that a church is failing—it is a sign that the church is human. Every congregation, ministry team, and pastoral relationship will face disagreement, misunderstanding, and tension. The question is not whether conflict will come, but whether leaders are prepared to handle it in a way that honors Christ, protects unity, and brings genuine healing.' },
-            { type: 'quote', content: '"If possible, so far as it depends on you, live peaceably with all."<br>— Romans 12:18 (ESV)' },
+            { type: 'header_h2', content: 'Session Overview for the Teacher' },
+            { type: 'text', content: 'This lesson is not merely about church structure. It is about the <strong>nature, identity, and purpose</strong> of the church. Many ministry leaders unconsciously function as though the church were a business, a platform, or a weekly event. Ephesians 4 corrects that view. The church is the body of Christ, governed by Christ, nourished by Christ, and built up through every member’s participation.' },
+            { type: 'text', content: 'This session is especially important for pastors and ministry leaders because poor ecclesiology produces poor ministry practice. When leaders misunderstand the church, they often create unhealthy dependency, consumer Christianity, over-centralized leadership, or shallow discipleship. By contrast, when pastors understand the theology of the church, they begin to labor not merely to gather crowds, but to build a spiritually healthy body.' },
             { type: 'divider' },
-            { type: 'header_h2', content: 'Part 1: The Biblical Basis for Confrontation and Reconciliation (5-18 Minutes)' },
-            { type: 'callout', emoji: '📖', bg: 'soft-gold', content: '<strong>Primary Focus Text: Matthew 18:15-17</strong><br>"If your brother sins against you, go and tell him his fault, between you and him alone. If he listens to you, you have gained your brother. But if he does not listen, take one or two others along with you, that every charge may be established by the evidence of two or three witnesses. If he refuses to listen to them, tell it to the church. And if he refuses to listen even to the church, let him be to you as a Gentile and a tax collector."' },
-            { type: 'header_h3', content: 'A. Confrontation is a Act of Love' },
-            { type: 'text', content: 'Jesus commands direct, private, personal confrontation as the first step. Many leaders skip this because it is uncomfortable. But avoiding confrontation is not kindness — it is a failure of love. The goal is always to gain a brother, not to win an argument.' },
-            { type: 'quote', content: '"Better is open rebuke than hidden love. Faithful are the wounds of a friend; profuse are the kisses of an enemy."<br>— Proverbs 27:5-6' },
-            { type: 'header_h3', content: 'B. The Three-Step Process' },
-            { type: 'bullet_list', content: '- Step 1: Go privately — preserve dignity and give the person a chance to respond without public shame.\n- Step 2: Bring witnesses — not for ganging up, but for accountability, clarity, and mediation.\n- Step 3: Bring it to the church — only when private efforts have been exhausted and there is ongoing unrepentant sin.' },
-            { type: 'header_h3', content: 'C. The Goal is Restoration, Not Punishment' },
-            { type: 'text', content: 'The spirit of Matthew 18 is restorative, not punitive. The process is designed to protect the offending person, the offended person, and the community. Excommunication (v.17) is a last resort — a painful act of discipline intended to awaken repentance.' },
-            { type: 'quote', content: '"Brothers, if anyone is caught in any transgression, you who are spiritual should restore him in a spirit of gentleness. Keep watch on yourself, lest you too be tempted."<br>— Galatians 6:1' },
-            { type: 'callout', emoji: '❓', bg: 'soft-red', content: '<strong>Discussion Prompt:</strong> Why do most pastors and leaders avoid direct, private confrontation, and what are the long-term consequences of that avoidance?' },
+            { type: 'header_h2', content: 'Opening Segment (0-5 Minutes)' },
+            { type: 'text', content: 'Begin by asking the participants this opening question:<br><br><strong>"When you think of the church, what image comes to mind first: organization, family, institution, event, or body?"</strong><br><br>Allow two or three brief responses. Then explain that how we answer this question shapes how we lead. If we think of the church mainly as an organization, we will prioritize efficiency. If we think of it mainly as an event, we will prioritize production. But if we understand it as the <strong>body of Christ</strong>, we will prioritize spiritual formation, mutual care, and maturity.' },
             { type: 'divider' },
-            { type: 'header_h2', content: 'Part 2: Sources of Ministry Conflict (18-30 Minutes)' },
-            { type: 'callout', emoji: '📖', bg: 'soft-gold', content: '<strong>Primary Focus Text: James 4:1-2; Philippians 2:3-4</strong><br>"What causes quarrels and what causes fights among you? Is it not this, that your passions are at war within you?"<br>"Do nothing from selfish ambition or conceit, but in humility count others more significant than yourselves."' },
-            { type: 'header_h3', content: 'A. Internal Sources of Conflict' },
-            { type: 'bullet_list', content: '- Pride and competition between leaders\n- Unmet expectations or unspoken assumptions\n- Insecurity and fear of losing influence\n- Unresolved personal wounds or trauma\n- Differing visions for the church direction' },
-            { type: 'header_h3', content: 'B. External Sources of Conflict' },
-            { type: 'bullet_list', content: '- Theological disagreements on secondary issues\n- Cultural or generational tensions\n- Financial pressures and resource allocation\n- Transitions: pastoral succession, staff changes\n- Misunderstandings in communication' },
-            { type: 'callout', emoji: '💡', bg: 'soft-navy', content: '<strong>Peter Scazzero</strong> in <em>Emotionally Healthy Spirituality</em> argues that most church conflict is driven by emotional immaturity — people reacting from past wounds rather than responding from spiritual maturity. The leader who has not done the inner work will repeatedly trigger the same conflicts.' },
-            { type: 'callout', emoji: '❓', bg: 'soft-red', content: '<strong>Discussion Prompt:</strong> Think of a conflict you witnessed or experienced in ministry. What was the surface issue, and what was the deeper root?' },
+            { type: 'header_h2', content: 'Part 1: Christ as Head of the Church (5-15 Minutes)' },
+            { type: 'callout', emoji: '📖', bg: 'soft-gold', content: '<strong>Primary Focus Text: Ephesians 4:15-16</strong><br>"Rather, speaking the truth in love, we are to grow up in every way into him who is the head, into Christ, from whom the whole body, joined and held together by every joint with which it is equipped, when each part is working properly, makes the body grow so that it builds itself up in love."' },
+            { type: 'header_h3', content: 'A. Christ is the source of the church\'s life' },
+            { type: 'text', content: 'The body derives its life from the head. In the same way, the church receives direction, nourishment, authority, and identity from Christ. A church can have programs, budgets, and staff and still be spiritually weak if it is not truly drawing life from Christ.' },
+            { type: 'quote', content: '"And he is the head of the body, the church." — Colossians 1:18' },
+            { type: 'header_h3', content: 'B. Christ is the authority over the church' },
+            { type: 'text', content: 'Since Christ is Head, the pastor has delegated authority, not autonomous authority. This guards against authoritarian leadership and personality cults. It also protects pastors from assuming they carry burdens Christ never assigned them.' },
+            { type: 'quote', content: '"Shepherd the flock of God that is among you... not domineering over those in your charge, but being examples to the flock." — 1 Peter 5:2-3' },
+            { type: 'header_h3', content: 'C. The church grows into Christ' },
+            { type: 'text', content: 'Paul says the body is to "grow up in every way into him." The standard of church growth is not merely numerical increase, but conformity to Christ. Growth that does not produce Christlikeness is incomplete growth.' },
+            { type: 'callout', emoji: '❓', bg: 'soft-red', content: '<strong>Discussion Prompt:</strong> Why is it dangerous for pastors to function as if they are the head of the church rather than servants under Christ’s authority?' },
             { type: 'divider' },
-            { type: 'header_h2', content: 'Part 3: Principles for Pastoral Peacekeeping (30-40 Minutes)' },
-            { type: 'callout', emoji: '📖', bg: 'soft-gold', content: '<strong>Primary Focus Text: Romans 12:17-21; Ephesians 4:26-27</strong><br>"Repay no one evil for evil, but give thought to do what is honorable in the sight of all."<br>"Be angry and do not sin; do not let the sun go down on your anger, and give no opportunity to the devil."' },
-            { type: 'header_h3', content: 'A. Act Quickly — Do Not Let Conflict Fester' },
-            { type: 'text', content: 'Unaddressed conflict gives the devil a foothold. Pastors who delay dealing with tensions allow bitterness to deepen, factions to form, and wounds to calcify. Speed with wisdom is essential.' },
-            { type: 'header_h3', content: 'B. Listen Before You Lead' },
-            { type: 'text', content: 'Most ministry conflicts escalate because leaders listen to respond rather than to understand. Before offering solutions, the wise pastor seeks to fully hear all parties involved.' },
-            { type: 'quote', content: '"Know this, my beloved brothers: let every person be quick to hear, slow to speak, slow to anger."<br>— James 1:19' },
-            { type: 'header_h3', content: 'C. Guard Your Own Spirit' },
-            { type: 'text', content: 'The mediating leader must keep his own soul clean during conflict. Anger, pride, and defensiveness in the pastor will escalate rather than resolve conflict.' },
-            { type: 'quote', content: '"A soft answer turns away wrath, but a harsh word stirs up anger."<br>— Proverbs 15:1' },
-            { type: 'header_h3', content: 'D. Distinguish Between Disputable Matters and Clear Sin' },
-            { type: 'text', content: 'Romans 14-15 teaches that some conflicts involve secondary matters where Christians differ in conscience. Not every difference requires confrontation. Wisdom discerns when to bear with one another and when to pursue formal discipline.' },
+            { type: 'header_h2', content: 'Part 2: Role of Pastors in Equipping the Saints (15-30 Minutes)' },
+            { type: 'callout', emoji: '📖', bg: 'soft-gold', content: '<strong>Primary Focus Text: Ephesians 4:11-12</strong><br>"And he gave the apostles, the prophets, the evangelists, the shepherds and teachers, to equip the saints for the work of ministry, for building up the body of Christ."' },
+            { type: 'header_h3', content: 'A. Ministry leaders are gifts from Christ to the church' },
+            { type: 'text', content: 'Paul says Christ "gave" these leaders. The church does not invent ministry offices for convenience. Christ Himself provides shepherds and teachers for the church’s good.' },
+            { type: 'header_h3', content: 'B. The pastor equips rather than replaces the saints' },
+            { type: 'text', content: 'The phrase "to equip the saints for the work of ministry" is central. The pastor is not meant to monopolize ministry. He trains, forms, instructs, corrects, and mobilizes believers so they can serve effectively.' },
+            { type: 'header_h3', content: 'C. The work of ministry belongs to the whole church' },
+            { type: 'text', content: 'Every believer has a role in the life of the body. Pastors are essential, but they are not the whole body. The church is weakened when members become passive consumers.' },
+            { type: 'header_h3', content: 'D. Equipping includes doctrine, example, correction, and opportunity' },
+            { type: 'bullet_list', content: '- <strong>Doctrinal formation</strong> - helping believers understand truth\n- <strong>Practical training</strong> - showing them how to serve\n- <strong>Spiritual formation</strong> - shaping character and maturity\n- <strong>Delegation and trust</strong> - giving real responsibility\n- <strong>Correction and encouragement</strong> - helping them grow through mistakes' },
             { type: 'divider' },
-            { type: 'header_h2', content: 'Part 4: Forgiveness and Reconciliation (40-50 Minutes)' },
-            { type: 'callout', emoji: '📖', bg: 'soft-gold', content: '<strong>Primary Focus Text: Matthew 18:21-22; Colossians 3:13</strong><br>"Then Peter came up and said to him, "Lord, how often will my brother sin against me, and I forgive him? As many as seven times?" Jesus said to him, "I do not say to you seven times, but seventy-seven times."<br>"...forgiving each other; as the Lord has forgiven you, so you also must forgive."' },
-            { type: 'header_h3', content: 'A. Forgiveness is Not Optional' },
-            { type: 'text', content: 'For the Christian leader, forgiveness is not merely a virtue to admire — it is a command to obey. Jesus does not suggest we forgive when we feel ready; He commands it as a baseline of kingdom living.' },
-            { type: 'header_h3', content: 'B. Forgiveness is Not the Same as Trust or Reconciliation' },
-            { type: 'text', content: 'Forgiveness is a unilateral decision to release bitterness and entrust justice to God. Reconciliation is bilateral — it requires both parties to engage honestly. Trust must be rebuilt over time through consistent behavior.' },
-            { type: 'callout', emoji: '⚠️', bg: 'soft-red', content: '<strong>Warning:</strong> Premature reconciliation without genuine repentance is not a spiritual achievement — it is a pastoral failure. Rushing people to "move on" before addressing root sin can enable ongoing harm.' },
+            { type: 'header_h2', content: 'Part 3: Spiritual Unity and Maturity (30-45 Minutes)' },
+            { type: 'callout', emoji: '📖', bg: 'soft-gold', content: '<strong>Primary Focus Text: Ephesians 4:13-14</strong><br>"...until we all attain to the unity of the faith and of the knowledge of the Son of God, to mature manhood, to the measure of the stature of the fullness of Christ, so that we may no longer be children, tossed to and fro by the waves and carried about by every wind of doctrine..."' },
+            { type: 'header_h3', content: 'A. The goal is unity of the faith' },
+            { type: 'text', content: 'Biblical unity is not superficial harmony or avoidance of conflict. It is shared grounding in the truth of Christ. Unity grows where truth is embraced together.' },
+            { type: 'header_h3', content: 'B. The goal is mature manhood' },
+            { type: 'text', content: 'Paul speaks of maturity in corporate terms. The church is to grow up together into the fullness of Christ. This maturity includes doctrine, character, discernment, relational health, and perseverance.' },
+            { type: 'header_h3', content: 'C. The goal is doctrinal stability' },
+            { type: 'text', content: 'Paul contrasts maturity with childhood. Spiritually immature believers are unstable, easily influenced, and vulnerable to deception. A healthy church is not easily manipulated by trends, personalities, or false doctrine.' },
+            { type: 'header_h3', content: 'D. Truth and love must remain together' },
+            { type: 'text', content: 'Verse 15 says, "speaking the truth in love." Truth without love becomes harsh. Love without truth becomes sentimental and weak. The church matures where both are held together.' },
+            { type: 'callout', emoji: '❓', bg: 'soft-red', content: '<strong>Teacher Discussion Question:</strong> What usually threatens unity and maturity more in a church context: false doctrine, pride, unresolved conflict, consumerism, or pastoral overcontrol? Why?' },
             { type: 'divider' },
-            { type: 'header_h2', content: 'Part 5: Personal Diagnostics and Conflict Reflection (50-57 Minutes)' },
-            { type: 'text', content: 'Ask participants to reflect silently or journal on these questions:<br><br>1. <strong>Avoidance:</strong> Is there a conflict I have been avoiding that needs to be addressed biblically?<br>2. <strong>Patterns:</strong> Do I see recurring conflict patterns in my ministry? What might they reveal about my leadership?<br>3. <strong>Forgiveness:</strong> Am I holding bitterness toward anyone in ministry that I need to release?<br>4. <strong>Peacemaking:</strong> Am I a peacemaker or a peacekeeper? (Peacekeepers avoid conflict; peacemakers address it for the sake of true unity.)<br>5. <strong>Spirit:</strong> When conflict arises, is my first instinct prayer, problem-solving, or self-protection?' },
+            { type: 'header_h2', content: 'Part 4: The Body Building Itself Up in Love (45-53 Minutes)' },
+            { type: 'callout', emoji: '📖', bg: 'soft-gold', content: '<strong>Primary Focus Text: Ephesians 4:16</strong><br>"...when each part is working properly, makes the body grow so that it builds itself up in love."' },
+            { type: 'header_h3', content: 'A. Every member matters' },
+            { type: 'text', content: 'Paul’s language leaves no room for spectatorship. The church is not designed for a few active leaders and many passive attenders. Every member contributes to health.' },
+            { type: 'header_h3', content: 'B. Proper function requires order and interdependence' },
+            { type: 'text', content: 'Not every member has the same role, but every member has value. Growth occurs through connectedness, not isolation.' },
+            { type: 'header_h3', content: 'C. Love is not an accessory; it is the atmosphere of growth' },
+            { type: 'text', content: 'The body builds itself up in love. This means church growth is not merely structural or doctrinal. It must be relationally textured by patience, service, humility, and care.' },
+            { type: 'divider' },
+            { type: 'header_h2', content: 'Reflection and Personal Application (53-58 Minutes)' },
+            { type: 'bullet_list', content: '1. <strong>Headship Check:</strong> In practice, does my leadership show that Christ is truly the Head of the church?\n2. <strong>Equipping Check:</strong> Am I equipping people for ministry, or doing ministry in place of them?\n3. <strong>Maturity Check:</strong> Are the people I lead becoming more stable, more loving, and more grounded in truth?\n4. <strong>Unity Check:</strong> Am I contributing to peace and maturity, or unintentionally reinforcing dependency and immaturity?' },
             { type: 'divider' },
             { type: 'header_h2', content: 'Summary: Key Takeaways' },
-            { type: 'bullet_list', content: '- Conflict is inevitable; the manner of response determines whether it becomes destructive or redemptive\n- Matthew 18 provides a clear, biblical, step-by-step process for confrontation and reconciliation\n- Most conflict has deeper roots in pride, insecurity, unmet expectations, or emotional immaturity\n- The pastor must guard his own spirit during conflict — a reactive leader makes things worse\n- Forgiveness is commanded, but reconciliation requires repentance and time\n- Peacemaking is an active, courageous, Christlike pursuit — not passive avoidance' },
-            { type: 'quote', content: '"Closing Prayer:<br>Lord, make us ministers of reconciliation. Give us the courage to confront what must be addressed, the humility to listen before we speak, the wisdom to distinguish between disputable matters and clear sin, and the grace to forgive as we have been forgiven. Keep our spirits tender, our words gentle, and our goals redemptive. For the sake of your church and the glory of your name. Amen."' },
-            { type: 'toggle_list', title: '📝 Optional Homework for the Week', content: '1. <strong>Read:</strong> Matthew 18:15-35; Romans 12:17-21; Galatians 6:1-2<br>2. <strong>Journal:</strong> Describe one unresolved conflict in your ministry context and write a biblical plan for addressing it using Matthew 18.<br>3. <strong>Practice:</strong> Have one intentional, honest conversation this week with someone you have been avoiding.<br>4. <strong>Memory Verse:</strong> Memorize Matthew 18:15' },
-            { type: 'accordion', items: [ { title: 'Step 1 — Go privately (Matthew 18:15)', content: 'If your brother sins against you, go and tell him his fault between you and him alone. Privacy protects dignity and creates space for genuine repentance.' }, { title: 'Step 2 — Bring one or two witnesses (Matthew 18:16)', content: 'Witnesses ensure accountability and accuracy. Every charge is established by evidence.' }, { title: 'Step 3 — Tell it to the church (Matthew 18:17)', content: 'Church discipline is a last resort — a redemptive act, not a punitive one, aimed at restoration.' } ] },
-            { type: 'flip_card', icon: '⚖️', front: 'What does "Speak the truth in love" mean in conflict resolution?', back: 'Truth without love becomes harshness; love without truth becomes flattery. Biblical confrontation holds both — delivering hard truth with genuine care for the person\'s restoration (Ephesians 4:15).' },
-            { type: 'question', content: 'Reflect on a real conflict situation in your ministry or personal life. Write a detailed response (minimum 20 characters) answering: How can you apply the Matthew 18 process to bring biblical resolution, and what personal changes do you need to make in how you handle conflict?' }
+            { type: 'bullet_list', content: '- Christ is the Head of the church — therefore pastoral authority is always delegated and accountable.\n- Pastors are given to equip the saints — ministry is not meant to be concentrated in one leader.\n- The goal of equipping is unity and maturity — not mere activity or attendance.\n- Doctrinal stability matters — immature churches are vulnerable churches.\n- Healthy churches build themselves up in love — every member matters in Christ’s design.' },
+            { type: 'toggle_list', title: '📝 Optional Homework for the Week', content: '1. <strong>Read:</strong> 1 Corinthians 12:12-27 and Colossians 1:15-20<br>2. <strong>Journal:</strong> In what ways has my ministry encouraged dependency on leaders rather than maturity in believers?<br>3. <strong>Ministry Audit:</strong> Identify one area where I can begin equipping others instead of carrying the entire burden myself.' },
+            { type: 'question', content: 'Reflect on Ephesians 4 and your own ministry model. Write a brief response (minimum 20 characters): What is one specific way you need to change your leadership to better equip the saints for ministry?' },
+            { type: 'file_upload', title: 'Module 3 Assignment', content: 'Upload your completed Ministry Audit or Journal Reflection for this week.' }
         ]
     },
     module4: {
@@ -1371,11 +1374,18 @@ function initFirestoreSync(onCollectionLoaded) {
             mods[doc.id] = doc.data();
         });
 
-        // Automatically update module11 content in Firestore if it's the old/placeholder content (Theology of the Church)
-        if (isTeacherOrAdmin && mods['module11'] && mods['module11'].title !== "Conflict Resolution") {
-            console.log("Migration: Seeding/updating module11 to 'Conflict Resolution'...");
-            firebaseDb.collection('modules_content').doc('module11').set(defaultModules['module11'])
-                .catch(err => console.error("Error migrating module11 in Firestore", err));
+        // Automatically update module3 and module11 content in Firestore if they are mismatched
+        if (isTeacherOrAdmin) {
+            if (mods['module3'] && mods['module3'].title !== "Theology of the Church") {
+                console.log("Migration: Seeding/updating module3 to 'Theology of the Church'...");
+                firebaseDb.collection('modules_content').doc('module3').set(defaultModules['module3'])
+                    .catch(err => console.error("Error migrating module3 in Firestore", err));
+            }
+            if (mods['module11'] && mods['module11'].title !== "Conflict Resolution") {
+                console.log("Migration: Seeding/updating module11 to 'Conflict Resolution'...");
+                firebaseDb.collection('modules_content').doc('module11').set(defaultModules['module11'])
+                    .catch(err => console.error("Error migrating module11 in Firestore", err));
+            }
         }
 
         localStorage.setItem(CONTENT_KEY, JSON.stringify(mods));
