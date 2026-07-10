@@ -460,26 +460,54 @@
         <!-- 1. COHORT PANEL -->
         <div id="panel-cohort">
             <div class="dashboard-header">
-                <h1 id="cohortHeader">Student Cohort</h1>
+                <h1 id="cohortHeader">Regular Student Cohort</h1>
+            </div>
+            
+            <div class="glass-card" style="padding: 2rem; border-color: var(--glass-border); background: var(--bg-card); margin-bottom: 2.5rem;">
+                <div class="admin-table-container" style="margin-top: 0;">
+                    <div class="table-responsive-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Assigned Outreach</th>
+                                    <th>Apprentice Username</th>
+                                    <th>Course Progress</th>
+                                    <th style="width: 150px; text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cohortTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-header">
+                <h1 id="sitinCohortHeader" style="color: #f59e0b;">Sit-In Student Cohort</h1>
             </div>
             
             <div class="glass-card" style="padding: 2rem; border-color: var(--glass-border); background: var(--bg-card);">
                 <div class="admin-table-container" style="margin-top: 0;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Assigned Outreach</th>
-                                <th>Apprentice Username</th>
-                                <th>Course Progress</th>
-                                <th style="width: 150px; text-align: center;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cohortTableBody">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
+                    <div class="table-responsive-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Assigned Outreach</th>
+                                    <th>Apprentice Username</th>
+                                    <th>Course Progress</th>
+                                    <th style="width: 150px; text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sitinCohortTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -564,19 +592,21 @@
             </div>
             <div class="glass-card" style="padding: 2rem; border-color: var(--glass-border); background: var(--bg-card);">
                 <div class="admin-table-container" style="margin-top: 0;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Full Name</th>
-                                <th>Username</th>
-                                <th>Assigned Outreach Oversight</th>
-                                <th>Registered Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="coInstructorsTableBody">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
+                    <div class="table-responsive-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Full Name</th>
+                                    <th>Username</th>
+                                    <th>Assigned Outreach Oversight</th>
+                                    <th>Registered Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="coInstructorsTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -626,6 +656,7 @@
                 const instAvatar = document.getElementById('instructorAvatar');
 
                 const cohortTableBody = document.getElementById('cohortTableBody');
+                const sitinCohortTableBody = document.getElementById('sitinCohortTableBody');
                 const qaBoardContainer = document.getElementById('qaBoardContainer');
                 const chatStudentsList = document.getElementById('chatStudentsList');
                 const chatBoxArea = document.getElementById('chatBoxArea');
@@ -738,14 +769,11 @@
                     // Filter Cohort to same outreach only, unless admin
                     const cohortList = allStudents.filter(s => s.status === 'approved' && (isAdmin || s.outreach === inst.outreach));
 
-                    cohortTableBody.innerHTML = '';
-                    if (cohortList.length === 0) {
-                        const scopeText = isAdmin ? 'any outreach' : `Outreach ${inst.outreach || 'Unassigned'}`;
-                        cohortTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 3rem;">No apprentices registered in ${scopeText} yet.</td></tr>`;
-                        return;
-                    }
+                    const regularList = cohortList.filter(s => !s.isSitIn);
+                    const sitinList = cohortList.filter(s => s.isSitIn);
 
-                    cohortList.forEach(student => {
+                    // Helper to create tr element
+                    function createCohortRow(student) {
                         const tr = document.createElement('tr');
                         const progress = student.progress || 0;
                         const progressHtml = `
@@ -765,8 +793,30 @@
                             <td>${progressHtml}</td>
                             <td style="text-align: center;"><button class="btn btn-secondary" onclick="viewStudentAnswers('${student.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; border-color: rgba(212, 175, 55, 0.4); font-family: var(--font-sans);">Open Portal</button></td>
                         `;
-                        cohortTableBody.appendChild(tr);
-                    });
+                        return tr;
+                    }
+
+                    cohortTableBody.innerHTML = '';
+                    if (regularList.length === 0) {
+                        const scopeText = isAdmin ? 'any outreach' : `Outreach ${inst.outreach || 'Unassigned'}`;
+                        cohortTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 3rem;">No regular apprentices registered in ${scopeText} yet.</td></tr>`;
+                    } else {
+                        regularList.forEach(student => {
+                            cohortTableBody.appendChild(createCohortRow(student));
+                        });
+                    }
+
+                    if (sitinCohortTableBody) {
+                        sitinCohortTableBody.innerHTML = '';
+                        if (sitinList.length === 0) {
+                            const scopeText = isAdmin ? 'any outreach' : `Outreach ${inst.outreach || 'Unassigned'}`;
+                            sitinCohortTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 3rem;">No sit-in apprentices registered in ${scopeText} yet.</td></tr>`;
+                        } else {
+                            sitinList.forEach(student => {
+                                sitinCohortTableBody.appendChild(createCohortRow(student));
+                            });
+                        }
+                    }
                 }
 
                 // --- Central Q&A Board Renderer ---

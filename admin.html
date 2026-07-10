@@ -343,7 +343,7 @@
                     </h3>
                     <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.2rem;">Completion states of apprentices across curriculum modules.</p>
                     
-                    <div style="overflow-x: auto; width: 100%;">
+                    <div class="table-responsive-wrapper">
                         <table class="matrix-table" id="dashboardMatrixTable" style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left;">
                             <thead>
                                 <tr id="dashboardMatrixHeaders">
@@ -474,44 +474,75 @@
                     Pending Applications <span id="pendingBadge" class="badge" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">0</span>
                 </h2>
                 <div class="admin-table-container" style="margin-top: 0;">
-                    <table id="pendingTable">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email Address</th>
-                                <th>Registration Date</th>
-                                <th style="width: 180px; text-align: center;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pendingTableBody">
-                            <!-- Populated by JS -->
-                        </tbody>
-                    </table>
+                    <div class="table-responsive-wrapper">
+                        <table id="pendingTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email Address</th>
+                                    <th>Registration Date</th>
+                                    <th style="width: 180px; text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pendingTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <!-- Section 2: Enrolled Students -->
-            <div>
+            <!-- Section 2: Enrolled Students (Regular) -->
+            <div style="margin-bottom: 3rem;">
                 <h2 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent-gold); display: flex; align-items: center; gap: 0.5rem;">
-                    Enrolled Cohort <span id="enrolledBadge" class="badge">0</span>
+                    Enrolled Regular Cohort <span id="enrolledBadge" class="badge">0</span>
                 </h2>
                 <div class="admin-table-container" style="margin-top: 0;">
-                    <table id="studentsTable">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Outreach</th>
-                                <th>Username</th>
-                                <th>Password</th>
-                                <th style="width: 200px;">Progress</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentsTableBody">
-                            <!-- Populated by JS -->
-                        </tbody>
-                    </table>
+                    <div class="table-responsive-wrapper">
+                        <table id="studentsTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Outreach</th>
+                                    <th>Username</th>
+                                    <th>Password</th>
+                                    <th style="width: 200px;">Progress</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Enrolled Students (Sit-In) -->
+            <div>
+                <h2 style="font-size: 1.5rem; margin-bottom: 1rem; color: #f59e0b; display: flex; align-items: center; gap: 0.5rem;">
+                    Enrolled Sit-In Cohort <span id="sitinBadge" class="badge" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">0</span>
+                </h2>
+                <div class="admin-table-container" style="margin-top: 0;">
+                    <div class="table-responsive-wrapper">
+                        <table id="sitinStudentsTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Outreach</th>
+                                    <th>Username</th>
+                                    <th>Password</th>
+                                    <th style="width: 200px;">Progress</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sitinStudentsTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -687,19 +718,21 @@
             <div class="glass-card" style="padding: 2rem; border-color: var(--glass-border); background: var(--bg-card);">
                 <h3 style="margin-bottom: 1.5rem; color: var(--accent-gold);">Announcements History</h3>
                 <div class="admin-table-container" style="margin-top: 0;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Title</th>
-                                <th>Message Snippet</th>
-                                <th style="width: 120px; text-align: center;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="announcementsTableBody">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
+                    <div class="table-responsive-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Title</th>
+                                    <th>Message Snippet</th>
+                                    <th style="width: 120px; text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="announcementsTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -740,19 +773,21 @@
             <div class="glass-card" style="padding: 2rem; border-color: var(--glass-border); background: var(--bg-card);">
                 <h3 style="margin-bottom: 1.5rem; color: var(--accent-gold);">Active Resources</h3>
                 <div class="admin-table-container" style="margin-top: 0;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Type</th>
-                                <th>Name</th>
-                                <th>URL</th>
-                                <th style="width: 120px; text-align: center;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="resourcesTableBody">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
+                    <div class="table-responsive-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Name</th>
+                                    <th>URL</th>
+                                    <th style="width: 120px; text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resourcesTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -857,7 +892,7 @@
 
             <!-- Instructors Grid/List -->
             <div class="glass-card" style="padding: 2rem; border-color: var(--glass-border);">
-                <div style="overflow-x: auto;">
+                <div class="table-responsive-wrapper">
                     <table style="width: 100%; border-collapse: collapse; text-align: left;">
                         <thead>
                             <tr style="border-bottom: 1.5px solid var(--accent-gold); font-size: 0.9rem; color: var(--accent-gold-light);">
@@ -1289,6 +1324,16 @@
                 if (rejected) {
                     showToast(`Rejected ${rejected.firstName} ${rejected.lastName}!`);
                     renderDashboard();
+                }
+            };
+
+            window.handleDeleteStudent = (id) => {
+                if (confirm("Are you sure you want to delete this student account? They will lose access immediately.")) {
+                    const success = AuthAPI.deleteStudent(id);
+                    if (success) {
+                        showToast("Student account deleted.");
+                        renderDashboard();
+                    }
                 }
             };
 
@@ -2751,9 +2796,15 @@
                 
                 const pendingList = students.filter(s => s.status === 'pending');
                 const enrolledList = students.filter(s => s.status === 'approved');
+                const regularEnrolledList = enrolledList.filter(s => !s.isSitIn);
+                const sitinEnrolledList = enrolledList.filter(s => s.isSitIn);
 
                 pendingBadge.innerText = pendingList.length;
-                enrolledBadge.innerText = enrolledList.length;
+                enrolledBadge.innerText = regularEnrolledList.length;
+                const sitinBadge = document.getElementById('sitinBadge');
+                if (sitinBadge) {
+                    sitinBadge.innerText = sitinEnrolledList.length;
+                }
 
                 // 3. Render Lesson Access Grid (in Course Builder panel)
                 const unlockedModules = AuthAPI.getUnlockedModules();
@@ -2870,53 +2921,76 @@
                     });
                 }
 
-                // 2. Render Enrolled Table
-                studentsTableBody.innerHTML = '';
-                if (enrolledList.length === 0) {
-                    studentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No enrolled students yet.</td></tr>';
-                } else {
-                    enrolledList.forEach(student => {
-                        const tr = document.createElement('tr');
-                        
-                        // Progress bar calculations
-                        const progress = student.progress || 0;
-                        const progressHtml = `
-                            <div style="display: flex; align-items: center; gap: 0.8rem;">
-                                <div style="flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
-                                    <div style="width: ${progress}%; height: 100%; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); border-radius: 3px;"></div>
-                                </div>
-                                <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-gold); min-width: 35px;">${progress}%</span>
+                // Helper to render student row
+                function createStudentRow(student) {
+                    const tr = document.createElement('tr');
+                    
+                    // Progress bar calculations
+                    const progress = student.progress || 0;
+                    const progressHtml = `
+                        <div style="display: flex; align-items: center; gap: 0.8rem;">
+                            <div style="flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                                <div style="width: ${progress}%; height: 100%; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); border-radius: 3px;"></div>
                             </div>
-                        `;
+                            <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-gold); min-width: 35px;">${progress}%</span>
+                        </div>
+                    `;
 
-                        // Answers button logic
-                        const actionHtml = `<button class="btn btn-secondary" onclick="viewStudentAnswers('${student.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; border-color: rgba(212, 175, 55, 0.4); font-family: var(--font-sans);">Open Portal</button>`;
+                    // Answers button logic
+                    const actionHtml = `
+                        <div style="display: flex; gap: 0.5rem; justify-content: center; align-items: center;">
+                            <button class="btn btn-secondary" onclick="viewStudentAnswers('${student.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; border-color: rgba(212, 175, 55, 0.4); font-family: var(--font-sans);">Open Portal</button>
+                            <button class="btn btn-secondary" onclick="handleDeleteStudent('${student.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; border-color: #ef4444; color: #ef4444; font-family: var(--font-sans);">Delete</button>
+                        </div>
+                    `;
 
-                        // Outreach assignment dropdown for admins
-                        const outreachColHtml = `
-                            <select onchange="handleUpdateStudentOutreach('${student.id}', this.value)" style="background: var(--bg-dark); color: var(--text-primary); border: 1px solid rgba(212,175,55,0.3); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-family: var(--font-sans);">
-                                <option value="" ${!student.outreach ? 'selected' : ''}>Unassigned</option>
-                                ${Array.from({length: 19}, (_, i) => i + 1).map(num => `
-                                    <option value="${num}" ${student.outreach === num.toString() ? 'selected' : ''}>Outreach ${num}</option>
-                                `).join('')}
-                            </select>
-                        `;
+                    // Outreach assignment dropdown for admins
+                    const outreachColHtml = `
+                        <select onchange="handleUpdateStudentOutreach('${student.id}', this.value)" style="background: var(--bg-dark); color: var(--text-primary); border: 1px solid rgba(212,175,55,0.3); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-family: var(--font-sans);">
+                            <option value="" ${!student.outreach ? 'selected' : ''}>Unassigned</option>
+                            ${Array.from({length: 19}, (_, i) => i + 1).map(num => `
+                                <option value="${num}" ${student.outreach === num.toString() ? 'selected' : ''}>Outreach ${num}</option>
+                            `).join('')}
+                        </select>
+                    `;
 
-                        const nameHtml = student.isSitIn 
-                            ? `<strong>${student.firstName} ${student.lastName}</strong> <span style="font-size: 0.65rem; color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); padding: 0.1rem 0.35rem; border-radius: 10px; background: rgba(245, 158, 11, 0.08); font-weight: normal; margin-left: 0.4rem; text-transform: uppercase; letter-spacing: 0.5px;">Sit-In</span>` 
-                            : `<strong>${student.firstName} ${student.lastName}</strong>`;
+                    const nameHtml = student.isSitIn 
+                        ? `<strong>${student.firstName} ${student.lastName}</strong> <span style="font-size: 0.65rem; color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); padding: 0.1rem 0.35rem; border-radius: 10px; background: rgba(245, 158, 11, 0.08); font-weight: normal; margin-left: 0.4rem; text-transform: uppercase; letter-spacing: 0.5px;">Sit-In</span>` 
+                        : `<strong>${student.firstName} ${student.lastName}</strong>`;
 
-                        tr.innerHTML = `
-                            <td>${nameHtml}</td>
-                            <td style="color: var(--text-secondary); font-size: 0.9rem;">${student.email}</td>
-                            <td>${outreachColHtml}</td>
-                            <td><span style="font-family: monospace; background: rgba(255,255,255,0.07); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9rem;">${student.username}</span></td>
-                            <td><span style="font-family: monospace; background: rgba(255,255,255,0.07); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9rem;">${student.password}</span></td>
-                            <td>${progressHtml}</td>
-                            <td>${actionHtml}</td>
-                        `;
-                        studentsTableBody.appendChild(tr);
+                    tr.innerHTML = `
+                        <td>${nameHtml}</td>
+                        <td style="color: var(--text-secondary); font-size: 0.9rem;">${student.email}</td>
+                        <td>${outreachColHtml}</td>
+                        <td><span style="font-family: monospace; background: rgba(255,255,255,0.07); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9rem;">${student.username}</span></td>
+                        <td><span style="font-family: monospace; background: rgba(255,255,255,0.07); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9rem;">${student.password}</span></td>
+                        <td>${progressHtml}</td>
+                        <td>${actionHtml}</td>
+                    `;
+                    return tr;
+                }
+
+                // 2. Render Enrolled Regular Table
+                studentsTableBody.innerHTML = '';
+                if (regularEnrolledList.length === 0) {
+                    studentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No enrolled regular students yet.</td></tr>';
+                } else {
+                    regularEnrolledList.forEach(student => {
+                        studentsTableBody.appendChild(createStudentRow(student));
                     });
+                }
+
+                // 3. Render Enrolled Sit-In Table
+                const sitinStudentsTableBody = document.getElementById('sitinStudentsTableBody');
+                if (sitinStudentsTableBody) {
+                    sitinStudentsTableBody.innerHTML = '';
+                    if (sitinEnrolledList.length === 0) {
+                        sitinStudentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No enrolled sit-in students yet.</td></tr>';
+                    } else {
+                        sitinEnrolledList.forEach(student => {
+                            sitinStudentsTableBody.appendChild(createStudentRow(student));
+                        });
+                    }
                 }
             }
 
@@ -3350,10 +3424,10 @@
                     snapshot.forEach(doc => {
                         const s = doc.data();
                         s.id = doc.id;
-                        if (s.isApproved) {
+                        if (s.status === 'approved') {
                             totalApproved++;
                             students.push(s);
-                        } else {
+                        } else if (s.status === 'pending') {
                             totalPending++;
                         }
                     });

@@ -516,3 +516,18 @@ body.light-theme {
 #dynamic-presentation-print-deck {
     display: none;
 }
+
+/* Responsive Table Wrapper Styles */
+.table-responsive-wrapper {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+}
+
+.table-responsive-wrapper table {
+    min-width: 800px; /* Ensures columns preserve readable breathing room */
+    width: 100%;
+    border-collapse: collapse;
+}

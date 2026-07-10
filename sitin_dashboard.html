@@ -526,23 +526,49 @@
                 const user = AuthAPI.getCurrentUser();
                 if (!user) return;
 
-                // Welcomes
-                document.getElementById('welcomeMessage').innerHTML = `Welcome back, <span>${user.firstName}!</span>`;
-                document.getElementById('userFullName').innerText = `${user.firstName} ${user.lastName}`;
-                document.getElementById('userAvatar').innerText = user.firstName.charAt(0).toUpperCase();
+                console.log("🛡️ Safely syncing user profile data to DOM elements...");
 
-                const userRoleEl = document.getElementById('userRole');
-                if (userRoleEl) {
-                    userRoleEl.innerText = `Sit-In Student`;
+                try {
+                    const welcomeMessageEl = document.getElementById('welcomeMessage');
+                    if (welcomeMessageEl) {
+                        welcomeMessageEl.innerHTML = `Welcome back, <span>${user.firstName}!</span>`;
+                    }
+                    
+                    const userFullNameEl = document.getElementById('userFullName');
+                    if (userFullNameEl) {
+                        userFullNameEl.innerText = `${user.firstName} ${user.lastName}`;
+                    }
+
+                    const userAvatarEl = document.getElementById('userAvatar');
+                    if (userAvatarEl) {
+                        userAvatarEl.innerText = user.firstName.charAt(0).toUpperCase();
+                    }
+
+                    const userRoleEl = document.getElementById('userRole');
+                    if (userRoleEl) {
+                        userRoleEl.innerText = `Sit-In Student`;
+                    }
+
+                    // Dynamic Progress Calculations
+                    const progress = user.progress || 0;
+                    const overallProgressTextEl = document.getElementById('overallProgressText');
+                    if (overallProgressTextEl) {
+                        overallProgressTextEl.innerText = `${progress}%`;
+                    }
+                    const overallProgressBarEl = document.getElementById('overallProgressBar');
+                    if (overallProgressBarEl) {
+                        overallProgressBarEl.style.width = `${progress}%`;
+                    }
+                } catch (domError) {
+                    console.warn("⚠️ Non-fatal DOM sync warning skipped during primary welcome render:", domError);
                 }
-
-                // Dynamic Progress Calculations
-                const progress = user.progress || 0;
-                document.getElementById('overallProgressText').innerText = `${progress}%`;
-                document.getElementById('overallProgressBar').style.width = `${progress}%`;
 
                 // Render Modules dynamically
                 const dynamicModulesContainer = document.getElementById('dynamicModulesContainer');
+                if (!dynamicModulesContainer) {
+                    console.warn("⚠️ dynamicModulesContainer element is missing, skipping module rendering.");
+                    return;
+                }
                 dynamicModulesContainer.innerHTML = '';
 
                 // Grab data via AuthAPI to ensure correct default fallbacks (e.g. defaultModules, ['module1'])
