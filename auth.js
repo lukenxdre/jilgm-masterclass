@@ -21,7 +21,7 @@ function triggerStorageSync(key) {
 }
 
 const jilgmChannel = (() => {
-    try { return new BroadcastChannel('jilgm_sync'); } catch(e) { return null; }
+    try { return new BroadcastChannel('jilgm_sync'); } catch (e) { return null; }
 })();
 
 function jilgmBroadcast(type, payload) {
@@ -100,7 +100,7 @@ const defaultModules = {
             { type: 'quote', content: '\"<strong>Closing Prayer:</strong><br>Lord Jesus, Chief Shepherd of our souls, we come before you humbled by the sacred trust of shepherd leadership. Restore what is broken in us. Deepen our love for you. Confirm our calling and correct our ambition. Give us the grace to bear the weight you have assigned, and the wisdom to care well for the souls you purchased with your own blood. May we one day hear, \'Well done, good and faithful servant.\' In your name we pray, Amen.\"' },
             { type: 'toggle_list', title: '📝 Homework & Memorization', content: '1. <strong>Read:</strong> 1 Peter 5:1-4 and Ezekiel 34:1-16<br>2. <strong>Journal:</strong> Write a 1-page reflection on your calling story—how did God call you, how has He confirmed it, and how has it been tested?<br>3. <strong>Memorize:</strong> Acts 20:28 (\"Pay careful attention to yourselves and to all the flock...\")' },
             { type: 'toggle_list', title: '📚 Reference & Citation Materials', content: '<strong>Books Cited:</strong><br>• Sanders, J. Oswald. <em>Spiritual Leadership: Principles of Excellence for Every Believer</em>. Chicago: Moody Publishers, 2007.<br>• Witmer, Timothy Z. <em>The Shepherd Leader: Achieving Effective Shepherding in Your Church</em>. Phillipsburg, NJ: P&R Publishing, 2010.<br>• MacArthur, John. <em>Pastoral Ministry: How to Shepherd Biblically</em>. Nashville: Thomas Nelson, 2005.<br>• Scazzero, Peter. <em>Emotionally Healthy Spirituality</em>. Grand Rapids: Zondervan, 2017.<br><br><strong>Additional Supporting Scriptures:</strong><br>• Psalm 78:70-72 (David as shepherd-king)<br>• Jeremiah 3:15 (God\'s promise of faithful shepherds)<br>• John 10:1-18 (Jesus as the Good Shepherd)<br>• 1 Peter 5:1-4 (Peter\'s charge to elders)<br>• Ezekiel 34 (God\'s indictment of unfaithful shepherds)' },
-                        { type: 'flip_card', icon: '🐑', front: 'What is Shepherd Leadership?', back: 'A sacred trust — given by Christ — to feed, tend, and protect souls purchased by His blood. It flows from love, not ambition.' },
+            { type: 'flip_card', icon: '🐑', front: 'What is Shepherd Leadership?', back: 'A sacred trust — given by Christ — to feed, tend, and protect souls purchased by His blood. It flows from love, not ambition.' },
             { type: 'true_false', statement: 'A pastor can effectively lead others even if their personal relationship with Christ is neglected.', correct: false, explanation: 'Jesus commissioned Peter only after restoring their relationship. Peter Scazzero warns: "The greatest gift you can give your congregation is your own transformation." Self-watch always comes before flock-watch (Acts 20:28).' },
             { type: 'multiple_choice', question: 'According to Acts 20:28, who makes someone an overseer of the church?', options: ['The church elder board', 'The bishop or denominational authority', 'The Holy Spirit', 'Personal gifting and ambition'], correct_index: 2, explanation: 'Acts 20:28 states clearly: "in which the Holy Spirit has made you overseers." Spiritual authority is divinely appointed, not humanly achieved.' },
             { type: 'question', content: 'Reflect on the five areas of personal reflection (Restoration, Love, Calling, Weight). Write a detailed journal response (minimum 20 characters) answering: How did you first sense God\'s call to shepherding leadership, and how is your relationship with Christ being examined and restored today?' }
@@ -176,7 +176,7 @@ const defaultModules = {
             { type: 'quote', content: '\"<strong>Closing Prayer:</strong><br>Father, thank you for the seriousness and beauty of pastoral ministry. Search our hearts and expose what is hidden. Form in us lives that are above reproach, homes that reflect your order and love, reputations that honor Christ, and maturity that can carry the weight of leadership. Guard us from pride, self-deception, and ambition without holiness. Make us faithful shepherds for the sake of your church. In Jesus\' name, Amen.\"' },
             { type: 'toggle_list', title: '📝 Homework & Memory Verse', content: '1. <strong>Read:</strong> 1 Peter 5:1-4 and 1 Timothy 4:12-16.<br>2. <strong>Reflection Action:</strong> Journal which qualification is currently strongest in your life, and which needs the most intentional growth.<br>3. <strong>Personal Step:</strong> Invite one mature believer or mentor to speak honestly into your readiness for ministry.<br>4. <strong>Memory Verse:</strong> Memorize 1 Timothy 3:2 or Titus 1:7-9.' },
             { type: 'toggle_list', title: '📚 Reference & Citation Materials', content: '<strong>Recommended Resources:</strong><br>• Sanders, J. Oswald. <em>Spiritual Leadership: Principles of Excellence for Every Believer</em>.<br>• Witmer, Timothy Z. <em>The Shepherd Leader: Achieving Effective Shepherding in Your Church</em>.<br>• MacArthur, John. <em>Pastoral Ministry: How to Shepherd Biblically</em>.<br>• Scazzero, Peter. <em>Emotionally Healthy Spirituality</em>.' },
-                        { type: 'matching', pairs: [ { left: 'Above reproach', right: 'No valid accusation against his character' }, { left: 'Husband of one wife', right: 'Devoted and faithful in marriage' }, { left: 'Hospitable', right: 'Opens home generously to others' }, { left: 'Able to teach', right: 'Skilled in communicating Scripture' } ] },
+            { type: 'matching', pairs: [{ left: 'Above reproach', right: 'No valid accusation against his character' }, { left: 'Husband of one wife', right: 'Devoted and faithful in marriage' }, { left: 'Hospitable', right: 'Opens home generously to others' }, { left: 'Able to teach', right: 'Skilled in communicating Scripture' }] },
             { type: 'true_false', statement: 'The biblical qualifications for a pastor are primarily about spiritual giftedness and preaching ability.', correct: false, explanation: 'Paul\'s lists in 1 Timothy 3 and Titus 1 focus overwhelmingly on character — being "above reproach," "self-controlled," "respectable." Ability to teach is listed, but character qualifications outnumber skills by roughly 10:1.' },
             { type: 'question', content: 'Reflect on the qualifications discussed. Write a detailed journal response (minimum 20 characters) answering: The qualification I most need God to deepen in me right now is...' },
             { type: 'file_upload', title: 'Module 2 Assignment: Personal Reflection & Action Plan', content: 'Upload your written reflection journal or video testimony showing how your character and home leadership are aligned with biblical standards. We accept images, videos, and documents.' }
@@ -323,7 +323,7 @@ const defaultModules = {
             { type: 'bullet_list', content: '- Prayer is not secondary to pastoral leadership — it is part of the work itself\n- The Word must shape the pastor before it is proclaimed through the pastor\n- Spiritual sensitivity is cultivated through surrender, Scripture, prayer, and obedience\n- Ministry activity is not the same as spiritual vitality\n- Pastoral longevity depends on hidden faithfulness, not visible busyness' },
             { type: 'quote', content: '"Closing Prayer (55-60 Minutes):<br>Lord, teach us to remain with you before we speak for you. Deliver us from empty service, self-reliance, and ministry that runs ahead of your Spirit. Deepen our life of prayer, root us in your Word, and keep our hearts tender before you. Make us shepherds whose public ministry flows from private faithfulness, and whose strength is found in abiding in Christ. In Jesus\' name, Amen."' },
             { type: 'toggle_list', title: '📝 Optional Homework for the Week', content: '1. <strong>Read:</strong> Acts 6:1-7; Psalm 1; John 15:1-8<br>2. <strong>Journal:</strong> Which spiritual discipline in my life has become most neglected, and what has that neglect produced in me?<br>3. <strong>Practice:</strong> Set aside one uninterrupted period this week for prayer and Scripture with no ministry output goal attached to it.<br>4. <strong>Memory Verse:</strong> Acts 6:4' },
-                        { type: 'flip_card', icon: '🙏', front: 'What is the difference between praying for ministry and praying in ministry?', back: 'Praying FOR ministry treats prayer as preparation for the "real work." Praying IN ministry means prayer IS the work — the primary spiritual act by which God accomplishes His purposes through the shepherd (Acts 6:4).' },
+            { type: 'flip_card', icon: '🙏', front: 'What is the difference between praying for ministry and praying in ministry?', back: 'Praying FOR ministry treats prayer as preparation for the "real work." Praying IN ministry means prayer IS the work — the primary spiritual act by which God accomplishes His purposes through the shepherd (Acts 6:4).' },
             { type: 'multiple_choice', question: 'In Acts 6:2-4, why did the apostles appoint deacons to handle food distribution?', options: ['They were too busy with administrative tasks', 'To protect their own authority and status', 'So they could devote themselves to prayer and the ministry of the Word', 'Because they disliked practical service work'], correct_index: 2, explanation: 'Acts 6:4 — "But we will devote ourselves to prayer and to the ministry of the word." The apostles understood that their primary calling was spiritual, and delegating administrative tasks freed them to fulfil it.' },
             { type: 'question', content: 'Reflect deeply on your current spiritual disciplines as a pastor or ministry leader. Write a detailed response (minimum 20 characters) answering: Which spiritual discipline (prayer, the Word, or spiritual sensitivity) needs the most intentional renewal in your life, and what concrete steps will you take this week?' }
         ]
@@ -405,7 +405,7 @@ const defaultModules = {
             { type: 'bullet_list', content: '- Biblical preaching begins with the command to preach the Word\n- Expository preaching lets the text set the message\n- Clear sermon structures serve faithful communication\n- Faithful preaching depends on faithful interpretation\n- The preacher is a steward under the authority of Scripture\n- Good preaching feeds, clarifies, convicts, and forms God\'s people' },
             { type: 'quote', content: '"Closing Prayer:<br>Lord, make us faithful stewards of your Word. Keep us from carelessness, pride, and distortion. Teach us to preach the text clearly, structure sermons wisely, interpret Scripture faithfully, and feed your people with truth. May our preaching honor Christ, strengthen the church, and bring conviction, hope, and transformation through the power of your Spirit. In Jesus\' name, Amen."' },
             { type: 'toggle_list', title: '📝 Optional Homework for the Week', content: '1. <strong>Read:</strong> 2 Timothy 3:14-17; 2 Timothy 4:1-5; Nehemiah 8:1-8<br>2. <strong>Journal:</strong> In what ways do my preaching show faithfulness to the text, and where am I most vulnerable to drifting from it?<br>3. <strong>Practice:</strong> Take one short passage and write its main idea in one sentence before outlining a sermon from it.<br>4. <strong>Memory Verse:</strong> 2 Timothy 4:2' },
-                        { type: 'matching', pairs: [ { left: 'Expository Preaching', right: 'Text of Scripture shapes the structure and content of the message' }, { left: 'Topical Preaching', right: 'A theme is explored using multiple passages' }, { left: 'Exegesis', right: 'Drawing meaning OUT of the text' }, { left: 'Eisegesis', right: 'Reading meaning INTO the text — a dangerous error' } ] },
+            { type: 'matching', pairs: [{ left: 'Expository Preaching', right: 'Text of Scripture shapes the structure and content of the message' }, { left: 'Topical Preaching', right: 'A theme is explored using multiple passages' }, { left: 'Exegesis', right: 'Drawing meaning OUT of the text' }, { left: 'Eisegesis', right: 'Reading meaning INTO the text — a dangerous error' }] },
             { type: 'true_false', statement: 'A preacher\'s primary responsibility is to make the sermon relevant and engaging to the modern audience.', correct: false, explanation: 'The preacher\'s primary responsibility is faithfulness to the biblical text. Relevance follows from faithful exposition — not from bending the text to fit cultural expectations. As John MacArthur writes, "The text itself is relevant; the preacher\'s job is to unleash it."' },
             { type: 'question', content: 'Reflect honestly on your current preaching practice. Write a detailed response (minimum 20 characters) answering: What is one specific change you will make in how you prepare or deliver sermons to ensure the biblical text, not your personal preferences, shapes your preaching?' }
         ]
@@ -519,7 +519,7 @@ const defaultModules = {
             { type: 'bullet_list', content: '- Pastoral care is central to shepherding, not secondary to it\n- Different people require different forms of care\n- Counseling begins with listening and aims at restoration\n- Visiting the sick and grieving requires presence, prayer, and gentleness\n- Crisis care requires calm, discernment, safety, and follow-up\n- Wise pastors know both their responsibilities and their limits\n- Pastoral care is strengthened when the whole church is equipped to care well' },
             { type: 'quote', content: '"Closing Prayer:<br>Lord Jesus, Chief Shepherd, make us tender without becoming weak, truthful without becoming harsh, and courageous without becoming self-reliant. Teach us to care for the hurting, guide the confused, strengthen the weak, and stand steady in crisis. Give us wisdom to know people well, love them faithfully, and serve them in ways that reflect your compassion and truth. In your name we pray. Amen."' },
             { type: 'toggle_list', title: '📝 Optional Homework for the Week', content: '1. <strong>Read:</strong> 1 Thessalonians 5:12-22; Galatians 6:1-5; James 5:13-16<br>2. <strong>Journal:</strong> Which area of pastoral care comes most naturally to me, and which do I tend to avoid?<br>3. <strong>Practice:</strong> Make one intentional pastoral care contact this week — visit, call, pray, or follow up with someone who is weak, grieving, or sick.<br>4. <strong>Ministry Audit:</strong> Identify one care burden you should share more wisely with trained leaders in the church.<br>5. <strong>Memory Verse:</strong> 1 Thessalonians 5:14' },
-                        { type: 'accordion', items: [ { title: 'Knowing — Personal connection', content: 'The shepherd knows the flock by name. John 10:14 — "I am the good shepherd. I know my own and my own know me." Pastoral care begins with genuine personal knowledge of each person.' }, { title: 'Feeding — Spiritual nourishment', content: 'Regular teaching, personal study encouragement, and Scripture-based counseling keep the flock spiritually healthy.' }, { title: 'Leading — Guiding toward God\'s purposes', content: 'The shepherd helps individuals discern God\'s direction, make wise decisions, and navigate life transitions.' }, { title: 'Protecting — Guarding from error and harm', content: 'False teaching, divisive people, and spiritual deception are real threats. The shepherd protects by teaching discernment and addressing error directly.' } ] },
+            { type: 'accordion', items: [{ title: 'Knowing — Personal connection', content: 'The shepherd knows the flock by name. John 10:14 — "I am the good shepherd. I know my own and my own know me." Pastoral care begins with genuine personal knowledge of each person.' }, { title: 'Feeding — Spiritual nourishment', content: 'Regular teaching, personal study encouragement, and Scripture-based counseling keep the flock spiritually healthy.' }, { title: 'Leading — Guiding toward God\'s purposes', content: 'The shepherd helps individuals discern God\'s direction, make wise decisions, and navigate life transitions.' }, { title: 'Protecting — Guarding from error and harm', content: 'False teaching, divisive people, and spiritual deception are real threats. The shepherd protects by teaching discernment and addressing error directly.' }] },
             { type: 'flip_card', icon: '🏥', front: 'What is the goal of pastoral counseling?', back: 'Not merely symptom management, but soul restoration — helping people understand their situation through a biblical lens, encounter Christ in their pain, and grow toward Christlikeness (Romans 8:28-29).' },
             { type: 'question', content: 'Reflect honestly on your current pastoral care practice. Write a detailed response (minimum 20 characters) answering: In what area of pastoral care (counseling, visitation, crisis response, or mobilizing the church body) do you feel least equipped, and what specific step will you take to grow in that area?' }
         ]
@@ -641,7 +641,7 @@ const defaultModules = {
             { type: 'bullet_list', content: '- Discipleship is central to the mission of the church, not a side ministry\n- Healthy discipleship must be intentional, biblical, and reproducible\n- Reproducing leaders is a necessary outcome of mature discipleship\n- Jesus modeled discipleship through presence, teaching, example, and correction, and mission\n- Small groups can become powerful environments for formation, care, and leadership development\n- Churches must distinguish activity from actual spiritual growth\n- A strong discipleship system helps move people from belief to maturity to multiplication' },
             { type: 'quote', content: '"Closing Prayer:<br>Lord Jesus, make us faithful disciple-makers. Teach us to form people patiently, truthfully, and relationally. Save us from shallow ministry that gathers crowds without producing maturity. Help us invest in others the way you invested in those you called to yourself, and grant that the people we serve would grow into faithful followers who strengthen others also. In your name we pray. Amen."' },
             { type: 'toggle_list', title: '📝 Optional Homework for the Week', content: '1. <strong>Read:</strong> 2 Timothy 2; Matthew 28:18-20; Acts 2:42-47<br>2. <strong>Journal:</strong> Where is discipleship in my ministry strongest, and where is it weakest?<br>3. <strong>Practice:</strong> Intentionally identify one person you should invest in over the next month.<br>4. <strong>Ministry Audit:</strong> Map the current discipleship pathway in your church and identify one major gap.<br>5. <strong>Memory Verse:</strong> 2 Timothy 2:2' },
-                        { type: 'multiple_choice', question: 'In Paul\'s discipleship model (2 Timothy 2:2), how many generations of disciples are described?', options: ['One — Paul to Timothy', 'Two — Paul and Timothy together', 'Three — Paul, Timothy, faithful men', 'Four — Paul, Timothy, faithful men, others also'], correct_index: 3, explanation: '2 Timothy 2:2 contains four generations: Paul → Timothy → faithful men → others also. This is the biblical DNA of multiplication — exponential Kingdom growth.' },
+            { type: 'multiple_choice', question: 'In Paul\'s discipleship model (2 Timothy 2:2), how many generations of disciples are described?', options: ['One — Paul to Timothy', 'Two — Paul and Timothy together', 'Three — Paul, Timothy, faithful men', 'Four — Paul, Timothy, faithful men, others also'], correct_index: 3, explanation: '2 Timothy 2:2 contains four generations: Paul → Timothy → faithful men → others also. This is the biblical DNA of multiplication — exponential Kingdom growth.' },
             { type: 'flip_card', icon: '🌱', front: 'What is the difference between addition and multiplication in discipleship?', back: 'Addition: one leader personally reaches one person at a time. Multiplication: each disciple makes disciples who make disciples. A church of multiplication eventually fills the earth (2 Timothy 2:2).' },
             { type: 'question', content: 'Reflect on your current approach to discipleship and leadership development. Write a detailed response (minimum 20 characters) answering: What is one specific change you will make in your discipleship practice, and who is one person you are committed to intentionally developing as a leader?' }
         ]
@@ -758,8 +758,8 @@ const defaultModules = {
             { type: 'bullet_list', content: '- Evangelism is a central part of church leadership, not a side ministry\n- Leaders help create either an evangelistic culture or an inward-looking one\n- Prayer, modeling, testimony, and training are essential in building evangelistic culture\n- Outreach ministries need gospel clarity, preparation, and follow-up\n- Community engagement can strengthen witness but it must not replace proclamation\n- The church must connect evangelism to disciple-making\n- Faithful evangelism leadership combines boldness, love, wisdom, and dependence on the Holy Spirit' },
             { type: 'quote', content: '"Closing Prayer:<br>Lord, give us faithful witnesses and wise leaders of your people. Give us courage without harshness, compassion without compromise, and zeal without self-reliance. Teach us to build churches that pray for the lost, speak the gospel clearly, serve the community sincerely, and welcome people into the life of discipleship. In Jesus\' name. Amen."' },
             { type: 'toggle_list', title: '📝 Optional Homework for the Week', content: '1. <strong>Read:</strong> Matthew 28:18-20; Acts 1:8; Colossians 4:2-6<br>2. <strong>Journal:</strong> What most weakens evangelistic culture in my ministry right now?<br>3. <strong>Practice:</strong> Have one intentional gospel conversation or invite one person into a meaningful spiritual conversation this week.<br>4. <strong>Ministry Audit:</strong> Evaluate one current outreach effort and identify whether it has prayer, gospel clarity, and follow-up.<br>5. <strong>Memory Verse:</strong> Acts 1:8' },
-                        { type: 'true_false', statement: 'Evangelism is primarily the responsibility of specially gifted individuals called evangelists, not the whole church body.', correct: false, explanation: 'Ephesians 4:11-12 shows that evangelists equip ALL the saints for the work of ministry. Acts 8:1-4 records that ordinary scattered believers "went about preaching the word." The whole church is a witnessing community.' },
-            { type: 'matching', pairs: [ { left: 'Go and make disciples', right: 'Matthew 28:19 — The Great Commission' }, { left: 'You will be my witnesses', right: 'Acts 1:8 — Jerusalem, Judea, Samaria, ends of the earth' }, { left: 'As the Father has sent me', right: 'John 20:21 — Incarnational sending model' }, { left: 'Preach the gospel to all creation', right: 'Mark 16:15 — Universal scope of the mission' } ] },
+            { type: 'true_false', statement: 'Evangelism is primarily the responsibility of specially gifted individuals called evangelists, not the whole church body.', correct: false, explanation: 'Ephesians 4:11-12 shows that evangelists equip ALL the saints for the work of ministry. Acts 8:1-4 records that ordinary scattered believers "went about preaching the word." The whole church is a witnessing community.' },
+            { type: 'matching', pairs: [{ left: 'Go and make disciples', right: 'Matthew 28:19 — The Great Commission' }, { left: 'You will be my witnesses', right: 'Acts 1:8 — Jerusalem, Judea, Samaria, ends of the earth' }, { left: 'As the Father has sent me', right: 'John 20:21 — Incarnational sending model' }, { left: 'Preach the gospel to all creation', right: 'Mark 16:15 — Universal scope of the mission' }] },
             { type: 'question', content: 'Reflect honestly on the evangelistic health of your ministry. Write a detailed response (minimum 20 characters) answering: What specific step will you take this week to strengthen evangelistic culture in your church or ministry context, and what personal fear or hesitation do you need to overcome?' }
         ]
     },
@@ -871,8 +871,8 @@ const defaultModules = {
             { type: 'bullet_list', content: '- Biblical leadership is modeled by Christ, not by worldly power structures\n- Servant leadership is central to Christian greatness\n- Real influence grows from character, credibility, and example\n- Humility and authority belong together in faithful leadership\n- Leadership distortions often appear strong while being spiritually unhealthy\n- God-centered leaders examine, not just do, but how they lead\n- Christlike leadership uses strength for the good of others and the glory of God' },
             { type: 'quote', content: '"Closing Prayer:<br>Lord Jesus, teach us to lead the way you lead. Save us from pride, fear that dominates, and self-reliance that suffocates. Form in us the servant heart of Jesus, humble strength, and faithful courage. Help us carry authority as steward under your lordship and use every gift for the good of your people and the honor of your name. Amen."' },
             { type: 'toggle_list', title: '📝 Optional Homework for the Week', content: '1. <strong>Read:</strong> Mark 10:35-45; John 13:1-17; Philippians 2:1-11<br>2. <strong>Journal:</strong> Which distortion am I most vulnerable to as a leader, and why?<br>3. <strong>Practice:</strong> Identify one concrete way to serve someone under your leadership this week without expecting recognition.<br>4. <strong>Ministry Audit:</strong> Ask one trusted person how your leadership feels in practice — supportive, controlling, unclear, or steady, approachable.<br>5. <strong>Memory Verse:</strong> Mark 10:44-45' },
-                        { type: 'flip_card', icon: '👑', front: 'What does servant leadership actually look like in practice?', back: 'It looks like Jesus washing feet (John 13) — the one with the most authority taking the lowest position. It means leading by example, absorbing cost rather than passing it on, and measuring success by the growth of others, not personal power.' },
-            { type: 'accordion', items: [ { title: 'Distortion 1 — Domineering Leadership (1 Peter 5:3)', content: '"Not domineering over those in your charge, but being examples to the flock." Domineering leaders coerce compliance through fear and suppress questioning. The antidote is transparent, accountable leadership.' }, { title: 'Distortion 2 — Celebrity Leadership', content: 'When the leader becomes the brand, the church becomes dependent on a personality rather than on Christ. Faithful leaders consistently redirect attention to Christ.' }, { title: 'Distortion 3 — Passive Leadership', content: 'Some leaders confuse humility with absence of direction. Servant leadership requires decisive courage — speaking truth, making hard calls, and steering the church toward faithfulness even when unpopular.' } ] },
+            { type: 'flip_card', icon: '👑', front: 'What does servant leadership actually look like in practice?', back: 'It looks like Jesus washing feet (John 13) — the one with the most authority taking the lowest position. It means leading by example, absorbing cost rather than passing it on, and measuring success by the growth of others, not personal power.' },
+            { type: 'accordion', items: [{ title: 'Distortion 1 — Domineering Leadership (1 Peter 5:3)', content: '"Not domineering over those in your charge, but being examples to the flock." Domineering leaders coerce compliance through fear and suppress questioning. The antidote is transparent, accountable leadership.' }, { title: 'Distortion 2 — Celebrity Leadership', content: 'When the leader becomes the brand, the church becomes dependent on a personality rather than on Christ. Faithful leaders consistently redirect attention to Christ.' }, { title: 'Distortion 3 — Passive Leadership', content: 'Some leaders confuse humility with absence of direction. Servant leadership requires decisive courage — speaking truth, making hard calls, and steering the church toward faithfulness even when unpopular.' }] },
             { type: 'question', content: 'Reflect honestly on your own leadership model. Write a detailed response (minimum 20 characters) answering: What leadership distortion are you most susceptible to, and what specific step will you take this week to lead more like Christ — with both servant humility and faithful authority?' }
         ]
     },
@@ -984,8 +984,8 @@ const defaultModules = {
             { type: 'bullet_list', content: '- Ministry decision making is a spiritual responsibility, not merely an administrative task\n- Biblical wisdom is essential for faithful leadership choices\n- Discernment helps leaders distinguish what is true, fitting, and best\n- Accountability protects leaders and strengthens trust\n- Wise counsel and transparency prevent lonely and costly ministry decisions\n- Wise decisions are shaped by prayer, Scripture, counsel, facts, and humility\n- Faithful leaders are not only decisive; they are teachable, discerning, and accountable' },
             { type: 'quote', content: '"Closing Prayer:<br>Lord, give us wisdom from above — pure, peaceable, gentle, open to reason, full of mercy and good fruits. Guard us from foolish haste, from pride that refuses counsel, and from fear that narrows our decisions. Lead us to lead with discernment, humility, and consecration so that our decisions may honor you and serve your people well. In Jesus\' name. Amen."' },
             { type: 'toggle_list', title: '📝 Optional Homework for the Week', content: '1. <strong>Read:</strong> James 1; Acts 6; Acts 15<br>2. <strong>Journal:</strong> What recent ministry decision best reveals my strengths and weaknesses as a leader?<br>3. <strong>Practice:</strong> Before making one important decision this week, pause to pray, gather counsel, and write down the biblical principles involved.<br>4. <strong>Ministry Audit:</strong> Identify one area where decision-making accountability needs to be strengthened in your ministry.<br>5. <strong>Memory Verse:</strong> James 1:5' },
-                        { type: 'multiple_choice', question: 'According to Proverbs 15:22, what happens to plans made without counsel?', options: ['They succeed through faith alone', 'They fail for lack of wisdom', 'They are established by God anyway', 'Plans fail, but with many advisers they succeed'], correct_index: 3, explanation: 'Proverbs 15:22 — "Without counsel plans fail, but with many advisers they succeed." Isolated decision-making is a warning sign of pride.' },
-            { type: 'matching', pairs: [ { left: 'Vision casting', right: 'Painting a compelling picture of God\'s preferred future' }, { left: 'Strategic planning', right: 'Identifying steps, resources, and timelines to reach goals' }, { left: 'Seeking counsel', right: 'Proverbs 15:22 — Safety in multiple advisors' }, { left: 'Evaluation', right: 'Honestly assessing what worked, what didn\'t, and why' } ] },
+            { type: 'multiple_choice', question: 'According to Proverbs 15:22, what happens to plans made without counsel?', options: ['They succeed through faith alone', 'They fail for lack of wisdom', 'They are established by God anyway', 'Plans fail, but with many advisers they succeed'], correct_index: 3, explanation: 'Proverbs 15:22 — "Without counsel plans fail, but with many advisers they succeed." Isolated decision-making is a warning sign of pride.' },
+            { type: 'matching', pairs: [{ left: 'Vision casting', right: 'Painting a compelling picture of God\'s preferred future' }, { left: 'Strategic planning', right: 'Identifying steps, resources, and timelines to reach goals' }, { left: 'Seeking counsel', right: 'Proverbs 15:22 — Safety in multiple advisors' }, { left: 'Evaluation', right: 'Honestly assessing what worked, what didn\'t, and why' }] },
             { type: 'question', content: 'Reflect honestly on how you currently make ministry decisions. Write a detailed response (minimum 20 characters) answering: What is the greatest danger in your decision-making process (haste, fear, pride, isolation, or fatigue), and what specific changes will you make to ensure your decisions are shaped by biblical wisdom, counsel, and prayer?' }
         ]
     },
@@ -1009,7 +1009,7 @@ const defaultModules = {
             { type: 'text', content: 'The following is a recommended 60-minute outline for the session:<br><br>• <strong>0-5 min</strong>: Opening, prayer, and framing. <em>Purpose: Establish conflict resolution as a normal and necessary leadership responsibility.</em><br>• <strong>5-18 min</strong>: Part 1: Church conflict causes. <em>Purpose: Identify why conflict arises in church life and ministry.</em><br>• <strong>18-30 min</strong>: Part 2: Biblical reconciliation. <em>Purpose: Teach the scriptural pattern for addressing and restoring conflict.</em><br>• <strong>30-40 min</strong>: Part 3: Protecting unity. <em>Purpose: Show how leaders guard unity without compromising truth.</em><br>• <strong>40-50 min</strong>: Part 4: Common mistakes and practical conflict wisdom. <em>Purpose: Expose destructive patterns and provide helpful responses.</em><br>• <strong>50-57 min</strong>: Part 5: Personal diagnostics and reflection. <em>Purpose: Help participants examine their own conflict patterns.</em><br>• <strong>57-60 min</strong>: Summary and closing prayer. <em>Purpose: Reinforce key truths and end in consecration.</em>' },
             { type: 'divider' },
             { type: 'header_h2', content: 'Opening Segment (0-5 Minutes)' },
-            { type: 'text', content: 'Begin by asking the participants this opening question:<br><br><strong>"What usually damages a church more — the existence of conflict, or the way conflict is handled?"</strong><br><br>Allow a few brief responses. Then explain that while conflict itself can be painful, mishandled conflict often does the greater damage. Churches are not harmed only by disagreement, but by gossip, pride, silence, public escalation, and the refusal to pursue truth and reconciliation.' } ,
+            { type: 'text', content: 'Begin by asking the participants this opening question:<br><br><strong>"What usually damages a church more — the existence of conflict, or the way conflict is handled?"</strong><br><br>Allow a few brief responses. Then explain that while conflict itself can be painful, mishandled conflict often does the greater damage. Churches are not harmed only by disagreement, but by gossip, pride, silence, public escalation, and the refusal to pursue truth and reconciliation.' },
             { type: 'quote', content: '<strong>Opening Statement for the Teacher:</strong><br>Conflict is not always a sign that ministry has failed. Sometimes it is simply the result of people living and serving closely together in a fallen world. The real test is whether leaders respond with biblical wisdom. Some leaders inflame conflict by harshness. Others deepen it by avoidance. But faithful shepherds learn to move toward conflict with humility, truth, patience, and a desire for restoration. Protecting the church\'s unity does not mean pretending peace exists when it does not. It means pursuing peace in a way that honors Christ.' },
             { type: 'text', content: '<strong>Opening Prayer:</strong><br><em>Father, teach us to handle conflict in ways that reflect your truth, holiness, mercy, and peace. Guard us from pride, gossip, anger, fear, and avoidance. Make us courageous in reconciliation, careful in speech, and faithful in promoting the unity of your people. In Jesus\' name, Amen.</em>' },
             { type: 'divider' },
@@ -1084,16 +1084,18 @@ const defaultModules = {
             { type: 'divider' },
             { type: 'header_h2', content: 'Part 4: Common Mistakes and Practical Conflict Wisdom (40-50 Minutes)' },
             { type: 'text', content: '<strong>Teaching Aim:</strong> Participants should identify destructive conflict habits and gain practical guidance for responding wisely.' },
-            { type: 'accordion', items: [
-                { title: 'A. Avoiding the issue too long', content: 'What begins as discomfort can become deeper distrust when left unaddressed.' },
-                { title: 'B. Speaking to others before speaking to the person involved', content: 'This often multiplies confusion and hardens positions.' },
-                { title: 'C. Assuming motives', content: 'People often interpret actions through suspicion instead of asking questions carefully.' },
-                { title: 'D. Escalating too quickly', content: 'Not every issue should become public, formal, or disciplinary immediately.' },
-                { title: 'E. Using Scripture as a weapon', content: 'Truth should heal, correct, and restore, not merely overpower.' },
-                { title: 'F. Taking sides too quickly', content: 'Leaders who listen selectively often lose credibility and worsen divisions.' },
-                { title: 'G. Confusing peacekeeping with peacemaking', content: 'Peacekeeping avoids discomfort. Peacemaking moves toward truth for the sake of real peace.' },
-                { title: 'H. Failing to follow up after reconciliation efforts', content: 'A hard conversation may begin the process, but leaders should also watch for lingering pain, confusion, or relational fragility.' }
-            ] },
+            {
+                type: 'accordion', items: [
+                    { title: 'A. Avoiding the issue too long', content: 'What begins as discomfort can become deeper distrust when left unaddressed.' },
+                    { title: 'B. Speaking to others before speaking to the person involved', content: 'This often multiplies confusion and hardens positions.' },
+                    { title: 'C. Assuming motives', content: 'People often interpret actions through suspicion instead of asking questions carefully.' },
+                    { title: 'D. Escalating too quickly', content: 'Not every issue should become public, formal, or disciplinary immediately.' },
+                    { title: 'E. Using Scripture as a weapon', content: 'Truth should heal, correct, and restore, not merely overpower.' },
+                    { title: 'F. Taking sides too quickly', content: 'Leaders who listen selectively often lose credibility and worsen divisions.' },
+                    { title: 'G. Confusing peacekeeping with peacemaking', content: 'Peacekeeping avoids discomfort. Peacemaking moves toward truth for the sake of real peace.' },
+                    { title: 'H. Failing to follow up after reconciliation efforts', content: 'A hard conversation may begin the process, but leaders should also watch for lingering pain, confusion, or relational fragility.' }
+                ]
+            },
             { type: 'toggle_list', title: '🛠️ Practical Wisdom for Conflict Conversations', content: 'Follow this basic framework to move from reaction to a redemptive process:<br><br>1. <strong>Pray before the conversation:</strong> Seek God\'s heart and self-control first.<br>2. <strong>Clarify the issue carefully:</strong> Separate facts from emotions and rumors.<br>3. <strong>Speak directly to the right person:</strong> Avoid triangulation and gossip.<br>4. <strong>Use calm, truthful, specific language:</strong> Describe events and feelings clearly without hyperbole.<br>5. <strong>Listen fully before responding:</strong> Seek first to understand before being understood.<br>6. <strong>Own your part where necessary:</strong> Apologize sincerely for any mistakes or harsh tone.<br>7. <strong>Seek repentance, understanding, or clarification:</strong> Focus on restoring truth and grace.<br>8. <strong>Pursue forgiveness and practical next steps:</strong> Agree on boundaries and accountability.<br>9. <strong>Involve others only when appropriate:</strong> Follow Matthew 18:16 guidelines if private steps fail.<br>10. <strong>Follow up afterward:</strong> Nurture the relationship and check progress.' },
             { type: 'quote', content: '<strong>Teacher Illustration:</strong><br>Use this statement: <em>"Many conflicts do not become destructive because they exist. They become destructive because people handle them indirectly, emotionally, and without truth."</em>' },
             { type: 'divider' },
@@ -1109,7 +1111,7 @@ const defaultModules = {
             { type: 'toggle_list', title: '📝 Optional Homework for the Week', content: '1. <strong>Read:</strong> Matthew 18:15-20; Ephesians 4:1-32; James 3:13-18<br>2. <strong>Journal:</strong> What is my usual conflict pattern, and how has it helped or harmed ministry?<br>3. <strong>Practice:</strong> Identify one unresolved tension and take one biblical step toward direct, peaceful resolution.<br>4. <strong>Ministry Audit:</strong> Consider whether gossip, silence, unclear communication, or avoidance is weakening unity in your ministry context.<br>5. <strong>Memory Verse:</strong> Ephesians 4:3' },
             { type: 'quote', content: '<strong>Short Teacher Wrap-Up Statement:</strong><br>Conflict resolution is where a leader\'s theology of grace, truth, holiness, and unity becomes visible in real relationships. It is one thing to preach peace; it is another to pursue it through hard conversations, humble repentance, and faithful reconciliation. Wise leaders do not merely react to conflict — they help redeem it for the health of Christ\'s church.' },
             { type: 'multiple_choice', question: 'According to Matthew 18:15, what is the critical first step in resolving a personal offense?', options: ['Tell a trusted friend or leader first', 'Go directly and tell them their fault alone', 'Address it publicly in a group meeting', 'Wait until they realize their mistake and apologize'], correct_index: 1, explanation: 'Matthew 18:15 — "If your brother sins against you, go and tell him his fault, between you and him alone." Private directness preserves dignity and prevents gossip.' },
-            { type: 'matching', pairs: [ { left: 'Peacemaking', right: 'Pursuing truth, repentance, and restored relationships' }, { left: 'Peacekeeping', right: 'Avoiding tension or hard talks to keep a superficial calm' }, { left: 'Triangulation', right: 'Involving a third person in a conflict instead of speaking directly' }, { left: 'Directness', right: 'Going to the person privately (Matthew 18:15)' } ] },
+            { type: 'matching', pairs: [{ left: 'Peacemaking', right: 'Pursuing truth, repentance, and restored relationships' }, { left: 'Peacekeeping', right: 'Avoiding tension or hard talks to keep a superficial calm' }, { left: 'Triangulation', right: 'Involving a third person in a conflict instead of speaking directly' }, { left: 'Directness', right: 'Going to the person privately (Matthew 18:15)' }] },
             { type: 'question', content: 'Reflect honestly on your personal conflict instincts. Write a detailed response (minimum 20 characters) answering: Are you more prone to conflict avoidance (peacekeeping) or aggressive confrontation, and what specific biblical principle or practice from this lesson will you implement to pursue redemptive reconciliation?' },
             { type: 'file_upload', title: 'Module 11 Assignment', content: 'Upload your completed Conflict Reflection Journal or Ministry Unity Audit for this week.' }
         ]
@@ -1154,7 +1156,7 @@ async function syncFromCloud() {
                 localStorage.setItem(CONTENT_KEY, JSON.stringify(data));
             }
         }
-        
+
         const resUnlock = await fetch(SYNC_URL + 'unlocked');
         if (resUnlock.ok) {
             const data = await resUnlock.json();
@@ -1386,6 +1388,14 @@ function initFirestoreSync(onCollectionLoaded) {
                 firebaseDb.collection('modules_content').doc('module11').set(defaultModules['module11'])
                     .catch(err => console.error("Error migrating module11 in Firestore", err));
             }
+            // Future-proof safe seeding check for newly configured modules (e.g. Modules 12–16)
+            Object.keys(defaultModules).forEach(id => {
+                if (!mods[id]) {
+                    console.log(`Safe Seeding: Deploying newly configured module ${id} to Firestore...`);
+                    firebaseDb.collection('modules_content').doc(id).set(defaultModules[id])
+                        .catch(err => console.error(`Error seeding newly configured module ${id} in Firestore`, err));
+                }
+            });
         }
 
         localStorage.setItem(CONTENT_KEY, JSON.stringify(mods));
@@ -1515,7 +1525,7 @@ function initFirestoreSync(onCollectionLoaded) {
                 list.push({ id: doc.id, ...doc.data() });
             });
             localStorage.setItem('jilgm_instructors', JSON.stringify(list));
-            
+
             // Sync current instructor session if they are logged in
             const currentInst = AuthAPI.getCurrentInstructor();
             if (currentInst) {
@@ -1524,7 +1534,7 @@ function initFirestoreSync(onCollectionLoaded) {
                     localStorage.setItem('jilgm_current_instructor', JSON.stringify(freshInst));
                 }
             }
-            
+
             triggerStorageSync('jilgm_instructors');
             markLoaded('instructors');
         }, err => {
@@ -1559,7 +1569,7 @@ async function saveFirebaseConfigToBootstrap(configObj) {
             method: 'POST',
             headers: { 'Content-Length': '0' }
         });
-    } catch(e) {
+    } catch (e) {
         console.error("Failed to upload Firebase configuration to bootstrap service:", e);
     }
 }
@@ -1570,7 +1580,7 @@ async function clearFirebaseConfigFromBootstrap() {
             method: 'POST',
             headers: { 'Content-Length': '0' }
         });
-    } catch(e) {
+    } catch (e) {
         console.error("Failed to clear Firebase configuration from bootstrap service:", e);
     }
 }
@@ -1587,14 +1597,14 @@ window.syncPromise = (async () => {
                 try {
                     const decoded = fromHex(rawVal);
                     cloudConfig = JSON.parse(decoded);
-                } catch(err) {
+                } catch (err) {
                     console.error("Error decoding bootstrap Firebase configuration:", err);
                 }
             }
         }
-        
+
         const localConfigStr = localStorage.getItem('jilgm_firebase_config');
-        
+
         if (cloudConfig && typeof cloudConfig === 'object' && cloudConfig.apiKey) {
             localStorage.setItem('jilgm_firebase_config', JSON.stringify(cloudConfig));
         } else if (localConfigStr) {
@@ -1604,9 +1614,9 @@ window.syncPromise = (async () => {
                     console.log("Backing up local Firebase configuration to the bootstrap cloud...");
                     await saveFirebaseConfigToBootstrap(localConfig);
                 }
-            } catch(err) {}
+            } catch (err) { }
         }
-    } catch(e) {
+    } catch (e) {
         console.warn("Bootstrap cloud fetch for Firebase configuration offline or skipped:", e);
     }
 
@@ -1631,7 +1641,7 @@ window.syncPromise = (async () => {
                 } catch (err) {
                     console.error("Error reading config for initialization in auth.js:", err);
                 }
-                
+
                 // Avoid initializing app if already initialized
                 if (firebase.apps.length === 0) {
                     firebase.initializeApp(configToUse);
@@ -1719,7 +1729,7 @@ const AuthAPI = {
             return [];
         }
     },
-    
+
     // Step 1: Enrollee registers (Pending Status)
     registerStudent: async (firstName, lastName, email, outreach = "", isSitIn = false) => {
         if (!isFirebaseInitialized || !firebaseDb) {
@@ -1731,11 +1741,11 @@ const AuthAPI = {
                 .where('email', '==', email)
                 .get();
             const snapshot = await withTimeout(snapshotPromise, 8000, "Registration check timed out. Please check your internet connection.");
-            
+
             if (!snapshot.empty) {
                 return { error: 'Email already registered.' };
             }
-            
+
             const newStudent = {
                 firstName,
                 lastName,
@@ -1749,7 +1759,7 @@ const AuthAPI = {
                 dateAdded: new Date().toISOString(),
                 isSitIn: !!isSitIn
             };
-            
+
             const docRef = firebaseDb.collection('students').doc();
             newStudent.id = docRef.id;
             await withTimeout(docRef.set(newStudent), 8000, "Saving registration timed out. Please try again.");
@@ -1760,7 +1770,7 @@ const AuthAPI = {
         }
     },
 
-    
+
     // Step 2: Admin approves and generates credentials
     approveStudent: (id) => {
         if (!isFirebaseInitialized || !firebaseDb) {
@@ -1769,14 +1779,14 @@ const AuthAPI = {
         }
         const students = AuthAPI.getAllStudents();
         const index = students.findIndex(s => s.id === id);
-        
+
         if (index !== -1) {
             const student = { ...students[index] };
             if (student.status === 'pending') {
                 student.status = 'approved';
                 student.username = (student.firstName.charAt(0) + student.lastName).toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(Math.random() * 100);
                 student.password = Math.random().toString(36).slice(-8);
-                
+
                 firebaseDb.collection('students').doc(id).update({
                     status: student.status,
                     username: student.username,
@@ -1802,7 +1812,7 @@ const AuthAPI = {
             const student = { ...students[index] };
             if (student.status === 'pending') {
                 student.status = 'rejected';
-                
+
                 firebaseDb.collection('students').doc(id).update({
                     status: student.status
                 }).catch(err => {
@@ -1835,13 +1845,13 @@ const AuthAPI = {
                 const doc = snapshot.docs[0];
                 return { id: doc.id, ...doc.data() };
             }
-        } catch(e) {
+        } catch (e) {
             console.error("Firestore checkStatus error", e);
         }
         return null;
     },
 
-    
+
     // Step 4: Answer submission and progress update (supports text, file uploads, and component index grading)
     submitAnswer: (userId, moduleId, question, answerText, fileData = null, componentIndex = null, extra = null) => {
         if (!isFirebaseInitialized || !firebaseDb) {
@@ -1850,21 +1860,21 @@ const AuthAPI = {
         }
         const students = AuthAPI.getAllStudents();
         const index = students.findIndex(s => s.id === userId);
-        
+
         if (index !== -1) {
             const student = { ...students[index] };
             if (!student.answers) {
                 student.answers = [];
             }
-            
+
             // Match by componentIndex if provided, otherwise fallback to question + moduleId
-            const existingIndex = student.answers.findIndex(a => 
-                a.moduleId === moduleId && 
+            const existingIndex = student.answers.findIndex(a =>
+                a.moduleId === moduleId &&
                 (componentIndex !== null ? a.componentIndex === componentIndex : a.question === question)
             );
-            
+
             let updatedAnswers = [...student.answers];
-            
+
             const newAnswerObj = {
                 moduleId,
                 componentIndex: componentIndex !== null ? componentIndex : null,
@@ -1897,9 +1907,9 @@ const AuthAPI = {
             } else {
                 updatedAnswers.push(newAnswerObj);
             }
-            
+
             student.answers = updatedAnswers;
-            
+
             // Dynamic progress calculation based on unique modules completed relative to total modules
             const mods = AuthAPI.getModulesContent();
             const totalModules = Object.keys(mods).length || 1;
@@ -1909,7 +1919,7 @@ const AuthAPI = {
                     .map(a => a.moduleId)
             )].filter(id => mods[id]);
             student.progress = Math.round(Math.min(100, (completedModuleIds.length / totalModules) * 100));
-            
+
             firebaseDb.collection('students').doc(userId).update({
                 answers: student.answers,
                 progress: student.progress
@@ -1917,7 +1927,7 @@ const AuthAPI = {
                 console.error("Firestore submit answer error", err);
                 alert("Database Error: " + err.message);
             });
-            
+
             // Update local session synchronously for quick local rendering
             const currentUser = AuthAPI.getCurrentUser();
             if (currentUser && currentUser.id === userId) {
@@ -1938,7 +1948,7 @@ const AuthAPI = {
         if (index !== -1) {
             const student = { ...students[index] };
             if (!student.answers) student.answers = [];
-            
+
             const ansIndex = student.answers.findIndex(a => a.moduleId === moduleId && a.componentIndex === componentIndex);
             if (ansIndex !== -1) {
                 const ans = { ...student.answers[ansIndex] };
@@ -1946,16 +1956,16 @@ const AuthAPI = {
                 ans.teacherRemarksDate = new Date().toISOString();
                 ans.teacherRemarksAdmin = adminName || 'Admin';
                 ans.remarksRead = false; // flag for student notification
-                
+
                 student.answers[ansIndex] = ans;
-                
+
                 firebaseDb.collection('students').doc(studentId).update({
                     answers: student.answers
                 }).catch(err => {
                     console.error("Firestore save teacher remark error", err);
                     alert("Database Error: " + err.message);
                 });
-                
+
                 jilgmBroadcast('remarks_updated', { studentId, moduleId, componentIndex });
                 return { success: true };
             }
@@ -1989,7 +1999,7 @@ const AuthAPI = {
                     }
                     return a;
                 });
-                
+
                 if (changed) {
                     firebaseDb.collection('students').doc(studentId).update({
                         answers: student.answers
@@ -1997,7 +2007,7 @@ const AuthAPI = {
                         console.error("Firestore mark remarks read error", err);
                         alert("Database Error: " + err.message);
                     });
-                    
+
                     const currentUser = AuthAPI.getCurrentUser();
                     if (currentUser && currentUser.id === studentId) {
                         localStorage.setItem(SESSION_KEY, JSON.stringify(student));
@@ -2025,20 +2035,20 @@ const AuthAPI = {
                 localStorage.setItem(SESSION_KEY, JSON.stringify(user));
                 return true;
             }
-        } catch(e) {
+        } catch (e) {
             console.error("Firestore login error", e);
         }
         return false;
     },
 
-    
+
     logout: () => {
         const user = AuthAPI.getCurrentUser();
         const isSitIn = user && user.isSitIn;
         localStorage.removeItem(SESSION_KEY);
         window.location.href = isSitIn ? 'sitin_login.html' : 'login.html';
     },
-    
+
     getCurrentUser: () => {
         try {
             const user = localStorage.getItem(SESSION_KEY);
@@ -2048,7 +2058,7 @@ const AuthAPI = {
             return null;
         }
     },
-    
+
     requireAuth: (expectSitIn = false) => {
         const user = AuthAPI.getCurrentUser();
         if (!user) {
@@ -2061,7 +2071,7 @@ const AuthAPI = {
             AuthAPI.logout();
         }
     },
-    
+
     getUnlockedModules: () => {
         try {
             const data = localStorage.getItem(UNLOCKED_KEY);
@@ -2071,7 +2081,7 @@ const AuthAPI = {
             return ['module1'];
         }
     },
-    
+
     setModuleUnlocked: (moduleId, isUnlocked) => {
         let unlocked = AuthAPI.getUnlockedModules();
         if (!isFirebaseInitialized || !firebaseDb) {
@@ -2085,7 +2095,7 @@ const AuthAPI = {
         } else {
             unlocked = unlocked.filter(id => id !== moduleId);
         }
-        
+
         firebaseDb.collection('settings').doc('unlocked_modules').set({ list: unlocked })
             .catch(err => console.error("Firestore set module unlocked error", err));
         // Trigger recalculation for all students under Firestore
@@ -2093,7 +2103,7 @@ const AuthAPI = {
             const batch = firebaseDb.batch();
             snapshot.forEach(doc => {
                 const student = doc.data();
-                const completedCount = unlocked.filter(modId => 
+                const completedCount = unlocked.filter(modId =>
                     (student.answers || []).some(a => a.moduleId === modId && a.type === 'lesson_completion')
                 ).length;
                 const progress = unlocked.length > 0 ? Math.round((completedCount / unlocked.length) * 100) : 0;
@@ -2103,7 +2113,7 @@ const AuthAPI = {
         });
         return unlocked;
     },
-    
+
     isModuleUnlocked: (moduleId) => {
         const unlocked = AuthAPI.getUnlockedModules();
         return unlocked.includes(moduleId);
@@ -2132,7 +2142,7 @@ const AuthAPI = {
                 if (Array.isArray(parsed) && parsed.length > 0) return parsed;
             }
             return Object.keys(AuthAPI.getModulesContent());
-        } catch(e) {
+        } catch (e) {
             return Object.keys(AuthAPI.getModulesContent());
         }
     },
@@ -2176,10 +2186,10 @@ const AuthAPI = {
                 { type: 'text', content: "Welcome to this new module. Add some content here." }
             ]
         };
-        
+
         const docRef = firebaseDb.collection('modules_content').doc();
         docRef.set(newMod).catch(err => console.error("Firestore add module error", err));
-        
+
         let order = AuthAPI.getModuleOrder();
         if (!order.includes(docRef.id)) {
             order.push(docRef.id);
@@ -2210,7 +2220,7 @@ const AuthAPI = {
                 ...mod,
                 archivedAt: new Date().toISOString()
             }).catch(err => console.error("Firestore archive module error", err));
-            
+
             // Also remove from unlocked list
             let unlocked = AuthAPI.getUnlockedModules();
             unlocked = unlocked.filter(id => id !== moduleId);
@@ -2219,7 +2229,7 @@ const AuthAPI = {
             let order = AuthAPI.getModuleOrder();
             order = order.filter(id => id !== moduleId);
             AuthAPI.saveModuleOrder(order);
-            
+
             return true;
         }
         return false;
@@ -2240,7 +2250,7 @@ const AuthAPI = {
                 };
                 firebaseDb.collection('modules_content').doc(moduleId).set(restoredMod);
                 firebaseDb.collection('archived_modules').doc(moduleId).delete();
-                
+
                 let order = AuthAPI.getModuleOrder();
                 if (!order.includes(moduleId)) {
                     order.push(moduleId);
@@ -2262,7 +2272,7 @@ const AuthAPI = {
                     date: new Date().toISOString()
                 }
             ];
-        } catch(e) {
+        } catch (e) {
             return [];
         }
     },
@@ -2277,7 +2287,7 @@ const AuthAPI = {
             content,
             date: new Date().toISOString()
         };
-        
+
         const docRef = firebaseDb.collection('announcements').doc();
         newAnn.id = docRef.id;
         docRef.set(newAnn).catch(err => console.error("Firestore add announcement error", err));
@@ -2310,7 +2320,7 @@ const AuthAPI = {
                     url: 'https://example.com/slides'
                 }
             ];
-        } catch(e) {
+        } catch (e) {
             return [];
         }
     },
@@ -2325,7 +2335,7 @@ const AuthAPI = {
             type,
             url
         };
-        
+
         const docRef = firebaseDb.collection('resources').doc();
         newRes.id = docRef.id;
         docRef.set(newRes).catch(err => console.error("Firestore add resource error", err));
@@ -2350,7 +2360,7 @@ const AuthAPI = {
                 isMain: true,
                 displayName: 'JILGM RiyadhRC'
             }];
-        } catch(e) {
+        } catch (e) {
             return [{
                 username: 'JILGM RiyadhRC',
                 password: '061577D',
@@ -2385,13 +2395,13 @@ const AuthAPI = {
             if (parsed) {
                 const uName = (parsed.username || '').toLowerCase();
                 const roleVal = (parsed.ROLE || parsed.role || '').toLowerCase();
-                const isValidAdmin = uName === 'jilgm riyadhrc' || 
-                                     uName === 'master_root' || 
-                                     uName === 'masterroot' || 
-                                     roleVal === 'master_root' || 
-                                     roleVal === 'masterroot' || 
-                                     parsed.isAdmin === true;
-                
+                const isValidAdmin = uName === 'jilgm riyadhrc' ||
+                    uName === 'master_root' ||
+                    uName === 'masterroot' ||
+                    roleVal === 'master_root' ||
+                    roleVal === 'masterroot' ||
+                    parsed.isAdmin === true;
+
                 if (!isValidAdmin) {
                     localStorage.removeItem('jilgm_current_admin');
                     return null;
@@ -2408,7 +2418,7 @@ const AuthAPI = {
                 }
             }
             return parsed;
-        } catch(e) {
+        } catch (e) {
             return null;
         }
     },
@@ -2416,10 +2426,10 @@ const AuthAPI = {
     updateAdminDisplayName: (newDisplayName) => {
         const admin = AuthAPI.getCurrentAdmin();
         if (!admin) return Promise.resolve({ error: 'Not authenticated as admin' });
-        
+
         admin.displayName = newDisplayName;
         localStorage.setItem('jilgm_current_admin', JSON.stringify(admin));
-        
+
         // Update list cache
         const data = localStorage.getItem('jilgm_admins');
         if (data) {
@@ -2430,18 +2440,18 @@ const AuthAPI = {
                 localStorage.setItem('jilgm_admins', JSON.stringify(list));
             }
         }
-        
+
         triggerStorageSync('jilgm_current_admin');
         triggerStorageSync('jilgm_admins');
-        
+
         if (isFirebaseInitialized && firebaseDb) {
             return firebaseDb.collection('admins').doc('JILGM RiyadhRC').update({
                 displayName: newDisplayName
             }).then(() => ({ success: true }))
-              .catch(err => {
-                  console.error("Firestore update admin display name error", err);
-                  return { error: err.message };
-              });
+                .catch(err => {
+                    console.error("Firestore update admin display name error", err);
+                    return { error: err.message };
+                });
         }
         return Promise.resolve({ success: true });
     },
@@ -2462,7 +2472,7 @@ const AuthAPI = {
         try {
             const data = localStorage.getItem('jilgm_instructors');
             return data ? JSON.parse(data) : [];
-        } catch(e) {
+        } catch (e) {
             return [];
         }
     },
@@ -2484,7 +2494,7 @@ const AuthAPI = {
             outreach,
             dateAdded: new Date().toISOString()
         };
-        
+
         firebaseDb.collection('instructors').doc(newInst.id).set(newInst).catch(err => console.error("Firestore add instructor error", err));
         return { success: true, instructor: newInst };
     },
@@ -2512,7 +2522,7 @@ const AuthAPI = {
                 localStorage.setItem('jilgm_current_instructor', JSON.stringify(inst));
                 return true;
             }
-        } catch(e) {
+        } catch (e) {
             console.error("Firestore loginInstructor error", e);
         }
         return false;
@@ -2522,7 +2532,7 @@ const AuthAPI = {
         try {
             const inst = localStorage.getItem('jilgm_current_instructor');
             return inst ? JSON.parse(inst) : null;
-        } catch(e) {
+        } catch (e) {
             return null;
         }
     },
@@ -2554,7 +2564,7 @@ const AuthAPI = {
         try {
             await firebaseDb.collection('instructors').doc(id).update({ outreach });
             return { success: true };
-        } catch(e) {
+        } catch (e) {
             console.error("Firestore update instructor outreach error", e);
             return { error: e.message };
         }
@@ -2567,7 +2577,7 @@ const AuthAPI = {
         try {
             await firebaseDb.collection('instructors').doc(id).update({ name });
             return { success: true };
-        } catch(e) {
+        } catch (e) {
             console.error("Firestore update instructor name error", e);
             return { error: e.message };
         }
@@ -2585,7 +2595,7 @@ const AuthAPI = {
             }
             await firebaseDb.collection('instructors').doc(id).update({ username });
             return { success: true };
-        } catch(e) {
+        } catch (e) {
             console.error("Firestore update instructor username error", e);
             return { error: e.message };
         }
@@ -2598,7 +2608,7 @@ const AuthAPI = {
         try {
             await firebaseDb.collection('instructors').doc(id).update({ password });
             return { success: true };
-        } catch(e) {
+        } catch (e) {
             console.error("Firestore update instructor password error", e);
             return { error: e.message };
         }
@@ -2610,7 +2620,7 @@ const AuthAPI = {
         }
         try {
             await firebaseDb.collection('students').doc(id).update({ outreach });
-            
+
             // Sync local student session if updating currently logged-in student
             const currentUser = AuthAPI.getCurrentUser();
             if (currentUser && currentUser.id === id) {
@@ -2621,7 +2631,7 @@ const AuthAPI = {
                 }
             }
             return { success: true };
-        } catch(e) {
+        } catch (e) {
             console.error("Firestore update student outreach error", e);
             return { error: e.message };
         }
@@ -2635,7 +2645,7 @@ const AuthAPI = {
             if (index !== -1) {
                 const student = { ...students[index] };
                 if (!student.questions) student.questions = [];
-                
+
                 const newQuestion = {
                     id: 'q_' + Date.now(),
                     moduleId,
@@ -2643,13 +2653,13 @@ const AuthAPI = {
                     date: new Date().toISOString(),
                     replies: []
                 };
-                
+
                 student.questions.push(newQuestion);
-                
+
                 await firebaseDb.collection('students').doc(studentId).update({
                     questions: student.questions
                 });
-                
+
                 // Update local session synchronously if current student
                 const currentUser = AuthAPI.getCurrentUser();
                 if (currentUser && currentUser.id === studentId) {
@@ -2657,7 +2667,7 @@ const AuthAPI = {
                 }
                 return { success: true, question: newQuestion };
             }
-        } catch(e) {
+        } catch (e) {
             console.error("Firestore askQuestion error", e);
             return { error: e.message };
         }
@@ -2672,27 +2682,27 @@ const AuthAPI = {
             if (index !== -1) {
                 const student = { ...students[index] };
                 if (!student.questions) student.questions = [];
-                
+
                 const qIndex = student.questions.findIndex(q => q.id === questionId);
                 if (qIndex !== -1) {
                     const question = { ...student.questions[qIndex] };
                     if (!question.replies) question.replies = [];
-                    
+
                     question.replies.push({
                         senderName: replierName,
                         message: replyText,
                         date: new Date().toISOString()
                     });
-                    
+
                     student.questions[qIndex] = question;
-                    
+
                     await firebaseDb.collection('students').doc(studentId).update({
                         questions: student.questions
                     });
                     return { success: true };
                 }
             }
-        } catch(e) {
+        } catch (e) {
             console.error("Firestore replyToQuestion error", e);
             return { error: e.message };
         }
@@ -2707,7 +2717,7 @@ const AuthAPI = {
             if (index !== -1) {
                 const student = { ...students[index] };
                 if (!student.chatMessages) student.chatMessages = [];
-                
+
                 const newMessage = {
                     id: 'msg_' + Date.now(),
                     senderId,
@@ -2717,13 +2727,13 @@ const AuthAPI = {
                     readByStudent: senderId === studentId,
                     readByInstructor: senderId !== studentId
                 };
-                
+
                 student.chatMessages.push(newMessage);
-                
+
                 await firebaseDb.collection('students').doc(studentId).update({
                     chatMessages: student.chatMessages
                 });
-                
+
                 // Update local session synchronously if current student
                 const currentUser = AuthAPI.getCurrentUser();
                 if (currentUser && currentUser.id === studentId) {
@@ -2731,7 +2741,7 @@ const AuthAPI = {
                 }
                 return { success: true, message: newMessage };
             }
-        } catch(e) {
+        } catch (e) {
             console.error("Firestore sendChatMessage error", e);
             return { error: e.message };
         }
@@ -2757,12 +2767,12 @@ const AuthAPI = {
                         }
                         return msg;
                     });
-                    
+
                     if (changed) {
                         await firebaseDb.collection('students').doc(studentId).update({
                             chatMessages: student.chatMessages
                         });
-                        
+
                         const currentUser = AuthAPI.getCurrentUser();
                         if (currentUser && currentUser.id === studentId) {
                             localStorage.setItem(SESSION_KEY, JSON.stringify(student));
@@ -2770,7 +2780,7 @@ const AuthAPI = {
                     }
                 }
             }
-        } catch(e) {
+        } catch (e) {
             console.error("Firestore markChatAsRead error", e);
         }
     }

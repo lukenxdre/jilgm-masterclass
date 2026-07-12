@@ -574,17 +574,19 @@
 
                 // Grab data via AuthAPI to ensure correct default fallbacks (e.g. defaultModules, ['module1'])
                 const modsContent = AuthAPI.getModulesContent();
-                const modIds = AuthAPI.getModuleOrder().filter(id => modsContent[id]);
+                const getModuleNum = (id) => parseInt(id.replace(/\D/g, ''), 10);
+                const modIds = Object.keys(modsContent).sort((a, b) => getModuleNum(a) - getModuleNum(b));
                 const unlockedModules = AuthAPI.getUnlockedModules();
                 const studentAnswers = user.answers || [];
 
                 const modulesData = modIds.map((id, index) => {
+                    const num = id.replace('module', '');
                     const prereqId = index > 0 ? modIds[index - 1] : null;
-                    const prereqName = prereqId ? (modsContent[prereqId].title || `Module ${index}`) : null;
+                    const prereqName = prereqId ? (modsContent[prereqId].title || `Module ${prereqId.replace('module', '')}`) : null;
                     return {
                         id: id,
-                        title: modsContent[id].title || `Module ${index + 1}`,
-                        badge: `Module ${index + 1}`,
+                        title: modsContent[id].title || `Module ${num}`,
+                        badge: `Module ${num}`,
                         prereq: prereqId,
                         prereqName: prereqName,
                         link: `module.html?id=${id}`

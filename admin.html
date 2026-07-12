@@ -2809,10 +2809,15 @@
                 // 3. Render Lesson Access Grid (in Course Builder panel)
                 const unlockedModules = AuthAPI.getUnlockedModules();
                 const modsContent = AuthAPI.getModulesContent();
-                const modulesList = AuthAPI.getModuleOrder().filter(id => modsContent[id]).map((id, index) => ({
-                    id: id,
-                    name: `Module ${index + 1}: ${modsContent[id].title || id}`
-                }));
+                const getModuleNum = (id) => parseInt(id.replace(/\D/g, ''), 10);
+                const sortedKeys = Object.keys(modsContent).sort((a, b) => getModuleNum(a) - getModuleNum(b));
+                const modulesList = sortedKeys.map(id => {
+                    const num = getModuleNum(id);
+                    return {
+                        id: id,
+                        name: `Module ${num}: ${modsContent[id].title || id}`
+                    };
+                });
                 
                 const grid = document.getElementById('moduleReleaseGrid');
                 if (grid) {
@@ -3477,16 +3482,17 @@
 
                 const modsContent = AuthAPI.getModulesContent();
 
-                moduleOrder.forEach((id, index) => {
+                moduleOrder.forEach(id => {
                     const isReleased = unlockedList.includes(id);
                     const title = modsContent[id]?.title || id;
+                    const num = id.replace('module', '');
 
                     const row = document.createElement('div');
                     row.className = 'switch-row';
                     row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px dashed rgba(255, 255, 255, 0.05);';
                     row.innerHTML = `
                         <div>
-                            <div class="switch-label" style="font-size: 0.88rem; font-weight: 600; color: var(--text-primary);">Module ${index + 1}: ${title}</div>
+                            <div class="switch-label" style="font-size: 0.88rem; font-weight: 600; color: var(--text-primary);">Module ${num}: ${title}</div>
                             <div class="switch-sub" style="font-size: 0.72rem; color: var(--text-secondary);">${isReleased ? 'Released Globally' : 'Locked'}</div>
                         </div>
                         <button type="button" class="btn btn-sm ${isReleased ? 'btn-danger' : 'btn-primary'}" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" onclick="toggleDashboardModuleRelease('${id}', ${isReleased})">
@@ -3515,10 +3521,10 @@
 
                 // 1. Build headers (Apprentice, M1, M2, ..., M11)
                 headersRow.innerHTML = '<th style="padding: 0.6rem 0.8rem; font-weight: 700; color: var(--accent-gold); border-bottom: 1.5px solid var(--glass-border);">Apprentice</th>';
-                moduleOrder.forEach((id, index) => {
+                moduleOrder.forEach(id => {
                     const th = document.createElement('th');
                     th.style.cssText = 'padding: 0.6rem 0.8rem; font-weight: 700; color: var(--accent-gold); border-bottom: 1.5px solid var(--glass-border); text-align: center; font-size: 0.75rem;';
-                    th.innerText = `M${index + 1}`;
+                    th.innerText = `M${id.replace('module', '')}`;
                     th.title = modsContent[id]?.title || id;
                     headersRow.appendChild(th);
                 });
