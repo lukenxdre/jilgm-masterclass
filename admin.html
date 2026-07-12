@@ -2265,10 +2265,14 @@
                 const selectedVal = selectModule.value || currentModuleId;
                 
                 selectModule.innerHTML = '';
-                AuthAPI.getModuleOrder().filter(id => modsContent[id]).forEach((id, idx) => {
+                const getModuleNum = (id) => parseInt(id.replace(/\D/g, ''), 10);
+                const sortedKeys = Object.keys(modsContent).sort((a, b) => getModuleNum(a) - getModuleNum(b));
+
+                sortedKeys.forEach(id => {
                     const option = document.createElement('option');
                     option.value = id;
-                    option.innerText = `Module ${idx + 1}: ${modsContent[id].title || id}`;
+                    const num = getModuleNum(id);
+                    option.innerText = `Module ${num}: ${modsContent[id].title || id}`;
                     selectModule.appendChild(option);
                 });
                 
@@ -3481,11 +3485,13 @@
                 container.innerHTML = '';
 
                 const modsContent = AuthAPI.getModulesContent();
+                const getModuleNum = (id) => parseInt(id.replace(/\D/g, ''), 10);
+                const sortedOrder = [...moduleOrder].sort((a, b) => getModuleNum(a) - getModuleNum(b));
 
-                moduleOrder.forEach(id => {
+                sortedOrder.forEach(id => {
                     const isReleased = unlockedList.includes(id);
                     const title = modsContent[id]?.title || id;
-                    const num = id.replace('module', '');
+                    const num = getModuleNum(id);
 
                     const row = document.createElement('div');
                     row.className = 'switch-row';
