@@ -492,60 +492,17 @@
                 </div>
             </div>
 
-            <!-- Section 2: Enrolled Students (Regular) -->
+            <!-- Section 2: Enrolled Cohorts by Outreach -->
             <div style="margin-bottom: 3rem;">
                 <h2 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent-gold); display: flex; align-items: center; gap: 0.5rem;">
-                    Enrolled Regular Cohort <span id="enrolledBadge" class="badge">0</span>
+                    Enrolled Cohorts by Outreach
+                    <span id="enrolledBadge" class="badge" title="Total Regular Apprentices">0</span>
+                    <span id="sitinBadge" class="badge" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3); font-weight: normal; margin-left: 0.4rem;" title="Total Sit-In Students">0</span>
                 </h2>
-                <div class="admin-table-container" style="margin-top: 0;">
-                    <div class="table-responsive-wrapper">
-                        <table id="studentsTable">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Outreach</th>
-                                    <th>Username</th>
-                                    <th>Password</th>
-                                    <th style="width: 200px;">Progress</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="studentsTableBody">
-                                <!-- Populated by JS -->
-                            </tbody>
-                        </table>
-                    </div>
+                <div id="cohortsByOutreachContainer">
+                    <!-- Populated dynamically by JS -->
                 </div>
             </div>
-
-            <!-- Section 3: Enrolled Students (Sit-In) -->
-            <div>
-                <h2 style="font-size: 1.5rem; margin-bottom: 1rem; color: #f59e0b; display: flex; align-items: center; gap: 0.5rem;">
-                    Enrolled Sit-In Cohort <span id="sitinBadge" class="badge" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">0</span>
-                </h2>
-                <div class="admin-table-container" style="margin-top: 0;">
-                    <div class="table-responsive-wrapper">
-                        <table id="sitinStudentsTable">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Outreach</th>
-                                    <th>Username</th>
-                                    <th>Password</th>
-                                    <th style="width: 200px;">Progress</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="sitinStudentsTableBody">
-                                <!-- Populated by JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- 2. COURSE BUILDER PANEL -->
         <div id="panel-builder" class="hidden">
@@ -1177,7 +1134,7 @@
 
                 const form = document.getElementById('adminAddForm');
             const pendingTableBody = document.getElementById('pendingTableBody');
-            const studentsTableBody = document.getElementById('studentsTableBody');
+            const cohortsByOutreachContainer = document.getElementById('cohortsByOutreachContainer');
             const credentialsModal = document.getElementById('credentialsModal');
             const pendingBadge = document.getElementById('pendingBadge');
             const enrolledBadge = document.getElementById('enrolledBadge');
@@ -2979,25 +2936,100 @@
                     return tr;
                 }
 
-                // 2. Render Enrolled Regular Table
-                studentsTableBody.innerHTML = '';
-                if (regularEnrolledList.length === 0) {
-                    studentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No enrolled regular students yet.</td></tr>';
-                } else {
-                    regularEnrolledList.forEach(student => {
-                        studentsTableBody.appendChild(createStudentRow(student));
+                // 2. Render Enrolled Cohorts organized by Outreach
+                const cohortsContainer = document.getElementById('cohortsByOutreachContainer');
+                if (cohortsContainer) {
+                    cohortsContainer.innerHTML = '';
+                    
+                    const instructors = AuthAPI.getInstructors();
+                    
+                    // Group approved students by outreach
+                    const studentsByOutreach = {};
+                    enrolledList.forEach(student => {
+                        const o = student.outreach || 'unassigned';
+                        if (!studentsByOutreach[o]) {
+                            studentsByOutreach[o] = [];
+                        }
+                        studentsByOutreach[o].push(student);
                     });
-                }
 
-                // 3. Render Enrolled Sit-In Table
-                const sitinStudentsTableBody = document.getElementById('sitinStudentsTableBody');
-                if (sitinStudentsTableBody) {
-                    sitinStudentsTableBody.innerHTML = '';
-                    if (sitinEnrolledList.length === 0) {
-                        sitinStudentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No enrolled sit-in students yet.</td></tr>';
+                    // Sort outreaches numerically, putting 'unassigned' at the end
+                    const sortedOutreaches = Object.keys(studentsByOutreach).sort((a, b) => {
+                        if (a === 'unassigned') return 1;
+                        if (b === 'unassigned') return -1;
+                        return parseInt(a, 10) - parseInt(b, 10);
+                    });
+
+                    if (sortedOutreaches.length === 0) {
+                        cohortsContainer.innerHTML = `
+                            <div class="glass-card" style="padding: 2rem; text-align: center; color: var(--text-secondary); border-color: var(--glass-border);">
+                                No approved enrollees found.
+                            </div>
+                        `;
                     } else {
-                        sitinEnrolledList.forEach(student => {
-                            sitinStudentsTableBody.appendChild(createStudentRow(student));
+                        sortedOutreaches.forEach(outreachKey => {
+                            const groupStudents = studentsByOutreach[outreachKey];
+                            const regularCount = groupStudents.filter(s => !s.isSitIn).length;
+                            const sitinCount = groupStudents.filter(s => s.isSitIn).length;
+                            
+                            // Find assigned instructor for this outreach
+                            const assignedInst = instructors.find(inst => inst.outreach === outreachKey);
+                            const instructorName = assignedInst ? assignedInst.name : 'Unassigned';
+
+                            const card = document.createElement('div');
+                            card.className = 'glass-card';
+                            card.style.cssText = 'margin-bottom: 2rem; padding: 1.5rem; border: 1px solid var(--glass-border); background: var(--bg-card);';
+                            
+                            const headerHtml = `
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 1rem; margin-bottom: 1rem;">
+                                    <div>
+                                        <h3 style="margin: 0; color: var(--accent-gold); font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                                            <span>📍</span> ${outreachKey === 'unassigned' ? 'Unassigned Outreach' : 'Outreach ' + outreachKey}
+                                        </h3>
+                                        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                                            Assigned Instructor: <strong style="color: var(--accent-gold-light);">${instructorName}</strong>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <span class="badge" style="background: rgba(212, 175, 55, 0.1); color: var(--accent-gold-light); border-color: rgba(212, 175, 55, 0.3);">
+                                            ${regularCount} Apprentices
+                                        </span>
+                                        <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">
+                                            ${sitinCount} Sit-Ins
+                                        </span>
+                                    </div>
+                                </div>
+                            `;
+
+                            card.innerHTML = headerHtml;
+
+                            const tableWrapper = document.createElement('div');
+                            tableWrapper.className = 'table-responsive-wrapper';
+                            
+                            const table = document.createElement('table');
+                            table.innerHTML = `
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Outreach</th>
+                                        <th>Username</th>
+                                        <th>Password</th>
+                                        <th style="width: 200px;">Progress</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                            `;
+                            
+                            const tbody = document.createElement('tbody');
+                            groupStudents.forEach(student => {
+                                tbody.appendChild(createStudentRow(student));
+                            });
+                            
+                            table.appendChild(tbody);
+                            tableWrapper.appendChild(table);
+                            card.appendChild(tableWrapper);
+                            cohortsContainer.appendChild(card);
                         });
                     }
                 }
