@@ -1501,9 +1501,16 @@ async function syncFromCloud() {
         const resMod = await fetch(SYNC_URL + 'modules');
         if (resMod.ok) {
             const data = await resMod.json();
-            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+            if (data && typeof data === 'object' && Object.keys(data).length > 0 && data.module12 && data.module16) {
                 localStorage.setItem(CONTENT_KEY, JSON.stringify(data));
+            } else {
+                console.log("Fetched cloud modules are incomplete or empty. Overwriting with local defaultModules and seeding...");
+                localStorage.setItem(CONTENT_KEY, JSON.stringify(defaultModules));
+                await saveToCloud('modules', defaultModules);
             }
+        } else {
+            console.log("Failed to fetch cloud modules. Falling back to local defaultModules seeding check...");
+            await checkAndSeedModules();
         }
 
         const resUnlock = await fetch(SYNC_URL + 'unlocked');
@@ -1579,6 +1586,27 @@ async function saveToCloud(key, data) {
         console.error("Cloud database synchronization failed:", e);
     }
 }
+
+async function checkAndSeedModules() {
+    let localMods = null;
+    try {
+        const stored = localStorage.getItem(CONTENT_KEY);
+        if (stored) {
+            localMods = JSON.parse(stored);
+        }
+    } catch (e) {
+        console.error("Error reading/parsing modules content from localStorage:", e);
+    }
+
+    const isMissing = !localMods || typeof localMods !== 'object' || Object.keys(localMods).length === 0 || !localMods.module12 || !localMods.module16;
+    if (isMissing) {
+        console.log("Local CONTENT_KEY is incomplete. Forcing seed of defaultModules to local storage and KVDB cloud sync...");
+        localStorage.setItem(CONTENT_KEY, JSON.stringify(defaultModules));
+        await saveToCloud('modules', defaultModules);
+        triggerStorageSync(CONTENT_KEY);
+    }
+}
+checkAndSeedModules();
 
 // --- Firebase Integration ---
 let firebaseDb = null;
@@ -2476,9 +2504,15 @@ const AuthAPI = {
     getModulesContent: () => {
         try {
             const data = localStorage.getItem(CONTENT_KEY);
-            return data ? JSON.parse(data) : defaultModules;
+            if (data) {
+                const parsed = JSON.parse(data);
+                if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0 && parsed.module12 && parsed.module16) {
+                    return parsed;
+                }
+            }
+            return defaultModules;
         } catch (e) {
-            console.error("Error parsing module content", e);
+            console.error("Error parsing module content, falling back to defaultModules", e);
             return defaultModules;
         }
     },
