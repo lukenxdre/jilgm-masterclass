@@ -1173,90 +1173,102 @@
             const panelSettings = document.getElementById('panel-settings');
             
             function clearAllTabs() {
-                navDashboard.classList.remove('active');
-                navStudents.classList.remove('active');
-                navBuilder.classList.remove('active');
-                navAnnouncements.classList.remove('active');
-                navResources.classList.remove('active');
+                if (navDashboard) navDashboard.classList.remove('active');
+                if (navStudents) navStudents.classList.remove('active');
+                if (navBuilder) navBuilder.classList.remove('active');
+                if (navAnnouncements) navAnnouncements.classList.remove('active');
+                if (navResources) navResources.classList.remove('active');
                 if (navInstructors) navInstructors.classList.remove('active');
                 if (navPeerReflections) navPeerReflections.classList.remove('active');
-                navSettings.classList.remove('active');
+                if (navSettings) navSettings.classList.remove('active');
 
-                panelDashboard.classList.add('hidden');
-                panelStudents.classList.add('hidden');
-                panelBuilder.classList.add('hidden');
-                panelAnnouncements.classList.add('hidden');
-                panelResources.classList.add('hidden');
+                if (panelDashboard) panelDashboard.classList.add('hidden');
+                if (panelStudents) panelStudents.classList.add('hidden');
+                if (panelBuilder) panelBuilder.classList.add('hidden');
+                if (panelAnnouncements) panelAnnouncements.classList.add('hidden');
+                if (panelResources) panelResources.classList.add('hidden');
                 if (panelInstructors) panelInstructors.classList.add('hidden');
                 if (panelPeerReflections) panelPeerReflections.classList.add('hidden');
-                panelSettings.classList.add('hidden');
+                if (panelSettings) panelSettings.classList.add('hidden');
             }
 
-            navDashboard.addEventListener('click', (e) => {
-                e.preventDefault();
-                clearAllTabs();
-                navDashboard.classList.add('active');
-                panelDashboard.classList.remove('hidden');
-                renderDashboardSummary();
-            });
+            if (navDashboard) {
+                navDashboard.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    clearAllTabs();
+                    navDashboard.classList.add('active');
+                    if (panelDashboard) panelDashboard.classList.remove('hidden');
+                    renderDashboardSummary();
+                });
+            }
 
-            navStudents.addEventListener('click', (e) => {
-                e.preventDefault();
-                clearAllTabs();
-                navStudents.classList.add('active');
-                panelStudents.classList.remove('hidden');
-            });
+            if (navStudents) {
+                navStudents.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    clearAllTabs();
+                    navStudents.classList.add('active');
+                    if (panelStudents) panelStudents.classList.remove('hidden');
+                });
+            }
 
             if (navPeerReflections) {
                 navPeerReflections.addEventListener('click', (e) => {
                     e.preventDefault();
                     clearAllTabs();
                     navPeerReflections.classList.add('active');
-                    panelPeerReflections.classList.remove('hidden');
+                    if (panelPeerReflections) panelPeerReflections.classList.remove('hidden');
                     renderPeerReflectionsBoard();
                 });
             }
             
-            navBuilder.addEventListener('click', (e) => {
-                e.preventDefault();
-                clearAllTabs();
-                navBuilder.classList.add('active');
-                panelBuilder.classList.remove('hidden');
-                loadBuilderModule();
-            });
+            if (navBuilder) {
+                navBuilder.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    clearAllTabs();
+                    navBuilder.classList.add('active');
+                    if (panelBuilder) panelBuilder.classList.remove('hidden');
+                    loadBuilderModule();
+                });
+            }
 
-            navAnnouncements.addEventListener('click', (e) => {
-                e.preventDefault();
-                clearAllTabs();
-                navAnnouncements.classList.add('active');
-                panelAnnouncements.classList.remove('hidden');
-                renderAnnouncementsAdmin();
-            });
+            if (navAnnouncements) {
+                navAnnouncements.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    clearAllTabs();
+                    navAnnouncements.classList.add('active');
+                    if (panelAnnouncements) panelAnnouncements.classList.remove('hidden');
+                    renderAnnouncementsAdmin();
+                });
+            }
 
-            navResources.addEventListener('click', (e) => {
-                e.preventDefault();
-                clearAllTabs();
-                navResources.classList.add('active');
-                panelResources.classList.remove('hidden');
-                renderResourcesAdmin();
-            });
+            if (navResources) {
+                navResources.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    clearAllTabs();
+                    navResources.classList.add('active');
+                    if (panelResources) panelResources.classList.remove('hidden');
+                    renderResourcesAdmin();
+                });
+            }
 
             if (navInstructors) {
                 navInstructors.addEventListener('click', (e) => {
                     e.preventDefault();
                     clearAllTabs();
                     navInstructors.classList.add('active');
-                    panelInstructors.classList.remove('hidden');
+                    if (panelInstructors) panelInstructors.classList.remove('hidden');
                     renderInstructorsAdmin();
                 });
             }
             
-            navSettings.addEventListener('click', (e) => {
-                e.preventDefault();
-                clearAllTabs();
-                navSettings.classList.add('active');
-                panelSettings.classList.remove('hidden');
-            });
+            if (navSettings) {
+                navSettings.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    clearAllTabs();
+                    navSettings.classList.add('active');
+                    if (panelSettings) panelSettings.classList.remove('hidden');
+                });
+            }
 
             // --- Toast Notification ---
             function showToast(message) {
