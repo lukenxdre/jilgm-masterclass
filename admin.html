@@ -3478,8 +3478,9 @@
                     if (totalStEl) totalStEl.innerText = totalApproved;
                     if (pendStEl) pendStEl.innerText = totalPending;
 
-                    // Update Cohort Matrix
+                    // Update Cohort Matrix and cohorts listing
                     renderDashboardMatrix(students);
+                    renderDashboard();
                 }, (err) => {
                     console.error("Dashboard students snap error:", err);
                 });
@@ -3508,6 +3509,48 @@
                     renderDashboardSwitchboard(moduleOrder, unlockedList);
                 }, (err) => {
                     console.error("Dashboard settings snap error:", err);
+                });
+
+                // 4. Fetch Modules Content
+                db.collection('modules_content').onSnapshot((snapshot) => {
+                    const mods = {};
+                    snapshot.forEach(doc => {
+                        mods[doc.id] = doc.data();
+                    });
+                    
+                    // Update cache
+                    localStorage.setItem('jilgm_modules_content', JSON.stringify(mods));
+
+                    // Explicitly clear inner HTML containers before running the loops
+                    const selectModule = document.getElementById('selectModule');
+                    if (selectModule) selectModule.innerHTML = '';
+
+                    const grid = document.getElementById('moduleReleaseGrid');
+                    if (grid) grid.innerHTML = '';
+
+                    const cohortsContainer = document.getElementById('cohortsByOutreachContainer');
+                    if (cohortsContainer) cohortsContainer.innerHTML = '';
+
+                    // Trigger loops
+                    populateModuleSelect();
+                    renderDashboard();
+                    loadBuilderModule();
+
+                    // Re-render switchboard and matrix if settings are already loaded
+                    const unlockedListStr = localStorage.getItem('jilgm_unlocked_modules');
+                    const unlockedList = unlockedListStr ? JSON.parse(unlockedListStr) : ['module1'];
+                    const moduleOrder = AuthAPI.getModuleOrder().filter(id => mods[id]);
+                    const releasedCount = moduleOrder.filter(id => unlockedList.includes(id)).length;
+
+                    const relModEl = document.getElementById('kpi-released-modules');
+                    if (relModEl) relModEl.innerText = `${releasedCount} / ${moduleOrder.length}`;
+
+                    renderDashboardSwitchboard(moduleOrder, unlockedList);
+
+                    const students = AuthAPI.getAllStudents();
+                    renderDashboardMatrix(students);
+                }, (err) => {
+                    console.error("Dashboard modules_content snap error:", err);
                 });
             }
 
@@ -3822,9 +3865,6 @@
 
             // Initial render
             renderDashboardSummary();
-            populateModuleSelect();
-            renderDashboard();
-            loadBuilderModule();
             } catch (err) {
                 console.error(err);
                 const errDiv = document.createElement('div');

@@ -787,36 +787,81 @@
            ===================================================================== */
 
         initInstructorFeatures: function () {
-            // Wait for student list element or page load
-            setTimeout(() => {
-                this.renderInstructorCohortSelector();
-                this.renderAnalyticsMetrics();
-                this.flagInactiveApprentices();
-            }, 300);
+            if (this.db) {
+                // Listen to student updates in real-time
+                this.db.collection('students').onSnapshot(() => {
+                    this.renderInstructorCohortSelector();
+                    this.renderAnalyticsMetrics();
+                    this.flagInactiveApprentices();
+                }, err => {
+                    console.error("Features students snapshot error:", err);
+                });
+                // Listen to modules updates in real-time
+                this.db.collection('modules_content').onSnapshot(() => {
+                    this.renderInstructorCohortSelector();
+                    this.renderAnalyticsMetrics();
+                    this.flagInactiveApprentices();
+                }, err => {
+                    console.error("Features modules snapshot error:", err);
+                });
+            } else {
+                setTimeout(() => {
+                    this.renderInstructorCohortSelector();
+                    this.renderAnalyticsMetrics();
+                    this.flagInactiveApprentices();
+                }, 300);
+            }
         },
 
         renderInstructorCohortSelector: function () {
             const table = document.querySelector('.table') || document.querySelector('table');
             if (!table) return;
 
-            // Check if selector exists
-            if (document.getElementById('instructorCohortFilter')) return;
+            // Check if selector exists; if so, clear its options and rebuild
+            let select = document.getElementById('instructorCohortFilter');
+            if (!select) {
+                // Create selector container above table
+                const filterDiv = document.createElement('div');
+                filterDiv.style.display = 'flex';
+                filterDiv.style.alignItems = 'center';
+                filterDiv.style.gap = '0.8rem';
+                filterDiv.style.marginBottom = '1rem';
+                filterDiv.innerHTML = `
+                    <label style="font-size: 0.85rem; color: var(--text-secondary);">Filter by Cohort:</label>
+                    <select id="instructorCohortFilter" class="glass-input" style="width: auto; padding: 0.4rem 1.2rem; font-size: 0.85rem; border-radius: 20px;">
+                        <option value="all">All Cohorts</option>
+                    </select>
+                `;
+                table.parentNode.insertBefore(filterDiv, table);
+                select = document.getElementById('instructorCohortFilter');
+                
+                select.addEventListener('change', () => {
+                    const selected = select.value;
+                    const rows = table.querySelectorAll('tbody tr');
+                    
+                    rows.forEach(row => {
+                        const studentNameLink = row.querySelector('td a');
+                        if (!studentNameLink) return;
 
-            // Create selector container above table
-            const filterDiv = document.createElement('div');
-            filterDiv.style.display = 'flex';
-            filterDiv.style.alignItems = 'center';
-            filterDiv.style.gap = '0.8rem';
-            filterDiv.style.marginBottom = '1rem';
-            filterDiv.innerHTML = `
-                <label style="font-size: 0.85rem; color: var(--text-secondary);">Filter by Cohort:</label>
-                <select id="instructorCohortFilter" class="glass-input" style="width: auto; padding: 0.4rem 1.2rem; font-size: 0.85rem; border-radius: 20px;">
-                    <option value="all">All Cohorts</option>
-                </select>
-            `;
-            table.parentNode.insertBefore(filterDiv, table);
+                        // Match name with cohort
+                        const studentId = studentNameLink.href.split('studentId=')[1] || '';
+                        if (!studentId) return;
 
-            const select = document.getElementById('instructorCohortFilter');
+                        const student = window.AuthAPI.getAllStudents().find(s => s.id === studentId);
+                        if (!student) return;
+
+                        const studentCohort = student.cohort || 'Unassigned';
+                        if (selected === 'all' || studentCohort === selected) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            } else {
+                // Clear options except "All Cohorts"
+                select.innerHTML = '<option value="all">All Cohorts</option>';
+            }
 
             // Load distinct cohorts dynamically from students list
             if (window.AuthAPI) {
@@ -830,29 +875,7 @@
                 });
             }
 
-            select.addEventListener('change', () => {
-                const selected = select.value;
-                const rows = table.querySelectorAll('tbody tr');
-                
-                rows.forEach(row => {
-                    const studentNameLink = row.querySelector('td a');
-                    if (!studentNameLink) return;
 
-                    // Match name with cohort
-                    const studentId = studentNameLink.href.split('studentId=')[1] || '';
-                    if (!studentId) return;
-
-                    const student = window.AuthAPI.getAllStudents().find(s => s.id === studentId);
-                    if (!student) return;
-
-                    const studentCohort = student.cohort || 'Unassigned';
-                    if (selected === 'all' || studentCohort === selected) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-            });
         },
 
         renderAnalyticsMetrics: function () {
@@ -860,17 +883,19 @@
             const statsSection = document.querySelector('.instructor-stats') || document.querySelector('.dashboard-grid');
             if (!statsSection) return;
 
-            if (document.getElementById('analyticsChartBox')) return;
+            let chartBox = document.getElementById('analyticsChartBox');
+            if (!chartBox) {
+                chartBox = document.createElement('div');
+                chartBox.id = 'analyticsChartBox';
+                chartBox.className = 'analytics-chart-container glass-panel';
+                chartBox.style.gridColumn = '1 / -1';
+                statsSection.parentNode.insertBefore(chartBox, statsSection);
+            }
 
-            const chartBox = document.createElement('div');
-            chartBox.id = 'analyticsChartBox';
-            chartBox.className = 'analytics-chart-container glass-panel';
-            chartBox.style.gridColumn = '1 / -1';
             chartBox.innerHTML = `
                 <h3 style="font-family: var(--font-serif); font-style: italic; color: var(--accent-gold-light); margin-bottom: 1.2rem; font-size: 1.4rem;">Curriculum Submission Analytics</h3>
                 <div id="analyticsBarsList"></div>
             `;
-            statsSection.parentNode.insertBefore(chartBox, statsSection);
 
             const barList = document.getElementById('analyticsBarsList');
             if (!window.AuthAPI) return;
@@ -928,7 +953,7 @@
                     const lastActive = new Date(student.lastActiveTimestamp);
                     const diffDays = (now - lastActive) / (1000 * 60 * 60 * 24);
 
-                    if (diffDays >= 5) {
+                    if (diffDays >= 5 && !nameLink.parentNode.querySelector('.needs-review-flag')) {
                         const alertSpan = document.createElement('span');
                         alertSpan.className = 'needs-review-flag';
                         alertSpan.innerHTML = `⚠️ 5d+ Inactive`;
