@@ -607,38 +607,40 @@
                             </tbody>
                         </table>
                     </div>
-        </div>
-
-        <!-- Submissions Details Modal -->
-        <div id="answersModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 999999; display: none; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; box-sizing: border-box;">
-            <div class="glass-card modal-content-wrapper student-profile-modal" style="max-width: 850px; width: 90%; padding: 2rem; border-color: rgba(212, 175, 55, 0.4); max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6); margin: 1.5rem auto; box-sizing: border-box;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                    <div>
-                        <h2 style="margin: 0; font-size: 1.6rem; color: var(--accent-gold);" id="modalStudentName">Student Name</h2>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.2rem;">Student Profile, Submissions & Private Messages</p>
-                    </div>
-                    <button class="btn btn-secondary" onclick="closeAnswersModal()" style="border-color: #ef4444; color: #ef4444; padding: 0.4rem 0.8rem; height: auto;">Close</button>
-                </div>
-
-                <!-- Modal Sub-Tabs -->
-                <div style="display: flex; border-bottom: 1px solid var(--glass-border); margin-bottom: 1.5rem; gap: 1rem;">
-                    <button id="modal-tab-submissions" class="btn" style="background: none; border: none; border-bottom: 2px solid var(--accent-gold); color: var(--text-primary); font-weight: bold; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0;">Lesson Submissions</button>
-                    <button id="modal-tab-qa" class="btn" style="background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0;">Lesson Q&A</button>
-                    <button id="modal-tab-chat" class="btn" style="background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0; display: flex; align-items: center; gap: 0.4rem;">Private Messages <span id="modal-chat-badge" class="badge" style="background:#ef4444; color:#fff; display:none; border:none; padding: 0.1rem 0.35rem; font-size:0.65rem;">0</span></button>
-                </div>
-                
-                <div id="modal-content-area" style="flex: 1; overflow-y: auto; padding-right: 0.5rem; margin-bottom: 1rem;">
-                    <div id="modalContentSubmissions">
-                        <div id="modalAnswersContainer" style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
-                            <!-- Populated dynamically -->
-                        </div>
-                    </div>
-                    <div id="modalContentQA" class="hidden"></div>
-                    <div id="modalContentChat" class="hidden"></div>
                 </div>
             </div>
         </div>
     </main>
+
+    <!-- Submissions Details Modal -->
+    <div id="answersModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 999999; display: none; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; box-sizing: border-box;">
+        <div class="glass-card modal-content-wrapper student-profile-modal" style="max-width: 850px; width: 90%; padding: 2rem; border-color: rgba(212, 175, 55, 0.4); max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6); margin: 1.5rem auto; box-sizing: border-box;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div>
+                    <h2 style="margin: 0; font-size: 1.6rem; color: var(--accent-gold);" id="modalStudentName">Student Name</h2>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.2rem;">Student Profile, Submissions & Private Messages</p>
+                </div>
+                <button class="btn btn-secondary" onclick="closeAnswersModal()" style="border-color: #ef4444; color: #ef4444; padding: 0.4rem 0.8rem; height: auto;">Close</button>
+            </div>
+
+            <!-- Modal Sub-Tabs -->
+            <div style="display: flex; border-bottom: 1px solid var(--glass-border); margin-bottom: 1.5rem; gap: 1rem;">
+                <button id="modal-tab-submissions" class="btn" style="background: none; border: none; border-bottom: 2px solid var(--accent-gold); color: var(--text-primary); font-weight: bold; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0;">Lesson Submissions</button>
+                <button id="modal-tab-qa" class="btn" style="background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0;">Lesson Q&A</button>
+                <button id="modal-tab-chat" class="btn" style="background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0; display: flex; align-items: center; gap: 0.4rem;">Private Messages <span id="modal-chat-badge" class="badge" style="background:#ef4444; color:#fff; display:none; border:none; padding: 0.1rem 0.35rem; font-size:0.65rem;">0</span></button>
+            </div>
+            
+            <div id="modal-content-area" style="flex: 1; overflow-y: auto; padding-right: 0.5rem; margin-bottom: 1rem;">
+                <div id="modalContentSubmissions">
+                    <div id="modalAnswersContainer" style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+                <div id="modalContentQA" class="hidden"></div>
+                <div id="modalContentChat" class="hidden"></div>
+            </div>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
