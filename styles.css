@@ -1812,9 +1812,36 @@ body.light-theme .tf-explanation {
   box-sizing: border-box !important;
 }
 
-.glass-card {
+/* Ensure glass cards inside dashboards take 100% width */
+.dashboard-content .glass-card,
+.dash-container .glass-card,
+#panel-cohort .glass-card,
+#panel-instructors .glass-card,
+.dashboard-header + .glass-card {
   width: 100% !important;
   max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Authentication / Login Cards - Centered Clean Card Layout (450px max width) */
+.auth-page .glass-card,
+.auth-card,
+.glass-card.auth-card {
+  max-width: 450px !important;
+  width: 100% !important;
+  margin: auto !important;
+  padding: 2.5rem 2rem !important;
+  box-sizing: border-box !important;
+  border-radius: 20px !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1.5rem !important;
   box-sizing: border-box !important;
 }
 
