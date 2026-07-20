@@ -1802,14 +1802,33 @@ body.light-theme .tf-explanation {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   GLOBAL RESPONSIVE FRAMEWORK & MEDIA QUERIES
+   GLOBAL RESPONSIVE FRAMEWORK & SPACE MAXIMIZATION
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Modal Fluid Width & Responsive Padding Constraints */
-.glass-card, .modal-card, .student-profile-modal, .modal-content-wrapper, .cmd-modal-content {
-  width: 90% !important;
-  max-width: 800px !important;
+/* Dashboard Layout & Main Panels - Maximize Full Available Space */
+.dashboard-content, .main-container, .dash-container, .dashboard-grid, .builder-editor-layout {
+  width: 100% !important;
+  max-width: 100% !important;
   box-sizing: border-box !important;
+}
+
+.glass-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Modal Popup Dialog Fluid Width & Padding (STRICTLY FOR POPUPS) */
+#answersModal .glass-card,
+#takeawaysModal .glass-card,
+.modal-card,
+.student-profile-modal,
+.modal-content-wrapper,
+.cmd-modal-content {
+  width: 90% !important;
+  max-width: 850px !important;
+  box-sizing: border-box !important;
+  margin: auto !important;
 }
 
 #answersModal, .modal-overlay, .modal-backdrop {
@@ -1817,17 +1836,17 @@ body.light-theme .tf-explanation {
   box-sizing: border-box !important;
 }
 
-/* Fluid Layout Wrappers & Table Responsiveness */
-.main-container, .dashboard-grid, .dash-container, .dashboard-content, .builder-editor-layout {
-  max-width: 1400px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
+/* Fluid Layout Wrappers & Table Responsiveness - Full Width Scaling */
 .table-responsive-wrapper, .admin-table-container, .table-container {
   width: 100% !important;
+  max-width: 100% !important;
   overflow-x: auto !important;
   -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive-wrapper table, .admin-table-container table {
+  width: 100% !important;
+  border-collapse: collapse;
 }
 
 /* Large Laptop Split-Screens & Desktop Scaling (max-width: 1200px) */
@@ -1870,7 +1889,7 @@ body.light-theme .tf-explanation {
     padding: 1rem !important;
     grid-template-columns: 1fr !important;
   }
-  .glass-card, .modal-card, .student-profile-modal, .modal-content-wrapper {
+  .modal-card, .student-profile-modal, .modal-content-wrapper, #answersModal .glass-card, #takeawaysModal .glass-card {
     width: 92% !important;
     max-width: 800px !important;
     padding: 1.5rem !important;
@@ -1887,7 +1906,7 @@ body.light-theme .tf-explanation {
 /* Mobile Layout Breakpoints (max-width: 576px) */
 @media (max-width: 576px) {
   body { font-size: 14px; }
-  .modal-content-wrapper, .glass-card, .student-profile-modal {
+  .modal-content-wrapper, .student-profile-modal, #answersModal .glass-card, #takeawaysModal .glass-card {
     padding: 12px !important;
     width: 95% !important;
     max-height: 90vh !important;

@@ -546,7 +546,7 @@ body.light-theme {
 /* Mobile Layout Breakpoints */
 @media (max-width: 576px) {
   body { font-size: 14px; }
-  .modal-content-wrapper, .glass-card, .student-profile-modal { 
+  .modal-content-wrapper, .student-profile-modal, #answersModal .glass-card, #takeawaysModal .glass-card { 
     padding: 10px !important; 
     width: 95% !important; 
   }
