@@ -1996,9 +1996,16 @@
                         }
 
                         switchModalTab(activeModalTab || 'submissions');
+                        const modal = document.getElementById('answersModal');
+                        if (modal) {
+                            if (modal.parentElement !== document.body) {
+                                document.body.appendChild(modal);
+                            }
+                            modal.style.display = 'block';
+                        }
+                        document.documentElement.style.overflow = 'hidden';
                         document.body.style.overflow = 'hidden';
                         document.body.classList.add('modal-open');
-                        document.getElementById('answersModal').style.display = 'flex';
                     }
                 };
 
@@ -2064,7 +2071,11 @@
                 };
 
                 window.closeAnswersModal = () => {
-                    document.getElementById('answersModal').style.display = 'none';
+                    const modal = document.getElementById('answersModal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                    }
+                    document.documentElement.style.overflow = '';
                     document.body.style.overflow = '';
                     document.body.classList.remove('modal-open');
                     activeModalStudentId = null;

@@ -1852,11 +1852,11 @@ body.light-theme .tf-explanation {
 .student-profile-modal,
 .modal-content-wrapper,
 .cmd-modal-content {
-  width: 90% !important;
+  width: 92% !important;
   max-width: 850px !important;
   max-height: 85vh !important;
   box-sizing: border-box !important;
-  margin: 1.5rem auto !important;
+  margin: 0 auto !important;
 }
 
 #answersModal, .modal-overlay, .modal-backdrop {
@@ -1868,11 +1868,9 @@ body.light-theme .tf-explanation {
   width: 100vw !important;
   height: 100vh !important;
   background: rgba(0, 0, 0, 0.85) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-  z-index: 999999 !important;
-  align-items: flex-start !important;
-  justify-content: center !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  z-index: 9999999 !important;
   padding: 2rem 1rem !important;
   overflow-y: auto !important;
   box-sizing: border-box !important;
