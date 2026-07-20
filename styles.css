@@ -1800,3 +1800,116 @@ body.light-theme .interactive-block-label {
 body.light-theme .tf-explanation {
     background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(0, 0, 0, 0.03));
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLOBAL RESPONSIVE FRAMEWORK & MEDIA QUERIES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Modal Fluid Width & Responsive Padding Constraints */
+.glass-card, .modal-card, .student-profile-modal, .modal-content-wrapper, .cmd-modal-content {
+  width: 90% !important;
+  max-width: 800px !important;
+  box-sizing: border-box !important;
+}
+
+#answersModal, .modal-overlay, .modal-backdrop {
+  padding: 1rem !important;
+  box-sizing: border-box !important;
+}
+
+/* Fluid Layout Wrappers & Table Responsiveness */
+.main-container, .dashboard-grid, .dash-container, .dashboard-content, .builder-editor-layout {
+  max-width: 1400px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.table-responsive-wrapper, .admin-table-container, .table-container {
+  width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Large Laptop Split-Screens & Desktop Scaling (max-width: 1200px) */
+@media (max-width: 1200px) {
+  .dashboard-layout {
+    flex-direction: column !important;
+  }
+  .sidebar {
+    width: 100% !important;
+    padding: 1.5rem !important;
+    border-right: none !important;
+    border-bottom: 2px solid rgba(170, 132, 28, 0.2) !important;
+    box-sizing: border-box !important;
+  }
+  .sidebar-nav {
+    margin-top: 1rem !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+  .sidebar-nav a {
+    padding: 0.5rem 0.85rem !important;
+    font-size: 0.85rem !important;
+  }
+  .dashboard-content {
+    padding: 2rem 1.5rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .dash-hero-top {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+  }
+}
+
+/* Tablet & Smaller Devices (max-width: 992px) */
+@media (max-width: 992px) {
+  .main-container, .dashboard-grid, .dash-grid, .builder-editor-layout {
+    padding: 1rem !important;
+    grid-template-columns: 1fr !important;
+  }
+  .glass-card, .modal-card, .student-profile-modal, .modal-content-wrapper {
+    width: 92% !important;
+    max-width: 800px !important;
+    padding: 1.5rem !important;
+  }
+  .table-responsive-wrapper, .admin-table-container, .table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  table {
+    min-width: 600px;
+  }
+}
+
+/* Mobile Layout Breakpoints (max-width: 576px) */
+@media (max-width: 576px) {
+  body { font-size: 14px; }
+  .modal-content-wrapper, .glass-card, .student-profile-modal {
+    padding: 12px !important;
+    width: 95% !important;
+    max-height: 90vh !important;
+  }
+  .dashboard-content {
+    padding: 1rem 0.6rem !important;
+  }
+  .dash-hero {
+    padding: 1.2rem !important;
+  }
+  .dash-hero-welcome {
+    font-size: 1.35rem !important;
+  }
+  .sidebar {
+    padding: 1rem !important;
+  }
+  .sidebar-nav a {
+    font-size: 0.78rem !important;
+    padding: 0.4rem 0.6rem !important;
+  }
+  .btn {
+    font-size: 0.8rem !important;
+    padding: 0.45rem 0.8rem !important;
+  }
+}

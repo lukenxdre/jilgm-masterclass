@@ -531,3 +531,23 @@ body.light-theme {
     width: 100%;
     border-collapse: collapse;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE MEDIA QUERIES (TABLET & MOBILE BREAKPOINTS)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Tablet & Smaller Devices */
+@media (max-width: 992px) {
+  .main-container, .dashboard-grid { 
+    padding: 1rem !important; 
+  }
+}
+
+/* Mobile Layout Breakpoints */
+@media (max-width: 576px) {
+  body { font-size: 14px; }
+  .modal-content-wrapper, .glass-card, .student-profile-modal { 
+    padding: 10px !important; 
+    width: 95% !important; 
+  }
+}
