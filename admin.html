@@ -1814,6 +1814,8 @@
                     });
                 }
 
+                let savedAdminScrollY = 0;
+
                 // Expose view answers function globally
                 window.viewStudentAnswers = (id) => {
                     activeModalStudentId = id;
@@ -1826,6 +1828,9 @@
                             alert("Access Restricted: You are not the assigned overseer for Outreach " + student.outreach);
                             return;
                         }
+
+                        // Capture current vertical scroll Y offset before opening modal
+                        savedAdminScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
 
                         document.getElementById('modalStudentName').innerText = `${student.firstName} ${student.lastName}`;
 
@@ -2001,8 +2006,11 @@
                             if (modal.parentElement !== document.body) {
                                 document.body.appendChild(modal);
                             }
+                            modal.scrollTop = 0;
                             modal.style.display = 'block';
                         }
+                        
+                        window.scrollTo(0, 0);
                         document.documentElement.style.overflow = 'hidden';
                         document.body.style.overflow = 'hidden';
                         document.body.classList.add('modal-open');
@@ -2078,6 +2086,9 @@
                     document.documentElement.style.overflow = '';
                     document.body.style.overflow = '';
                     document.body.classList.remove('modal-open');
+                    
+                    window.scrollTo(0, savedAdminScrollY);
+
                     activeModalStudentId = null;
                     activeModalTab = 'submissions';
                 };

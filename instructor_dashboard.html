@@ -1783,11 +1783,16 @@
                     });
                 }
 
+                let savedInstructorScrollY = 0;
+
                 window.viewStudentAnswers = (id) => {
                     activeModalStudentId = id;
                     const students = AuthAPI.getAllStudents();
                     const student = students.find(s => s.id === id);
                     if (student) {
+                        // Capture current vertical scroll Y offset before opening modal
+                        savedInstructorScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+
                         document.getElementById('modalStudentName').innerText = `${student.firstName} ${student.lastName}`;
                         
                         // Show chat badge if any unread
@@ -1807,8 +1812,12 @@
                             if (modal.parentElement !== document.body) {
                                 document.body.appendChild(modal);
                             }
+                            modal.scrollTop = 0;
                             modal.style.display = 'block';
                         }
+                        
+                        // Reset window viewport scroll to top 0 while modal overlay is active
+                        window.scrollTo(0, 0);
                         document.documentElement.style.overflow = 'hidden';
                         document.body.style.overflow = 'hidden';
                         document.body.classList.add('modal-open');
@@ -1824,6 +1833,10 @@
                     document.documentElement.style.overflow = '';
                     document.body.style.overflow = '';
                     document.body.classList.remove('modal-open');
+                    
+                    // Smoothly restore previous scroll Y position so user stays at their row in table
+                    window.scrollTo(0, savedInstructorScrollY);
+
                     activeModalStudentId = null;
                     activeModalTab = 'submissions';
                     
