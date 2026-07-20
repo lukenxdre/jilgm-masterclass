@@ -1996,6 +1996,8 @@
                         }
 
                         switchModalTab(activeModalTab || 'submissions');
+                        document.body.style.overflow = 'hidden';
+                        document.body.classList.add('modal-open');
                         document.getElementById('answersModal').style.display = 'flex';
                     }
                 };
@@ -2063,6 +2065,8 @@
 
                 window.closeAnswersModal = () => {
                     document.getElementById('answersModal').style.display = 'none';
+                    document.body.style.overflow = '';
+                    document.body.classList.remove('modal-open');
                     activeModalStudentId = null;
                     activeModalTab = 'submissions';
                 };
