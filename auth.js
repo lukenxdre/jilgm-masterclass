@@ -32,11 +32,10 @@ function jilgmBroadcast(type, payload) {
 
 const defaultModules = {
     module1: {
-        title: "The Heart of a Leader",
+        title: "The Call to Shepherd",
         subtitle: "Foundations of character, servanthood, and spiritual authority.",
         components: [
             { type: 'header_h1', content: 'Week 1: The Call to Shepherd' },
-            { type: 'image', content: 'heart_of_leader.png' },
             { type: 'callout', emoji: '🎯', bg: 'soft-gold', content: '<strong>Learning Objectives:</strong> By the end of this session, you will:<br>1. Understand the biblical meaning of shepherd leadership as modeled by Christ and mandated by Scripture.<br>2. Identify the critical difference between divine calling and human ambition in ministry.<br>3. Reflect personally on the authenticity and implications of your pastoral calling.' },
             { type: 'divider' },
             { type: 'header_h2', content: 'Introduction' },
@@ -1177,7 +1176,7 @@ const defaultModules = {
             { type: 'toggle_list', title: '📚 Supplementary Notes for the Teacher', content: '<strong>1. Sanders on Spiritual Leadership:</strong> Reinforce that leadership is influence, and influence is multiplied through others.<br><strong>2. Witmer on the Shepherd Leader:</strong> Connect team leadership to shepherding, showing how a team of shepherds can care for the flock more effectively than a single leader.<br><strong>3. Scazzero on Emotional Health:</strong> Connect burnout prevention to emotional health, showing that a leader\'s ministry cannot be healthier than their personal life.' },
             { type: 'toggle_list', title: '📝 Optional Homework for the Week', content: '1. <strong>Read:</strong> Exodus 18 and Ephesians 4.<br>2. <strong>Ministry Audit:</strong> List all your weekly tasks. Identify 2-3 tasks you can delegate to others this week.<br>3. <strong>Dialogue:</strong> Speak with a key volunteer or team member. Ask them how you can better empower them in their role.<br>4. <strong>Memory Verse:</strong> Memorize Exodus 18:18.' },
             { type: 'multiple_choice', question: 'According to Jethro\'s counsel in Exodus 18:21, what are the primary character traits required for delegated leaders?', options: ['Highly educated, charismatic, and popular', 'Fear God, men of truth, and hating covetousness', 'Experienced in business, wealthy, and influential', 'Young, energetic, and willing to work long hours'], correct_index: 1, explanation: 'Exodus 18:21 — "...select capable men from all the people—men who fear God, trustworthy men who hate a dishonest gain..." Character and integrity are the primary qualifications.' },
-            { type: 'matching', pairs: [ { left: 'Intercession', right: 'Standing before God on behalf of the people' }, { left: 'Instruction', right: 'Teaching the statutes, decisions, and way to walk' }, { left: 'Delegation', right: 'Selecting capable, trustworthy leaders to share the burden' }, { left: 'Empowerment', right: 'Giving authority, resources, and accountability' } ] },
+            { type: 'matching', pairs: [{ left: 'Intercession', right: 'Standing before God on behalf of the people' }, { left: 'Instruction', right: 'Teaching the statutes, decisions, and way to walk' }, { left: 'Delegation', right: 'Selecting capable, trustworthy leaders to share the burden' }, { left: 'Empowerment', right: 'Giving authority, resources, and accountability' }] },
             { type: 'question', content: 'Reflect on Jethro\'s counsel. Write a detailed response (minimum 20 characters) answering: What is the single most important change you need to make in your leadership style based on this lesson, and how will you start this week?' },
             { type: 'file_upload', title: 'Module 12 Assignment', content: 'Upload your completed weekly Ministry Task Audit or dialogue notes showing how you plan to delegate and empower others.' }
         ]
@@ -1245,7 +1244,7 @@ const defaultModules = {
             { type: 'toggle_list', title: '📚 Supplementary Notes for the Teacher', content: '<strong>1. Alexander Strauch on Biblical Eldership:</strong> Use Strauch\'s work to reinforce the value of plural leadership and the explicit spiritual qualifications required for elders.<br><strong>2. Jeramie Rinne on Church Elders:</strong> Highlight Rinne\'s emphasis on elders as shepherds who track the spiritual health of the flock, rather than acting purely as business board directors.' },
             { type: 'toggle_list', title: '📝 Optional Homework for the Week', content: '1. <strong>Read:</strong> Titus 1 and 1 Timothy 3.<br>2. <strong>Structure Audit:</strong> Map out your current church governance lines. Identify any areas where authority or accountability is vague.<br>3. <strong>Policy Review:</strong> Select one current church policy (e.g., child safety or financial handling) and review it for clarity and current relevance.' },
             { type: 'multiple_choice', question: 'According to Titus 1:5, why did Paul leave Titus in Crete?', options: ['To raise financial support for missions', 'To put what remained into order and appoint elders', 'To build a new church facility', 'To conduct an evangelistic campaign'], correct_index: 1, explanation: 'Titus 1:5 explicitly states that Titus was left in Crete to put things in order and appoint qualified elders in every city.' },
-            { type: 'matching', pairs: [ { left: 'Governance', right: 'The structure of authority, responsibility, and accountability' }, { left: 'Oversight', right: 'The spiritual care, protection, and direction of the church' }, { left: 'Policy', right: 'A clear guideline for handling important operational matters' }, { left: 'Accountability', right: 'Being answerable for decisions, conduct, and stewardship' } ] },
+            { type: 'matching', pairs: [{ left: 'Governance', right: 'The structure of authority, responsibility, and accountability' }, { left: 'Oversight', right: 'The spiritual care, protection, and direction of the church' }, { left: 'Policy', right: 'A clear guideline for handling important operational matters' }, { left: 'Accountability', right: 'Being answerable for decisions, conduct, and stewardship' }] },
             { type: 'question', content: 'Reflect on the administration of your ministry. What is one specific structural or policy improvement you will initiate this week based on this lesson?' },
             { type: 'file_upload', title: 'Module 13 Assignment', content: 'Upload your completed Structure Audit diagram or your updated policy review notes.' }
         ]
@@ -1326,7 +1325,7 @@ const defaultModules = {
             { type: 'toggle_list', title: '📚 Supplementary Notes for the Teacher', content: '<strong>1. Randy Alcorn on Money, Possessions, and Eternity:</strong> Highlight Alcorn\'s focus on the absolute spiritual weight of money, stewardship, and eternal perspective.<br><strong>2. John Maxwell on Developing the Leader Within You:</strong> Review Maxwell\'s principles for building leadership integrity, credibility, and disciplined oversight.<br><strong>3. Jamie Dunlop on Budgeting for a Healthy Church:</strong> Emphasize Dunlop\'s guidance on linking budget oversight directly to mission, priorities, and church health.' },
             { type: 'toggle_list', title: '📝 Optional Homework for the Week', content: '1. <strong>Read:</strong> 2 Corinthians 8-9 and Luke 16:1-13.<br>2. <strong>Process Audit:</strong> Map out your current church financial flow from collections to expenditure. Identify any gaps in accountability or documentation.<br>3. <strong>Budget Review:</strong> Review the current budget structure against actual spending trends from the last quarter.' },
             { type: 'multiple_choice', question: 'According to 2 Corinthians 8:21, what double standard did Paul aim to meet when administering the financial gift?', options: ['Managing it quickly and spending it completely', 'Honorable not only in the Lord\'s sight but also in the sight of man', 'Investing it wisely and growing it significantly', 'Keeping it confidential and secure from outside observers'], correct_index: 1, explanation: '2 Corinthians 8:21 explicitly sets the standard: "For we aim at what is honorable not only in the Lord\'s sight but also in the sight of man."' },
-            { type: 'matching', pairs: [ { left: 'Integrity', right: 'Being honest, careful, and above reproach' }, { left: 'Stewardship', right: 'Faithfully managing resources that belong to God' }, { left: 'Budgeting', right: 'Planning, tracking, and allocating financial tools' }, { left: 'Transparency', right: 'Keeping records open, clear, and accountable' } ] },
+            { type: 'matching', pairs: [{ left: 'Integrity', right: 'Being honest, careful, and above reproach' }, { left: 'Stewardship', right: 'Faithfully managing resources that belong to God' }, { left: 'Budgeting', right: 'Planning, tracking, and allocating financial tools' }, { left: 'Transparency', right: 'Keeping records open, clear, and accountable' }] },
             { type: 'question', content: 'Reflect on your current financial oversight. What is one specific structural change or improvement you will prioritize this week based on this lesson?' },
             { type: 'file_upload', title: 'Module 14 Assignment', content: 'Upload your completed Process Audit map or budget structure review notes.' }
         ]
@@ -1396,7 +1395,7 @@ const defaultModules = {
             { type: 'toggle_list', title: '📚 Supplementary Notes for the Teacher', content: '<strong>1. Peter Scazzero on Emotionally Healthy Spirituality:</strong> Emphasize Scazzero\'s core truth: It\'s impossible to be spiritually mature while remaining emotionally immature.<br><strong>2. Daniel Goleman on Emotional Intelligence:</strong> Connect spiritual maturity to the core elements of emotional intelligence: self-awareness, self-regulation, empathy, and relationship management.<br><strong>3. Henry Cloud on Necessary Endings:</strong> Use Cloud\'s principles to discuss how clean emotional boundaries protect personal health, families, and long-term ministry impact.' },
             { type: 'toggle_list', title: '📝 Optional Homework for the Week', content: '1. <strong>Read:</strong> Psalm 139 and James 1.<br>2. <strong>Trigger Log:</strong> Throughout the week, write down moments you felt emotionally triggered, defensive, or anxious. Analyze what drove that reaction.<br>3. <strong>Feedback Dialogue:</strong> Ask a trusted peer or leader: "What is one blind spot you see in my communication or leadership style that I might be missing?"' },
             { type: 'multiple_choice', question: 'According to Proverbs 17:10, how does a rebuke affect a man of understanding compared to a fool?', options: ['It makes him bitter and discouraged', 'It goes deeper into him than a hundred blows into a fool', 'It has no effect on his established behavior', 'It causes him to immediately defend his reputation'], correct_index: 1, explanation: 'Proverbs 17:10 explicitly states: "A rebuke goes deeper into a man of understanding than a hundred blows into a fool."' },
-            { type: 'matching', pairs: [ { left: 'Self-Awareness', right: 'Accurate self-knowledge and tracking our emotional habits' }, { left: 'Criticism', right: 'Inevitable feedback that must be weighed with wisdom' }, { left: 'Maturity', right: 'The capacity to maintain connection and composure under stress' }, { left: 'Identity', right: 'Anchoring our personal worth completely in Christ' } ] },
+            { type: 'matching', pairs: [{ left: 'Self-Awareness', right: 'Accurate self-knowledge and tracking our emotional habits' }, { left: 'Criticism', right: 'Inevitable feedback that must be weighed with wisdom' }, { left: 'Maturity', right: 'The capacity to maintain connection and composure under stress' }, { left: 'Identity', right: 'Anchoring our personal worth completely in Christ' }] },
             { type: 'question', content: 'Reflect on a recent situation where you felt defensive or reactive. What did that reaction reveal about your underlying emotional triggers, and how will you apply this lesson next time?' },
             { type: 'file_upload', title: 'Module 15 Assignment', content: 'Upload your personal Trigger Log or reflections from your feedback dialogue.' }
         ]
@@ -1460,7 +1459,7 @@ const defaultModules = {
             { type: 'toggle_list', title: '📚 Supplementary Notes for the Teacher', content: '<strong>1. J. Oswald Sanders on Spiritual Leadership:</strong> Reinforce Sanders\' principles regarding the absolute necessity of visionary foresight, courage, and spiritual alignment in tracking objectives.<br><strong>2. Timothy Witmer on The Shepherd Leader:</strong> Emphasize Witmer\'s model showing that a clear strategic vision must protect the personal care and shepherding of every individual member.<br><strong>3. Peter Scazzero on Emotional Health:</strong> Finalize the track by connecting long-term strategic vision directly to the internal character and structural sanity of the leadership team.' },
             { type: 'toggle_list', title: '📝 Optional Homework for the Week', content: '1. <strong>Final Compilation:</strong> Assemble all weekly assignment items into your completed Masterclass Ministry Plan portfolio.<br>2. <strong>Vision Communication:</strong> Share your updated 3-page vision summary document with your core leadership team or board for feedback.<br>3. <strong>Implementation Schedule:</strong> Set exact calendar dates for executing the structural and policy updates developed during this course.' },
             { type: 'multiple_choice', question: 'According to Habakkuk 2:2, why must the vision be made plain on tablets?', options: ['So it can be preserved for historical records', 'So he may run who reads it', 'To satisfy administrative requirements', 'To prevent outside opposition from changing it'], correct_index: 1, explanation: 'Habakkuk 2:2 explicitly states the reason for clear, public documentation: "...make it plain on tablets, so he may run who reads it."' },
-            { type: 'matching', pairs: [ { left: 'Vision', right: 'Discerning and documenting God\'s clear direction' }, { left: 'Strategy', right: 'Mapping out practical pathways, timelines, and budgets' }, { left: 'Growth', right: 'Balanced scaling across spiritual, structural, and numerical areas' }, { left: 'Synthesis', right: 'Compiling the entire course into a functional local plan' } ] },
+            { type: 'matching', pairs: [{ left: 'Vision', right: 'Discerning and documenting God\'s clear direction' }, { left: 'Strategy', right: 'Mapping out practical pathways, timelines, and budgets' }, { left: 'Growth', right: 'Balanced scaling across spiritual, structural, and numerical areas' }, { left: 'Synthesis', right: 'Compiling the entire course into a functional local plan' }] },
             { type: 'question', content: 'Reflect on your entire 16-week masterclass journey. What is the single most transformative shift that has occurred in your leadership style, and what is your immediate next action step this week?' },
             { type: 'file_upload', title: 'Module 16 Final Portfolio Submission', content: 'Upload your completed, comprehensive Masterclass Local Ministry Plan portfolio document here.' }
         ]
@@ -1501,7 +1500,7 @@ async function syncFromCloud() {
         const resMod = await fetch(SYNC_URL + 'modules');
         if (resMod.ok) {
             const data = await resMod.json();
-            if (data && typeof data === 'object' && Object.keys(data).length > 0 && data.module12 && data.module16) {
+            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
                 localStorage.setItem(CONTENT_KEY, JSON.stringify(data));
             } else {
                 console.log("Fetched cloud modules are incomplete or empty. Overwriting with local defaultModules and seeding...");
@@ -1588,22 +1587,17 @@ async function saveToCloud(key, data) {
 }
 
 async function checkAndSeedModules() {
-    let localMods = null;
-    try {
-        const stored = localStorage.getItem(CONTENT_KEY);
-        if (stored) {
-            localMods = JSON.parse(stored);
-        }
-    } catch (e) {
-        console.error("Error reading/parsing modules content from localStorage:", e);
-    }
-
-    const isMissing = !localMods || typeof localMods !== 'object' || Object.keys(localMods).length === 0 || !localMods.module12 || !localMods.module16;
-    if (isMissing) {
-        console.log("Local CONTENT_KEY is incomplete. Forcing seed of defaultModules to local storage and KVDB cloud sync...");
+    // This function no longer overwrites Firestore with defaults.
+    // Firebase is the source of truth. We only need local defaults
+    // as a fallback if localStorage is empty AND Firebase hasn't loaded yet.
+    // The real sync happens in initFirestoreSync via onSnapshot.
+    const stored = localStorage.getItem(CONTENT_KEY);
+    if (!stored) {
+        // Temporarily seed localStorage from defaultModules so the UI
+        // isn't blank while waiting for the Firestore snapshot to arrive.
+        console.log("localStorage empty — seeding temporary defaults while waiting for Firestore sync...");
         localStorage.setItem(CONTENT_KEY, JSON.stringify(defaultModules));
-        await saveToCloud('modules', defaultModules);
-        triggerStorageSync(CONTENT_KEY);
+        // NOTE: We do NOT write to Firestore here. Firebase is the source of truth.
     }
 }
 checkAndSeedModules();
@@ -1753,25 +1747,19 @@ function initFirestoreSync(onCollectionLoaded) {
             mods[doc.id] = doc.data();
         });
 
-        // Automatically update module3 and module11 content in Firestore if they are mismatched
+        // Firebase is the source of truth — never overwrite existing docs with defaults.
+        // Only seed docs that are completely missing from Firestore (no document at all).
         if (isTeacherOrAdmin) {
-            if (mods['module3'] && mods['module3'].title !== "Theology of the Church") {
-                console.log("Migration: Seeding/updating module3 to 'Theology of the Church'...");
-                firebaseDb.collection('modules_content').doc('module3').set(defaultModules['module3'])
-                    .catch(err => console.error("Error migrating module3 in Firestore", err));
-            }
-            if (mods['module11'] && mods['module11'].title !== "Conflict Resolution") {
-                console.log("Migration: Seeding/updating module11 to 'Conflict Resolution'...");
-                firebaseDb.collection('modules_content').doc('module11').set(defaultModules['module11'])
-                    .catch(err => console.error("Error migrating module11 in Firestore", err));
-            }
-            // Future-proof safe seeding check for newly configured modules (e.g. Modules 12–16)
+            const archivedList = AuthAPI.getArchivedModules();
+            const archivedIds = archivedList.map(m => m.id);
             Object.keys(defaultModules).forEach(id => {
-                if (!mods[id]) {
-                    console.log(`Safe Seeding: Deploying newly configured module ${id} to Firestore...`);
+                if (!mods[id] && !archivedIds.includes(id)) {
+                    // This module ID doesn't exist in Firestore at all and is not archived — safe to seed
+                    console.log(`Safe Seeding: Adding new module ${id} to Firestore (did not exist)...`);
                     firebaseDb.collection('modules_content').doc(id).set(defaultModules[id])
-                        .catch(err => console.error(`Error seeding newly configured module ${id} in Firestore`, err));
+                        .catch(err => console.error(`Error seeding new module ${id} in Firestore`, err));
                 }
+                // If the doc already exists, leave it completely untouched.
             });
         }
 
@@ -1815,10 +1803,20 @@ function initFirestoreSync(onCollectionLoaded) {
             const data = doc.data();
             if (data && data.list) {
                 // Permanently update module_order in Firestore if module11 is missing
-                if (isTeacherOrAdmin && !data.list.includes('module11')) {
-                    data.list.push('module11');
-                    firebaseDb.collection('settings').doc('module_order').set({ list: data.list })
-                        .catch(err => console.error("Error migrating module_order in Firestore", err));
+                if (isTeacherOrAdmin) {
+                    const archivedList = AuthAPI.getArchivedModules();
+                    const archivedIds = archivedList.map(m => m.id);
+                    let migrated = false;
+                    Object.keys(defaultModules).forEach(id => {
+                        if (!data.list.includes(id) && !archivedIds.includes(id)) {
+                            data.list.push(id);
+                            migrated = true;
+                        }
+                    });
+                    if (migrated) {
+                        firebaseDb.collection('settings').doc('module_order').set({ list: data.list })
+                            .catch(err => console.error("Error migrating module_order in Firestore", err));
+                    }
                 }
                 localStorage.setItem(ORDER_KEY, JSON.stringify(data.list));
                 triggerStorageSync(ORDER_KEY);
@@ -2315,7 +2313,7 @@ const AuthAPI = {
         return { error: 'User not found' };
     },
 
-    saveTeacherRemark: (studentId, moduleId, componentIndex, remarkText, adminName) => {
+    saveTeacherRemark: async (studentId, moduleId, componentIndex, remarkText, adminName) => {
         if (!isFirebaseInitialized || !firebaseDb) {
             alert('Database is offline or not configured. Operation blocked.');
             return { error: 'Database is offline or not configured. Operation blocked.' };
@@ -2336,14 +2334,39 @@ const AuthAPI = {
 
                 student.answers[ansIndex] = ans;
 
-                firebaseDb.collection('students').doc(studentId).update({
+                await firebaseDb.collection('students').doc(studentId).update({
                     answers: student.answers
-                }).catch(err => {
-                    console.error("Firestore save teacher remark error", err);
-                    alert("Database Error: " + err.message);
                 });
 
                 jilgmBroadcast('remarks_updated', { studentId, moduleId, componentIndex });
+                return { success: true };
+            }
+        }
+        return { error: 'Student or answer not found' };
+    },
+
+    saveGradeScore: async (studentId, moduleId, componentIndex, scoreVal) => {
+        if (!isFirebaseInitialized || !firebaseDb) {
+            alert('Database is offline or not configured. Operation blocked.');
+            return { error: 'Database is offline or not configured. Operation blocked.' };
+        }
+        const students = AuthAPI.getAllStudents();
+        const index = students.findIndex(s => s.id === studentId);
+        if (index !== -1) {
+            const student = { ...students[index] };
+            if (!student.answers) student.answers = [];
+
+            const ansIndex = student.answers.findIndex(a => a.moduleId === moduleId && a.componentIndex === componentIndex);
+            if (ansIndex !== -1) {
+                const ans = { ...student.answers[ansIndex] };
+                ans.score = scoreVal;
+
+                student.answers[ansIndex] = ans;
+
+                await firebaseDb.collection('students').doc(studentId).update({
+                    answers: student.answers
+                });
+
                 return { success: true };
             }
         }
@@ -2459,7 +2482,7 @@ const AuthAPI = {
         }
     },
 
-    setModuleUnlocked: (moduleId, isUnlocked) => {
+    setModuleUnlocked: async (moduleId, isUnlocked) => {
         let unlocked = AuthAPI.getUnlockedModules();
         if (!isFirebaseInitialized || !firebaseDb) {
             alert('Database is offline or not configured. Operation blocked.');
@@ -2473,21 +2496,19 @@ const AuthAPI = {
             unlocked = unlocked.filter(id => id !== moduleId);
         }
 
-        firebaseDb.collection('settings').doc('unlocked_modules').set({ list: unlocked })
-            .catch(err => console.error("Firestore set module unlocked error", err));
+        await firebaseDb.collection('settings').doc('unlocked_modules').set({ list: unlocked });
         // Trigger recalculation for all students under Firestore
-        firebaseDb.collection('students').get().then(snapshot => {
-            const batch = firebaseDb.batch();
-            snapshot.forEach(doc => {
-                const student = doc.data();
-                const completedCount = unlocked.filter(modId =>
-                    (student.answers || []).some(a => a.moduleId === modId && a.type === 'lesson_completion')
-                ).length;
-                const progress = unlocked.length > 0 ? Math.round((completedCount / unlocked.length) * 100) : 0;
-                batch.update(doc.ref, { progress });
-            });
-            batch.commit().catch(err => console.error("Firestore bulk progress update error", err));
+        const snapshot = await firebaseDb.collection('students').get();
+        const batch = firebaseDb.batch();
+        snapshot.forEach(doc => {
+            const student = doc.data();
+            const completedCount = unlocked.filter(modId =>
+                (student.answers || []).some(a => a.moduleId === modId && a.type === 'lesson_completion')
+            ).length;
+            const progress = unlocked.length > 0 ? Math.round((completedCount / unlocked.length) * 100) : 0;
+            batch.update(doc.ref, { progress });
         });
+        await batch.commit();
         return unlocked;
     },
 
@@ -2506,7 +2527,7 @@ const AuthAPI = {
             const data = localStorage.getItem(CONTENT_KEY);
             if (data) {
                 const parsed = JSON.parse(data);
-                if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0 && parsed.module12 && parsed.module16) {
+                if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
                     return parsed;
                 }
             }
@@ -2530,11 +2551,10 @@ const AuthAPI = {
         }
     },
 
-    saveModuleOrder: (orderArray) => {
+    saveModuleOrder: async (orderArray) => {
         localStorage.setItem(ORDER_KEY, JSON.stringify(orderArray));
         if (isFirebaseInitialized && firebaseDb) {
-            firebaseDb.collection('settings').doc('module_order').set({ list: orderArray })
-                .catch(err => console.error("Firestore save module order error", err));
+            await firebaseDb.collection('settings').doc('module_order').set({ list: orderArray });
         }
     },
 
@@ -2543,20 +2563,20 @@ const AuthAPI = {
         return mods[moduleId] || null;
     },
 
-    saveModule: (moduleId, title, subtitle, components) => {
+    saveModule: async (moduleId, title, subtitle, components) => {
         if (!isFirebaseInitialized || !firebaseDb) {
             alert('Database is offline or not configured. Operation blocked.');
             return false;
         }
-        firebaseDb.collection('modules_content').doc(moduleId).set({
+        await firebaseDb.collection('modules_content').doc(moduleId).set({
             title,
             subtitle,
             components
-        }).catch(err => console.error("Firestore save module error", err));
+        });
         return true;
     },
 
-    addModule: (title, subtitle) => {
+    addModule: async (title, subtitle) => {
         if (!isFirebaseInitialized || !firebaseDb) {
             alert('Database is offline or not configured. Operation blocked.');
             return null;
@@ -2571,12 +2591,12 @@ const AuthAPI = {
         };
 
         const docRef = firebaseDb.collection('modules_content').doc();
-        docRef.set(newMod).catch(err => console.error("Firestore add module error", err));
+        await docRef.set(newMod);
 
         let order = AuthAPI.getModuleOrder();
         if (!order.includes(docRef.id)) {
             order.push(docRef.id);
-            AuthAPI.saveModuleOrder(order);
+            await AuthAPI.saveModuleOrder(order);
         }
         return docRef.id;
     },
@@ -2591,57 +2611,57 @@ const AuthAPI = {
         }
     },
 
-    deleteModule: (moduleId) => {
+    deleteModule: async (moduleId) => {
         if (!isFirebaseInitialized || !firebaseDb) {
             alert('Database is offline or not configured. Operation blocked.');
             return false;
         }
         const mod = AuthAPI.getModule(moduleId);
         if (mod) {
-            firebaseDb.collection('modules_content').doc(moduleId).delete().catch(err => console.error("Firestore delete module error", err));
-            firebaseDb.collection('archived_modules').doc(moduleId).set({
+            await firebaseDb.collection('modules_content').doc(moduleId).delete();
+            await firebaseDb.collection('archived_modules').doc(moduleId).set({
                 ...mod,
                 archivedAt: new Date().toISOString()
-            }).catch(err => console.error("Firestore archive module error", err));
+            });
 
             // Also remove from unlocked list
             let unlocked = AuthAPI.getUnlockedModules();
             unlocked = unlocked.filter(id => id !== moduleId);
-            firebaseDb.collection('settings').doc('unlocked_modules').set({ list: unlocked });
+            await firebaseDb.collection('settings').doc('unlocked_modules').set({ list: unlocked });
 
             let order = AuthAPI.getModuleOrder();
             order = order.filter(id => id !== moduleId);
-            AuthAPI.saveModuleOrder(order);
+            await AuthAPI.saveModuleOrder(order);
 
             return true;
         }
         return false;
     },
 
-    restoreModule: (moduleId) => {
+    restoreModule: async (moduleId) => {
         if (!isFirebaseInitialized || !firebaseDb) {
             alert('Database is offline or not configured. Operation blocked.');
             return false;
         }
-        firebaseDb.collection('archived_modules').doc(moduleId).get().then(doc => {
-            if (doc.exists) {
-                const modData = doc.data();
-                const restoredMod = {
-                    title: modData.title,
-                    subtitle: modData.subtitle,
-                    components: modData.components
-                };
-                firebaseDb.collection('modules_content').doc(moduleId).set(restoredMod);
-                firebaseDb.collection('archived_modules').doc(moduleId).delete();
+        const doc = await firebaseDb.collection('archived_modules').doc(moduleId).get();
+        if (doc.exists) {
+            const modData = doc.data();
+            const restoredMod = {
+                title: modData.title,
+                subtitle: modData.subtitle,
+                components: modData.components
+            };
+            await firebaseDb.collection('modules_content').doc(moduleId).set(restoredMod);
+            await firebaseDb.collection('archived_modules').doc(moduleId).delete();
 
-                let order = AuthAPI.getModuleOrder();
-                if (!order.includes(moduleId)) {
-                    order.push(moduleId);
-                    AuthAPI.saveModuleOrder(order);
-                }
+            let order = AuthAPI.getModuleOrder();
+            if (!order.includes(moduleId)) {
+                order.push(moduleId);
+                await AuthAPI.saveModuleOrder(order);
             }
-        }).catch(err => console.error("Firestore restore module error", err));
-        return true;
+            return true;
+        }
+        return false;
     },
 
     getAnnouncements: () => {
@@ -3170,4 +3190,5 @@ const AuthAPI = {
 };
 
 window.AuthAPI = AuthAPI;
+window.defaultModules = defaultModules;
 

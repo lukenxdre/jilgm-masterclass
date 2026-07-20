@@ -607,40 +607,38 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Submissions Details Modal -->
-        <div id="answersModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem;">
-            <div class="glass-card" style="max-width: 850px; width: 100%; padding: 2.5rem; border-color: rgba(212, 175, 55, 0.4); max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6);">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                    <div>
-                        <h2 style="margin: 0; font-size: 1.6rem; color: var(--accent-gold);" id="modalStudentName">Student Name</h2>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.2rem;">Student Profile, Submissions & Private Messages</p>
-                    </div>
-                    <button class="btn btn-secondary" onclick="closeAnswersModal()" style="border-color: #ef4444; color: #ef4444; padding: 0.4rem 0.8rem; height: auto;">Close</button>
-                </div>
-
-                <!-- Modal Sub-Tabs -->
-                <div style="display: flex; border-bottom: 1px solid var(--glass-border); margin-bottom: 1.5rem; gap: 1rem;">
-                    <button id="modal-tab-submissions" class="btn" style="background: none; border: none; border-bottom: 2px solid var(--accent-gold); color: var(--text-primary); font-weight: bold; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0;">Lesson Submissions</button>
-                    <button id="modal-tab-qa" class="btn" style="background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0;">Lesson Q&A</button>
-                    <button id="modal-tab-chat" class="btn" style="background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0; display: flex; align-items: center; gap: 0.4rem;">Private Messages <span id="modal-chat-badge" class="badge" style="background:#ef4444; color:#fff; display:none; border:none; padding: 0.1rem 0.35rem; font-size:0.65rem;">0</span></button>
-                </div>
-                
-                <div id="modal-content-area" style="flex: 1; overflow-y: auto; padding-right: 0.5rem; margin-bottom: 1rem;">
-                    <div id="modalContentSubmissions">
-                        <div id="modalAnswersContainer" style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
-                            <!-- Populated dynamically -->
-                        </div>
-                    </div>
-                    <div id="modalContentQA" class="hidden"></div>
-                    <div id="modalContentChat" class="hidden"></div>
-                </div>
-            </div>
         </div>
     </main>
+
+    <!-- Submissions Details Modal -->
+    <div id="answersModal" style="position: fixed; inset: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 1.5rem; overflow-y: auto; box-sizing: border-box;">
+        <div class="glass-card" style="max-width: 850px; width: 100%; padding: 2.5rem; border-color: rgba(212, 175, 55, 0.4); max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6); margin: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div>
+                    <h2 style="margin: 0; font-size: 1.6rem; color: var(--accent-gold);" id="modalStudentName">Student Name</h2>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.2rem;">Student Profile, Submissions & Private Messages</p>
+                </div>
+                <button class="btn btn-secondary" onclick="closeAnswersModal()" style="border-color: #ef4444; color: #ef4444; padding: 0.4rem 0.8rem; height: auto;">Close</button>
+            </div>
+
+            <!-- Modal Sub-Tabs -->
+            <div style="display: flex; border-bottom: 1px solid var(--glass-border); margin-bottom: 1.5rem; gap: 1rem;">
+                <button id="modal-tab-submissions" class="btn" style="background: none; border: none; border-bottom: 2px solid var(--accent-gold); color: var(--text-primary); font-weight: bold; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0;">Lesson Submissions</button>
+                <button id="modal-tab-qa" class="btn" style="background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0;">Lesson Q&A</button>
+                <button id="modal-tab-chat" class="btn" style="background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 0; display: flex; align-items: center; gap: 0.4rem;">Private Messages <span id="modal-chat-badge" class="badge" style="background:#ef4444; color:#fff; display:none; border:none; padding: 0.1rem 0.35rem; font-size:0.65rem;">0</span></button>
+            </div>
+            
+            <div id="modal-content-area" style="flex: 1; overflow-y: auto; padding-right: 0.5rem; margin-bottom: 1rem;">
+                <div id="modalContentSubmissions">
+                    <div id="modalAnswersContainer" style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+                <div id="modalContentQA" class="hidden"></div>
+                <div id="modalContentChat" class="hidden"></div>
+            </div>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
@@ -1366,51 +1364,174 @@
                         header.innerHTML = `<h4 style="margin: 0; font-size: 1.15rem; font-family: var(--font-serif); font-style: italic;"><a href="module.html?id=${modId}&preview=true&from=instructor" style="color: var(--accent-gold); text-decoration: none; border-bottom: 1px dashed rgba(212,175,55,0.4);">${modNum}${mod.title}</a></h4>`;
                         modSection.appendChild(header);
 
+                        const itemsContainer = document.createElement('div');
+                        itemsContainer.style.display = 'flex';
+                        itemsContainer.style.flexDirection = 'column';
+                        itemsContainer.style.gap = '1.2rem';
+
                         grouped[modId].forEach(ans => {
-                            const block = document.createElement('div');
-                            block.style.marginBottom = '1.5rem';
-                            block.style.borderBottom = '1px solid rgba(249, 115, 22, 0.12)';
-                            block.style.paddingBottom = '1rem';
-                            
-                            const scoreVal = ans.score !== undefined ? ans.score : '';
+                            const card = document.createElement('div');
+                            card.style.background = 'rgba(255,255,255,0.04)';
+                            card.style.padding = '1.2rem';
+                            card.style.borderRadius = '8px';
+                            card.style.border = '1px solid var(--glass-hover, rgba(200,200,200,0.15))';
+
+                            let typeLabel = ans.type ? ans.type.replace('_', ' ').toUpperCase() : 'REFLECTION';
+                            let contentHtml = '';
+                            let gradeFormHtml = '';
+
+                            const scoreVal = (ans.score !== undefined && ans.score !== null) ? ans.score : '';
                             const currentRemark = ans.teacherRemarks || '';
                             const compIdxStr = ans.componentIndex !== null ? ans.componentIndex : 'null';
 
-                            block.innerHTML = `
-                                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.4rem;">
-                                    <span>Task Type: ${ans.type || 'Reflection'}</span>
-                                    <span>Submitted: ${new Date(ans.dateSubmitted).toLocaleString()}</span>
-                                </div>
-                                <div style="background: rgba(249, 115, 22, 0.05); border: 1px solid rgba(249, 115, 22, 0.15); padding: 1rem; border-radius: 6px; font-size: 0.95rem; line-height: 1.5; color: var(--text-primary); margin-bottom: 1rem; white-space: pre-wrap; text-align: left;">${ans.text}</div>
+                            let answerTextHtml = '';
+                            if (ans.answer) {
+                                answerTextHtml = `<p style="margin: 0.5rem 0; color: var(--text-primary); line-height: 1.5; font-size: 0.92rem; text-align: left;"><strong>Response:</strong> <span style="font-style: italic; color: var(--text-primary);">"${ans.answer}"</span></p>`;
+                            }
+
+                            let fileHtml = '';
+                            if (ans.file) {
+                                let previewHtml = '';
+                                let actionButtonsHtml = '';
+                                if (ans.file.url) {
+                                    const ext = (ans.file.name || '').split('.').pop().toLowerCase();
+                                    const isImg = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'heic', 'tiff'].includes(ext);
+                                    const isVid = ['mp4', 'webm', 'ogg', 'mov', 'quicktime', 'avi', 'mkv', '3gp', 'wmv'].includes(ext);
+                                    const isPdf = ext === 'pdf';
+                                    
+                                    if (isImg) {
+                                        previewHtml = `<div style="margin-top:0.8rem;"><img src="${ans.file.url}" style="max-height: 200px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212,175,55,0.3); object-fit: contain;"></div>`;
+                                    } else if (isVid) {
+                                        previewHtml = `<div style="margin-top:0.8rem;"><video src="${ans.file.url}" controls style="max-height: 220px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212,175,55,0.3); background:#000;"></video></div>`;
+                                    } else if (isPdf) {
+                                        previewHtml = `<div style="margin-top:0.8rem; font-size: 0.85rem; color: var(--text-secondary);">PDF Document. Click preview button below to view.</div>`;
+                                    }
+                                    
+                                    let previewBtn = '';
+                                    if (isImg || isVid || isPdf) {
+                                        previewBtn = `<button onclick="window.openFilePreview('${ans.file.url.replace(/'/g, "\\'")}', '${(ans.file.name || '').replace(/'/g, "\\'")}')" class="btn" style="font-size:0.8rem; padding:0.4rem 0.8rem; background:rgba(212,175,55,0.25); color:var(--accent-gold); border:1px solid rgba(212,175,55,0.4); border-radius:4px; cursor:pointer;">🔍 Preview File</button>`;
+                                    }
+                                    
+                                    actionButtonsHtml = `
+                                        <div style="display: flex; gap: 0.8rem; margin-top: 0.8rem; flex-wrap: wrap;">
+                                            <a href="${ans.file.url}" download="${ans.file.name || 'download'}" class="btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; padding:0.4rem 0.8rem; font-size:0.8rem; background:rgba(212,175,55,0.15); color:var(--accent-gold-light); border:1px solid rgba(212,175,55,0.3); border-radius:4px;">📥 Download File</a>
+                                            ${previewBtn}
+                                        </div>
+                                    `;
+                                } else {
+                                    actionButtonsHtml = `<div style="margin-top: 0.6rem; font-size: 0.85rem; color: #f87171; font-style: italic;">⚠️ File content not stored in database (stale upload). Only metadata is available.</div>`;
+                                }
                                 
-                                <div style="background: rgba(249, 115, 22, 0.03); border: 1px solid rgba(249, 115, 22, 0.2); border-radius: 8px; padding: 1rem; margin-top: 0.8rem; display: flex; flex-direction: column; gap: 0.8rem;">
-                                    <div style="display: flex; align-items: center; gap: 1rem;">
-                                        <label style="font-size: 0.85rem; color: var(--accent-gold); font-weight: bold; min-width: 100px; text-align: left;">GRADE SCORE:</label>
-                                        <input type="number" id="score_input_${ans.moduleId}_${ans.componentIndex !== null ? ans.componentIndex : ''}" class="glass-input" style="width: 80px; padding: 0.3rem 0.5rem; text-align: center;" min="0" max="100" placeholder="0-100" value="${scoreVal}">
-                                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-style: italic;">% (Apprentices view instantly)</span>
+                                fileHtml = `
+                                    <div style="background: rgba(249, 115, 22, 0.05); border: 1px solid rgba(249, 115, 22, 0.15); padding: 1rem; border-radius: 6px; font-size: 0.95rem; line-height: 1.5; color: var(--text-primary); margin-top: 0.5rem; margin-bottom: 1rem; text-align: left;">
+                                        <strong>Attached File:</strong> <span style="font-family: monospace; font-size: 0.85rem; color: var(--accent-gold-light);">${ans.file.name || 'File'} (${ans.file.size || 'N/A'})</span>
+                                        ${previewHtml}
+                                        ${actionButtonsHtml}
                                     </div>
-                                    <div style="display: flex; gap: 0.8rem; align-items: flex-start;">
-                                        <textarea id="remark_input_${ans.moduleId}_${ans.componentIndex !== null ? ans.componentIndex : ''}" class="glass-input" rows="2" style="flex: 1; font-size: 0.85rem; padding: 0.5rem; line-height: 1.4;" placeholder="Type teacher comments or shepherding remarks here...">${currentRemark}</textarea>
-                                        <button class="btn btn-primary" style="font-size: 0.8rem; padding: 0.5rem 1.2rem; height: auto;" onclick="saveGradeAndRemarks('${student.id}', '${ans.moduleId}', ${compIdxStr})">Save Grade</button>
+                                `;
+                            }
+
+                            if (!answerTextHtml && !fileHtml) {
+                                contentHtml = `<div style="background: rgba(249, 115, 22, 0.05); border: 1px solid rgba(249, 115, 22, 0.15); padding: 1rem; border-radius: 6px; font-size: 0.95rem; line-height: 1.5; color: var(--text-primary); margin-bottom: 1rem; white-space: pre-wrap; text-align: left;">${ans.text || ''}</div>`;
+                            } else {
+                                contentHtml = answerTextHtml + fileHtml;
+                            }
+
+                            // Show auto-graded score for multiple choice/true false, OR manual grading form for essays/reflections
+                            if (ans.type === 'multiple_choice' || ans.type === 'true_false') {
+                                gradeFormHtml = `
+                                    <div style="font-size: 0.85rem; font-weight: bold; color: ${ans.isCorrect ? '#4ade80' : '#f87171'}; margin-top: 0.4rem; text-align: left;">
+                                        Auto-Graded Result: ${ans.score} / ${ans.maxScore} (${ans.isCorrect ? 'CORRECT' : 'INCORRECT'})
                                     </div>
-                                    ${ans.teacherRemarksDate ? `<span style="font-size: 0.72rem; color: var(--text-secondary); text-align: left;">Last evaluated on ${new Date(ans.teacherRemarksDate).toLocaleString()} by ${ans.teacherRemarksAdmin || 'Teacher'}</span>` : ''}
+                                    <div style="background: rgba(249, 115, 22, 0.03); border: 1px solid rgba(249, 115, 22, 0.2); border-radius: 8px; padding: 1rem; margin-top: 0.8rem; display: flex; flex-direction: column; gap: 0.8rem;">
+                                        <div style="display: flex; gap: 0.8rem; align-items: flex-start;">
+                                            <textarea id="remark_input_${ans.moduleId}_${ans.componentIndex !== null ? ans.componentIndex : ''}" class="glass-input" rows="2" style="flex: 1; font-size: 0.85rem; padding: 0.5rem; line-height: 1.4; color: var(--text-primary); background: var(--glass-bg, rgba(200,200,200,0.1));" placeholder="Type shepherding remarks here...">${currentRemark}</textarea>
+                                            <button class="btn btn-primary" style="font-size: 0.8rem; padding: 0.5rem 1.2rem; height: auto;" onclick="saveGradeAndRemarks('${student.id}', '${ans.moduleId}', ${compIdxStr})">Save Remarks</button>
+                                        </div>
+                                        ${ans.teacherRemarksDate ? `<span style="font-size: 0.72rem; color: var(--text-secondary); text-align: left;">Last evaluated on ${new Date(ans.teacherRemarksDate).toLocaleString()} by ${ans.teacherRemarksAdmin || 'Teacher'}</span>` : ''}
+                                    </div>
+                                `;
+                            } else {
+                                gradeFormHtml = `
+                                    <div style="background: rgba(249, 115, 22, 0.03); border: 1px solid rgba(249, 115, 22, 0.2); border-radius: 8px; padding: 1rem; margin-top: 0.8rem; display: flex; flex-direction: column; gap: 0.8rem;">
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <label style="font-size: 0.85rem; color: var(--accent-gold); font-weight: bold; min-width: 100px; text-align: left;">GRADE SCORE:</label>
+                                            <input type="number" id="score_input_${ans.moduleId}_${ans.componentIndex !== null ? ans.componentIndex : ''}" class="glass-input" style="width: 80px; padding: 0.3rem 0.5rem; text-align: center;" min="0" max="100" placeholder="0-100" value="${scoreVal}">
+                                            <span style="font-size: 0.85rem; color: var(--text-secondary); font-style: italic;">% (Apprentices view instantly)</span>
+                                        </div>
+                                        <div style="display: flex; gap: 0.8rem; align-items: flex-start;">
+                                            <textarea id="remark_input_${ans.moduleId}_${ans.componentIndex !== null ? ans.componentIndex : ''}" class="glass-input" rows="2" style="flex: 1; font-size: 0.85rem; padding: 0.5rem; line-height: 1.4; color: var(--text-primary); background: var(--glass-bg, rgba(200,200,200,0.1));" placeholder="Type comments or shepherding remarks here...">${currentRemark}</textarea>
+                                            <button class="btn btn-primary" style="font-size: 0.8rem; padding: 0.5rem 1.2rem; height: auto;" onclick="saveGradeAndRemarks('${student.id}', '${ans.moduleId}', ${compIdxStr})">Save Grade</button>
+                                        </div>
+                                        ${ans.teacherRemarksDate ? `<span style="font-size: 0.72rem; color: var(--text-secondary); text-align: left;">Last evaluated on ${new Date(ans.teacherRemarksDate).toLocaleString()} by ${ans.teacherRemarksAdmin || 'Teacher'}</span>` : ''}
+                                    </div>
+                                `;
+                            }
+
+                            card.innerHTML = `
+                                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-hover, rgba(200,200,200,0.15)); padding-bottom: 0.4rem; margin-bottom: 0.6rem;">
+                                    <span style="font-weight: bold; font-size: 0.92rem; color: var(--text-primary); text-align: left;">${ans.question}</span>
+                                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                        <span class="badge" style="background: rgba(212,175,55,0.15); color: var(--accent-gold-light); border: 1px solid rgba(212,175,55,0.3); font-size: 0.65rem;">${typeLabel}</span>
+                                        <span style="font-size: 0.72rem; color: var(--text-secondary);">Submitted: ${new Date(ans.date || ans.dateSubmitted).toLocaleString()}</span>
+                                    </div>
                                 </div>
+                                ${contentHtml}
+                                ${gradeFormHtml}
                             `;
-                            modSection.appendChild(block);
+                            itemsContainer.appendChild(card);
                         });
 
+                        modSection.appendChild(itemsContainer);
                         container.appendChild(modSection);
                     });
                 }
+
+                window.openFilePreview = (url, name) => {
+                    const ext = name.split('.').pop().toLowerCase();
+                    const isPdf = ext === 'pdf';
+                    const isImg = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'heic', 'tiff'].includes(ext);
+                    const isVid = ['mp4', 'webm', 'ogg', 'mov', 'quicktime', 'avi', 'mkv', '3gp', 'wmv'].includes(ext);
+                    
+                    const newTab = window.open();
+                    if (newTab) {
+                        if (isPdf) {
+                            newTab.document.write(`<iframe src="${url}" style="width:100%; height:100%; border:none; margin:0; padding:0;"></iframe>`);
+                        } else if (isImg) {
+                            newTab.document.write(`
+                                <html style="background:#111; display:flex; align-items:center; justify-content:center; margin:0; height:100%;">
+                                    <head><title>Preview - ${name}</title></head>
+                                    <body style="margin:0; max-width:95%; max-height:95%;">
+                                        <img src="${url}" style="max-width:100%; max-height:100%; border-radius:8px; box-shadow:0 12px 36px rgba(0,0,0,0.8); object-fit:contain;">
+                                    </body>
+                                </html>
+                            `);
+                        } else if (isVid) {
+                            newTab.document.write(`
+                                <html style="background:#111; display:flex; align-items:center; justify-content:center; margin:0; height:100%;">
+                                    <head><title>Preview - ${name}</title></head>
+                                    <body style="margin:0; max-width:95%; max-height:95%;">
+                                        <video src="${url}" controls style="max-width:100%; max-height:100%; border-radius:8px; box-shadow:0 12px 36px rgba(0,0,0,0.8); background:#000;"></video>
+                                    </body>
+                                </html>
+                            `);
+                        } else {
+                            newTab.location.href = url;
+                        }
+                        newTab.document.close();
+                    } else {
+                        alert("Popup blocked! Please allow popups to preview the file.");
+                    }
+                };
 
                 window.saveGradeAndRemarks = async (studentId, moduleId, componentIndex) => {
                     const searchIdx = componentIndex !== null ? componentIndex : '';
                     const scoreInput = document.getElementById(`score_input_${moduleId}_${searchIdx}`);
                     const textarea = document.getElementById(`remark_input_${moduleId}_${searchIdx}`);
-                    if (!textarea || !scoreInput) return;
+                    if (!textarea) return;
 
                     const remarkText = textarea.value.trim();
-                    const scoreVal = scoreInput.value ? parseInt(scoreInput.value) : undefined;
+                    const scoreVal = (scoreInput && scoreInput.value) ? parseInt(scoreInput.value) : undefined;
 
                     const teacherName = inst ? (inst.name || inst.username || 'Admin') : 'Instructor';
 

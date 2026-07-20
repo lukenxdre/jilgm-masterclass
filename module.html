@@ -327,7 +327,7 @@
                             blockEl.style.marginBottom = '1.5rem';
                             blockEl.innerHTML = `
                                 <span style="font-size: 1.5rem; line-height: 1;">${comp.emoji || '💡'}</span>
-                                <div style="flex: 1; font-size: 1rem; color: var(--text-primary); line-height: 1.5;">${comp.content}</div>
+                                <div style="flex: 1; font-size: 1rem; color: var(--text-primary); line-height: 1.5; white-space: pre-wrap;">${comp.content}</div>
                             `;
                         } else if (comp.type === 'bullet_list') {
                             blockEl = document.createElement('ul');
@@ -595,6 +595,19 @@
                                     renderContainer.innerHTML = `<img src="${uploadedFile.url}" style="max-height: 180px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); object-fit: contain;">`;
                                 } else if (isVideo(uploadedFile.type, uploadedFile.name)) {
                                     renderContainer.innerHTML = `<video src="${uploadedFile.url}" controls style="max-height: 240px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: var(--bg-darker);"></video>`;
+                                } else {
+                                    const ext = uploadedFile.name.split('.').pop().toLowerCase();
+                                    const isPdf = ext === 'pdf';
+                                    let previewBtn = '';
+                                    if (isPdf) {
+                                        previewBtn = `<button onclick="window.openFilePreview('${uploadedFile.url.replace(/'/g, "\\'")}', '${uploadedFile.name.replace(/'/g, "\\'")}')" class="btn" style="font-size:0.8rem; padding:0.4rem 0.8rem; background:rgba(212,175,55,0.25); color:var(--accent-gold); border:1px solid rgba(212,175,55,0.4); border-radius:4px; cursor:pointer; margin-left:0.5rem;">🔍 Preview PDF</button>`;
+                                    }
+                                    renderContainer.innerHTML = `
+                                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                            <a href="${uploadedFile.url}" download="${uploadedFile.name}" class="btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; padding:0.4rem 0.8rem; font-size:0.8rem; background:rgba(212,175,55,0.15); color:var(--accent-gold-light); border:1px solid rgba(212,175,55,0.3); border-radius:4px;">📥 Download File</a>
+                                            ${previewBtn}
+                                        </div>
+                                    `;
                                 }
                             }
 
@@ -640,10 +653,10 @@
                                 warningMsg.style.display = 'none';
                                 btnUpload.disabled = isPreview;
                                 
-                                // Limit size to 2.5MB
-                                const maxSizeBytes = 2.5 * 1024 * 1024;
+                                // Limit size to 750KB
+                                const maxSizeBytes = 750 * 1024;
                                 if (file.size > maxSizeBytes) {
-                                    warningMsg.innerText = '⚠️ File exceeds 2.5MB limit. Please choose a smaller file to avoid storage quota issues.';
+                                    warningMsg.innerText = '⚠️ File exceeds 750KB limit. Please choose a smaller file.';
                                     warningMsg.style.display = 'block';
                                     btnUpload.disabled = true;
                                     return;
@@ -670,8 +683,8 @@
                              btnUpload.addEventListener('click', () => {
                                  if (isPreview || !selectedFile) return;
                                  
-                                 if (selectedFile.size > 2.5 * 1024 * 1024) {
-                                     showToast('File is too large (max 2.5MB)!');
+                                 if (selectedFile.size > 750 * 1024) {
+                                     showToast('File is too large (max 750KB for cloud storage)!');
                                      return;
                                  }
 
@@ -702,6 +715,19 @@
                                              renderSuccess.innerHTML = `<img src="${base64Url}" style="max-height: 180px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); object-fit: contain;">`;
                                          } else if (isVideo(fileObj.type, fileObj.name)) {
                                              renderSuccess.innerHTML = `<video src="${base64Url}" controls style="max-height: 240px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: var(--bg-darker);"></video>`;
+                                         } else {
+                                             const ext = fileObj.name.split('.').pop().toLowerCase();
+                                             const isPdf = ext === 'pdf';
+                                             let previewBtn = '';
+                                             if (isPdf) {
+                                                 previewBtn = `<button onclick="window.openFilePreview('${base64Url.replace(/'/g, "\\'")}', '${fileObj.name.replace(/'/g, "\\'")}')" class="btn" style="font-size:0.8rem; padding:0.4rem 0.8rem; background:rgba(212,175,55,0.25); color:var(--accent-gold); border:1px solid rgba(212,175,55,0.4); border-radius:4px; cursor:pointer; margin-left:0.5rem;">🔍 Preview PDF</button>`;
+                                             }
+                                             renderSuccess.innerHTML = `
+                                                 <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                                     <a href="${base64Url}" download="${fileObj.name}" class="btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; padding:0.4rem 0.8rem; font-size:0.8rem; background:rgba(212,175,55,0.15); color:var(--accent-gold-light); border:1px solid rgba(212,175,55,0.3); border-radius:4px;">📥 Download File</a>
+                                                     ${previewBtn}
+                                                 </div>
+                                             `;
                                          }
                                      }
                                      fileSuccess.classList.remove('hidden');
@@ -710,14 +736,12 @@
 
                                  if (selectedFile.base64Data) {
                                      saveAnswer(selectedFile.base64Data);
-                                 } else if (isImage(selectedFile.type, selectedFile.name) || isVideo(selectedFile.type, selectedFile.name)) {
+                                 } else {
                                      const reader = new FileReader();
                                      reader.onload = (e) => {
                                          saveAnswer(e.target.result);
                                      };
                                      reader.readAsDataURL(selectedFile);
-                                 } else {
-                                     saveAnswer(null);
                                  }
                              });
 
@@ -1245,6 +1269,43 @@
                     }
                 };
             } catch(err) { /* BroadcastChannel not supported – storage event is the fallback */ }
+
+            window.openFilePreview = (url, name) => {
+                const ext = name.split('.').pop().toLowerCase();
+                const isPdf = ext === 'pdf';
+                const isImg = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'heic', 'tiff'].includes(ext);
+                const isVid = ['mp4', 'webm', 'ogg', 'mov', 'quicktime', 'avi', 'mkv', '3gp', 'wmv'].includes(ext);
+                
+                const newTab = window.open();
+                if (newTab) {
+                    if (isPdf) {
+                        newTab.document.write(`<iframe src="${url}" style="width:100%; height:100%; border:none; margin:0; padding:0;"></iframe>`);
+                    } else if (isImg) {
+                        newTab.document.write(`
+                            <html style="background:#111; display:flex; align-items:center; justify-content:center; margin:0; height:100%;">
+                                <head><title>Preview - ${name}</title></head>
+                                <body style="margin:0; max-width:95%; max-height:95%;">
+                                    <img src="${url}" style="max-width:100%; max-height:100%; border-radius:8px; box-shadow:0 12px 36px rgba(0,0,0,0.8); object-fit:contain;">
+                                </body>
+                            </html>
+                        `);
+                    } else if (isVid) {
+                        newTab.document.write(`
+                            <html style="background:#111; display:flex; align-items:center; justify-content:center; margin:0; height:100%;">
+                                <head><title>Preview - ${name}</title></head>
+                                <body style="margin:0; max-width:95%; max-height:95%;">
+                                    <video src="${url}" controls style="max-width:100%; max-height:100%; border-radius:8px; box-shadow:0 12px 36px rgba(0,0,0,0.8); background:#000;"></video>
+                                </body>
+                            </html>
+                        `);
+                    } else {
+                        newTab.location.href = url;
+                    }
+                    newTab.document.close();
+                } else {
+                    alert("Popup blocked! Please allow popups to preview the file.");
+                }
+            };
 
             // Initial render
             renderModuleUI();
