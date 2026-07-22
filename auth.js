@@ -2586,7 +2586,12 @@ const AuthAPI = {
     saveModuleOrder: async (orderArray) => {
         localStorage.setItem(ORDER_KEY, JSON.stringify(orderArray));
         if (isFirebaseInitialized && firebaseDb) {
-            await firebaseDb.collection('settings').doc('module_order').set({ list: orderArray });
+            try {
+                await withTimeout(firebaseDb.collection('settings').doc('module_order').set({ list: orderArray }), 10000, "Cloud Firestore write timed out while saving module order.");
+            } catch (e) {
+                console.error("Firestore saveModuleOrder error:", e);
+                alert("Database Error: Failed to save module order. " + e.message);
+            }
         }
     },
 
@@ -2607,12 +2612,21 @@ const AuthAPI = {
             alert('Database is offline or not configured. Operation blocked.');
             return false;
         }
-        await firebaseDb.collection('modules_content').doc(moduleId).set({
-            title,
-            subtitle,
-            components
-        });
-        return true;
+        try {
+            console.log(`Attempting to save module ${moduleId} to Firestore...`);
+            const savePromise = firebaseDb.collection('modules_content').doc(moduleId).set({
+                title,
+                subtitle,
+                components
+            });
+            await withTimeout(savePromise, 10000, "Cloud Firestore write timed out. Ensure you are connected to the internet and your Firebase security rules allow writes to 'modules_content'.");
+            console.log(`Module ${moduleId} saved to Firestore successfully.`);
+            return true;
+        } catch (e) {
+            console.error("Firestore saveModule error:", e);
+            alert("Database Error: Failed to save module. " + e.message);
+            throw e; // throw to caller to prevent silent failure
+        }
     },
 
     addModule: async (title, subtitle) => {
@@ -2620,24 +2634,31 @@ const AuthAPI = {
             alert('Database is offline or not configured. Operation blocked.');
             return null;
         }
-        const newMod = {
-            title: title || "New Module",
-            subtitle: subtitle || "New Module Subtitle",
-            components: [
-                { type: 'header_h1', content: title || "New Module" },
-                { type: 'text', content: "Welcome to this new module. Add some content here." }
-            ]
-        };
+        try {
+            const newMod = {
+                title: title || "New Module",
+                subtitle: subtitle || "New Module Subtitle",
+                components: [
+                    { type: 'header_h1', content: title || "New Module" },
+                    { type: 'text', content: "Welcome to this new module. Add some content here." }
+                ]
+            };
 
-        const docRef = firebaseDb.collection('modules_content').doc();
-        await docRef.set(newMod);
+            const docRef = firebaseDb.collection('modules_content').doc();
+            console.log(`Adding new module ${docRef.id} to Firestore...`);
+            await withTimeout(docRef.set(newMod), 10000, "Cloud Firestore write timed out while adding module.");
 
-        let order = AuthAPI.getModuleOrder();
-        if (!order.includes(docRef.id)) {
-            order.push(docRef.id);
-            await AuthAPI.saveModuleOrder(order);
+            let order = AuthAPI.getModuleOrder();
+            if (!order.includes(docRef.id)) {
+                order.push(docRef.id);
+                await AuthAPI.saveModuleOrder(order);
+            }
+            return docRef.id;
+        } catch (e) {
+            console.error("Firestore addModule error:", e);
+            alert("Database Error: Failed to add module. " + e.message);
+            throw e;
         }
-        return docRef.id;
     },
 
     getArchivedModules: () => {
@@ -2655,26 +2676,34 @@ const AuthAPI = {
             alert('Database is offline or not configured. Operation blocked.');
             return false;
         }
-        const mod = AuthAPI.getModule(moduleId);
-        if (mod) {
-            await firebaseDb.collection('modules_content').doc(moduleId).delete();
-            await firebaseDb.collection('archived_modules').doc(moduleId).set({
-                ...mod,
-                archivedAt: new Date().toISOString()
-            });
+        try {
+            const mod = AuthAPI.getModule(moduleId);
+            if (mod) {
+                console.log(`Deleting module ${moduleId} from Firestore...`);
+                const deletePromise = firebaseDb.collection('modules_content').doc(moduleId).delete();
+                const archivePromise = firebaseDb.collection('archived_modules').doc(moduleId).set({
+                    ...mod,
+                    archivedAt: new Date().toISOString()
+                });
+                await withTimeout(Promise.all([deletePromise, archivePromise]), 10000, "Cloud Firestore write timed out while deleting module.");
 
-            // Also remove from unlocked list
-            let unlocked = AuthAPI.getUnlockedModules();
-            unlocked = unlocked.filter(id => id !== moduleId);
-            await firebaseDb.collection('settings').doc('unlocked_modules').set({ list: unlocked });
+                // Also remove from unlocked list
+                let unlocked = AuthAPI.getUnlockedModules();
+                unlocked = unlocked.filter(id => id !== moduleId);
+                await firebaseDb.collection('settings').doc('unlocked_modules').set({ list: unlocked });
 
-            let order = AuthAPI.getModuleOrder();
-            order = order.filter(id => id !== moduleId);
-            await AuthAPI.saveModuleOrder(order);
+                let order = AuthAPI.getModuleOrder();
+                order = order.filter(id => id !== moduleId);
+                await AuthAPI.saveModuleOrder(order);
 
-            return true;
+                return true;
+            }
+            return false;
+        } catch (e) {
+            console.error("Firestore deleteModule error:", e);
+            alert("Database Error: Failed to delete module. " + e.message);
+            throw e;
         }
-        return false;
     },
 
     restoreModule: async (moduleId) => {
@@ -2682,25 +2711,33 @@ const AuthAPI = {
             alert('Database is offline or not configured. Operation blocked.');
             return false;
         }
-        const doc = await firebaseDb.collection('archived_modules').doc(moduleId).get();
-        if (doc.exists) {
-            const modData = doc.data();
-            const restoredMod = {
-                title: modData.title,
-                subtitle: modData.subtitle,
-                components: modData.components
-            };
-            await firebaseDb.collection('modules_content').doc(moduleId).set(restoredMod);
-            await firebaseDb.collection('archived_modules').doc(moduleId).delete();
+        try {
+            console.log(`Restoring module ${moduleId} from archived...`);
+            const doc = await withTimeout(firebaseDb.collection('archived_modules').doc(moduleId).get(), 8000, "Failed to get archived module document.");
+            if (doc.exists) {
+                const modData = doc.data();
+                const restoredMod = {
+                    title: modData.title,
+                    subtitle: modData.subtitle,
+                    components: modData.components
+                };
+                const setPromise = firebaseDb.collection('modules_content').doc(moduleId).set(restoredMod);
+                const deletePromise = firebaseDb.collection('archived_modules').doc(moduleId).delete();
+                await withTimeout(Promise.all([setPromise, deletePromise]), 10000, "Cloud Firestore write timed out while restoring module.");
 
-            let order = AuthAPI.getModuleOrder();
-            if (!order.includes(moduleId)) {
-                order.push(moduleId);
-                await AuthAPI.saveModuleOrder(order);
+                let order = AuthAPI.getModuleOrder();
+                if (!order.includes(moduleId)) {
+                    order.push(moduleId);
+                    await AuthAPI.saveModuleOrder(order);
+                }
+                return true;
             }
-            return true;
+            return false;
+        } catch (e) {
+            console.error("Firestore restoreModule error:", e);
+            alert("Database Error: Failed to restore module. " + e.message);
+            throw e;
         }
-        return false;
     },
 
     getAnnouncements: () => {
