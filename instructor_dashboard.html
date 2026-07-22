@@ -767,7 +767,7 @@
 
                     const allStudents = AuthAPI.getAllStudents();
                     // Filter Cohort to same outreach only, unless admin
-                    const cohortList = allStudents.filter(s => s.status === 'approved' && (isAdmin || s.outreach === inst.outreach));
+                    const cohortList = allStudents.filter(s => s.status && s.status.toLowerCase() === 'approved' && (isAdmin || s.outreach === inst.outreach));
 
                     const regularList = cohortList.filter(s => !s.isSitIn);
                     const sitinList = cohortList.filter(s => s.isSitIn);
@@ -824,7 +824,7 @@
                     if (!inst || !qaBoardContainer) return;
 
                     const allStudents = AuthAPI.getAllStudents();
-                    const cohortList = allStudents.filter(s => s.status === 'approved' && (isAdmin || s.outreach === inst.outreach));
+                    const cohortList = allStudents.filter(s => s.status && s.status.toLowerCase() === 'approved' && (isAdmin || s.outreach === inst.outreach));
                     const modsContent = AuthAPI.getModulesContent();
                     const modIds = AuthAPI.getModuleOrder().filter(id => modsContent[id]);
 
@@ -980,7 +980,7 @@
                     if (!inst) return;
 
                     const allStudents = AuthAPI.getAllStudents();
-                    const cohortList = allStudents.filter(s => s.status === 'approved' && (isAdmin || s.outreach === inst.outreach));
+                    const cohortList = allStudents.filter(s => s.status && s.status.toLowerCase() === 'approved' && (isAdmin || s.outreach === inst.outreach));
 
                     chatStudentsList.innerHTML = '';
                     if (cohortList.length === 0) {
@@ -1266,7 +1266,7 @@
                     if (!inst) return;
 
                     const students = AuthAPI.getAllStudents();
-                    const cohortList = students.filter(s => s.status === 'approved' && (isAdmin || s.outreach === inst.outreach));
+                    const cohortList = students.filter(s => s.status && s.status.toLowerCase() === 'approved' && (isAdmin || s.outreach === inst.outreach));
                     
                     let totalUnread = 0;
                     cohortList.forEach(s => {

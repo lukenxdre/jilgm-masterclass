@@ -960,7 +960,7 @@
                 if (currentUser) {
                     const students = AuthAPI.getAllStudents();
                     const freshUser = students.find(s => s.id === currentUser.id);
-                    if (freshUser && freshUser.status === 'approved') {
+                    if (freshUser && freshUser.status && freshUser.status.toLowerCase() === 'approved') {
                         localStorage.setItem('jilgm_current_user', JSON.stringify(freshUser));
                         if (freshUser.outreach !== lastStudentOutreach) {
                             msg = `Your assigned outreach has been updated to Outreach ${freshUser.outreach || 'Unassigned'}!`;

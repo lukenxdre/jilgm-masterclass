@@ -174,15 +174,17 @@
                         statusResult.style.borderColor = 'rgba(239, 68, 68, 0.3)';
                         statusResult.style.color = '#ef4444';
                         statusResult.innerHTML = `Email <strong>${email}</strong> not found. If you haven't applied yet, please <a href="register.html" style="color: var(--accent-gold); text-decoration: underline;">register here</a>.`;
-                    } else if (student.status === 'pending') {
-                        statusResult.style.background = 'rgba(245, 158, 11, 0.1)';
-                        statusResult.style.borderColor = 'rgba(245, 158, 11, 0.3)';
-                        statusResult.style.color = '#f59e0b';
-                        statusResult.innerHTML = `Your registration application is still <strong>Pending Approval</strong>. Please check back later or contact your administrator.`;
-                    } else if (student.status === 'approved') {
-                        statusResult.style.background = 'rgba(34, 197, 94, 0.1)';
-                        statusResult.style.borderColor = 'rgba(34, 197, 94, 0.3)';
-                        statusResult.style.color = '#4ade80';
+                    } else {
+                        const statusLower = (student.status || '').toLowerCase();
+                        if (statusLower === 'pending') {
+                            statusResult.style.background = 'rgba(245, 158, 11, 0.1)';
+                            statusResult.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+                            statusResult.style.color = '#f59e0b';
+                            statusResult.innerHTML = `Your registration application is still <strong>Pending Approval</strong>. Please check back later or contact your administrator.`;
+                        } else if (statusLower === 'approved') {
+                            statusResult.style.background = 'rgba(34, 197, 94, 0.1)';
+                            statusResult.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+                            statusResult.style.color = '#4ade80';
                         statusResult.innerHTML = `
                             <p style="margin-bottom: 0.5rem; font-weight: bold;">Application Approved! Here are your credentials:</p>
                             <div style="background: var(--glass-bg, rgba(200,200,200,0.1)); padding: 0.8rem; border-radius: 6px; margin-bottom: 0.8rem; border: 1px dashed rgba(255,255,255,0.1);">
@@ -199,7 +201,8 @@
                             tabLogin.click(); // Switch to login tab
                         });
                     }
-                }, 800);
+                }
+            }, 800);
             });
 
         });

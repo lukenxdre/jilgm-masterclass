@@ -2158,7 +2158,7 @@ const AuthAPI = {
 
         if (index !== -1) {
             const student = { ...students[index] };
-            if (student.status === 'pending') {
+            if (student.status && student.status.toLowerCase() === 'pending') {
                 student.status = 'approved';
                 student.username = (student.firstName.charAt(0) + student.lastName).toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(Math.random() * 100);
                 student.password = Math.random().toString(36).slice(-8);
@@ -2186,7 +2186,7 @@ const AuthAPI = {
         const index = students.findIndex(s => s.id === id);
         if (index !== -1) {
             const student = { ...students[index] };
-            if (student.status === 'pending') {
+            if (student.status && student.status.toLowerCase() === 'pending') {
                 student.status = 'rejected';
 
                 firebaseDb.collection('students').doc(id).update({
@@ -2468,7 +2468,7 @@ const AuthAPI = {
         }
         const students = AuthAPI.getAllStudents();
         const freshUser = students.find(s => s.id === user.id);
-        if (!freshUser || freshUser.status !== 'approved') {
+        if (!freshUser || !freshUser.status || freshUser.status.toLowerCase() !== 'approved') {
             AuthAPI.logout();
         }
     },

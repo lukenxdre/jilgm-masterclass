@@ -3149,8 +3149,8 @@
 
                     const students = AuthAPI.getAllStudents();
 
-                    const pendingList = students.filter(s => s.status === 'pending');
-                    const enrolledList = students.filter(s => s.status === 'approved');
+                    const pendingList = students.filter(s => s.status && s.status.toLowerCase() === 'pending');
+                    const enrolledList = students.filter(s => s.status && s.status.toLowerCase() === 'approved');
                     const regularEnrolledList = enrolledList.filter(s => !s.isSitIn);
                     const sitinEnrolledList = enrolledList.filter(s => s.isSitIn);
 
@@ -3881,10 +3881,11 @@
                         snapshot.forEach(doc => {
                             const s = doc.data();
                             s.id = doc.id;
-                            if (s.status === 'approved') {
+                            const statusLower = (s.status || '').toLowerCase();
+                            if (statusLower === 'approved') {
                                 totalApproved++;
                                 students.push(s);
-                            } else if (s.status === 'pending') {
+                            } else if (statusLower === 'pending') {
                                 totalPending++;
                             }
                         });
