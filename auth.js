@@ -1,5 +1,9 @@
 import { firebaseConfig } from "./firebase.js";
 
+// Live in-memory caches populated directly from Firestore collections
+window.liveStudents = [];
+window.liveInstructors = [];
+
 // Simulated Backend using localStorage
 
 const DB_KEY = 'jilgm_students';
@@ -1655,6 +1659,7 @@ function initFirestoreSync(onCollectionLoaded) {
             snapshot.forEach(doc => {
                 students.push({ id: doc.id, ...doc.data() });
             });
+            window.liveStudents = students;
             localStorage.setItem(DB_KEY, JSON.stringify(students));
             triggerStorageSync(DB_KEY);
             markLoaded('students');
@@ -1667,6 +1672,7 @@ function initFirestoreSync(onCollectionLoaded) {
         firebaseDb.collection('students').doc(currentUser.id).onSnapshot(doc => {
             if (doc.exists) {
                 const student = { id: doc.id, ...doc.data() };
+                window.liveStudents = [student];
                 localStorage.setItem(DB_KEY, JSON.stringify([student]));
                 localStorage.setItem(SESSION_KEY, JSON.stringify(student));
                 triggerStorageSync(DB_KEY);
@@ -1899,6 +1905,7 @@ function initFirestoreSync(onCollectionLoaded) {
             snapshot.forEach(doc => {
                 list.push({ id: doc.id, ...doc.data() });
             });
+            window.liveInstructors = list;
             localStorage.setItem('jilgm_instructors', JSON.stringify(list));
 
             // Sync current instructor session if they are logged in
@@ -2097,6 +2104,9 @@ const AuthAPI = {
     },
 
     getAllStudents: () => {
+        if (window.liveStudents && window.liveStudents.length > 0) {
+            return window.liveStudents;
+        }
         try {
             const data = localStorage.getItem(DB_KEY);
             return data ? JSON.parse(data) : [];
@@ -2873,6 +2883,9 @@ const AuthAPI = {
     },
 
     getInstructors: () => {
+        if (window.liveInstructors && window.liveInstructors.length > 0) {
+            return window.liveInstructors;
+        }
         try {
             const data = localStorage.getItem('jilgm_instructors');
             return data ? JSON.parse(data) : [];
