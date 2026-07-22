@@ -941,7 +941,7 @@
                 <p style="color: var(--text-secondary); margin-bottom: 2rem;">You can reset the database and restore
                     default student profiles and modules here.</p>
                 <button class="btn btn-secondary"
-                    onclick="if(confirm('Are you sure you want to reset all students, progress, and modules to default content?')){localStorage.clear(); location.reload();}"
+                    onclick="if(confirm('Are you sure you want to reset all students, progress, and modules to default content?')){const c=localStorage.getItem('jilgm_firebase_config');const a=localStorage.getItem('jilgm_current_admin');const i=localStorage.getItem('jilgm_current_instructor');localStorage.clear();if(c)localStorage.setItem('jilgm_firebase_config',c);if(a)localStorage.setItem('jilgm_current_admin',a);if(i)localStorage.setItem('jilgm_current_instructor',i);location.reload();}"
                     style="border-color: #ef4444; color: #ef4444;">Reset Local Database</button>
             </div>
             <div class="glass-card" style="padding: 2.5rem; border-color: var(--glass-border); margin-top: 2rem;">

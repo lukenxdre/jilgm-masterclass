@@ -3,6 +3,7 @@ import { firebaseConfig } from "./firebase.js";
 // Live in-memory caches populated directly from Firestore collections
 window.liveStudents = [];
 window.liveInstructors = [];
+window.liveModules = [];
 
 // Simulated Backend using localStorage
 
@@ -1749,9 +1750,13 @@ function initFirestoreSync(onCollectionLoaded) {
             return;
         }
         const mods = {};
+        const liveMods = [];
         snapshot.forEach(doc => {
-            mods[doc.id] = doc.data();
+            const data = doc.data();
+            mods[doc.id] = data;
+            liveMods.push({ id: doc.id, ...data });
         });
+        window.liveModules = liveMods;
 
         // Firebase is the source of truth — never overwrite existing docs with defaults.
         // Only seed docs that are completely missing from Firestore (no document at all).
@@ -2533,7 +2538,23 @@ const AuthAPI = {
         return studentAnswers.some(a => a.moduleId === moduleId && a.type === 'lesson_completion');
     },
 
+    getAllModules: () => {
+        if (window.liveModules && window.liveModules.length > 0) {
+            return window.liveModules;
+        }
+        const mods = AuthAPI.getModulesContent();
+        return Object.keys(mods).map(id => ({ id, ...mods[id] }));
+    },
+
     getModulesContent: () => {
+        if (window.liveModules && window.liveModules.length > 0) {
+            const mods = {};
+            window.liveModules.forEach(m => {
+                const { id, ...data } = m;
+                mods[id] = data;
+            });
+            return mods;
+        }
         try {
             const data = localStorage.getItem(CONTENT_KEY);
             if (data) {
@@ -2570,6 +2591,13 @@ const AuthAPI = {
     },
 
     getModule: (moduleId) => {
+        if (window.liveModules && window.liveModules.length > 0) {
+            const found = window.liveModules.find(m => m.id === moduleId);
+            if (found) {
+                const { id, ...data } = found;
+                return data;
+            }
+        }
         const mods = AuthAPI.getModulesContent();
         return mods[moduleId] || null;
     },
