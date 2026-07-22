@@ -1980,12 +1980,13 @@ window.syncPromise = (async () => {
 
         const localConfigStr = localStorage.getItem('jilgm_firebase_config');
 
-        if (cloudConfig && typeof cloudConfig === 'object' && cloudConfig.apiKey) {
+        // Strictly validate both cloud and local Firebase configuration objects before sync/backup
+        if (cloudConfig && typeof cloudConfig === 'object' && cloudConfig.apiKey && cloudConfig.projectId && cloudConfig.appId) {
             localStorage.setItem('jilgm_firebase_config', JSON.stringify(cloudConfig));
         } else if (localConfigStr) {
             try {
                 const localConfig = JSON.parse(localConfigStr);
-                if (localConfig && localConfig.apiKey) {
+                if (localConfig && localConfig.apiKey && localConfig.projectId && localConfig.appId) {
                     console.log("Backing up local Firebase configuration to the bootstrap cloud...");
                     await saveFirebaseConfigToBootstrap(localConfig);
                 }
@@ -2009,7 +2010,7 @@ window.syncPromise = (async () => {
                     const stored = localStorage.getItem('jilgm_firebase_config');
                     if (stored) {
                         const parsed = JSON.parse(stored);
-                        if (parsed && parsed.apiKey && parsed.projectId) {
+                        if (parsed && parsed.apiKey && parsed.projectId && parsed.appId) {
                             configToUse = parsed;
                         }
                     }

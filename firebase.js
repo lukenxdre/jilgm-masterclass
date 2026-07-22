@@ -15,7 +15,7 @@ if (typeof window !== "undefined" && window.localStorage) {
   if (storedConfigStr) {
     try {
       const parsed = JSON.parse(storedConfigStr);
-      if (parsed && parsed.apiKey && parsed.projectId) {
+      if (parsed && parsed.apiKey && parsed.projectId && parsed.appId) {
         firebaseConfig = parsed;
         console.log("Using custom Firebase configuration from storage in firebase.js");
       }
