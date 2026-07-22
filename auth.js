@@ -25,6 +25,18 @@ function triggerStorageSync(key) {
     }
 }
 
+function safeLocalStorageSet(key, value) {
+    try {
+        localStorage.setItem(key, value);
+    } catch (e) {
+        if (e.name === 'QuotaExceededError' || e.code === 22 || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+            console.warn(`LocalStorage quota exceeded while saving key "${key}". Operation bypassed safely.`);
+        } else {
+            console.error(`Failed to write to localStorage for key "${key}":`, e);
+        }
+    }
+}
+
 const jilgmChannel = (() => {
     try { return new BroadcastChannel('jilgm_sync'); } catch (e) { return null; }
 })();
@@ -1661,7 +1673,6 @@ function initFirestoreSync(onCollectionLoaded) {
                 students.push({ id: doc.id, ...doc.data() });
             });
             window.liveStudents = students;
-            localStorage.setItem(DB_KEY, JSON.stringify(students));
             triggerStorageSync(DB_KEY);
             markLoaded('students');
         }, err => {
@@ -1674,8 +1685,11 @@ function initFirestoreSync(onCollectionLoaded) {
             if (doc.exists) {
                 const student = { id: doc.id, ...doc.data() };
                 window.liveStudents = [student];
-                localStorage.setItem(DB_KEY, JSON.stringify([student]));
-                localStorage.setItem(SESSION_KEY, JSON.stringify(student));
+                try {
+                    localStorage.setItem(SESSION_KEY, JSON.stringify(student));
+                } catch (e) {
+                    console.warn("Storage quota exceeded for student session:", e);
+                }
                 triggerStorageSync(DB_KEY);
             }
             markLoaded('students');
@@ -1699,10 +1713,10 @@ function initFirestoreSync(onCollectionLoaded) {
             if (previousAnnouncementsLength !== null && list.length > previousAnnouncementsLength) {
                 const diff = list.length - previousAnnouncementsLength;
                 const currentBadge = parseInt(localStorage.getItem('jilgm_unread_announcements') || '0');
-                localStorage.setItem('jilgm_unread_announcements', (currentBadge + diff).toString());
+                safeLocalStorageSet('jilgm_unread_announcements', (currentBadge + diff).toString());
             }
             previousAnnouncementsLength = list.length;
-            localStorage.setItem('jilgm_announcements', JSON.stringify(list));
+            safeLocalStorageSet('jilgm_announcements', JSON.stringify(list));
             triggerStorageSync('jilgm_announcements');
             markLoaded('announcements');
         }, err => {
@@ -1720,7 +1734,7 @@ function initFirestoreSync(onCollectionLoaded) {
             snapshot.forEach(doc => {
                 list.push({ id: doc.id, ...doc.data() });
             });
-            localStorage.setItem('jilgm_resources', JSON.stringify(list));
+            safeLocalStorageSet('jilgm_resources', JSON.stringify(list));
             triggerStorageSync('jilgm_resources');
             markLoaded('resources');
         }, err => {
@@ -1774,7 +1788,6 @@ function initFirestoreSync(onCollectionLoaded) {
             });
         }
 
-        localStorage.setItem(CONTENT_KEY, JSON.stringify(mods));
         triggerStorageSync(CONTENT_KEY);
         markLoaded('modules_content');
     }, err => {
@@ -1787,7 +1800,7 @@ function initFirestoreSync(onCollectionLoaded) {
         if (doc.exists) {
             const data = doc.data();
             if (data && data.list) {
-                localStorage.setItem(UNLOCKED_KEY, JSON.stringify(data.list));
+                safeLocalStorageSet(UNLOCKED_KEY, JSON.stringify(data.list));
                 triggerStorageSync(UNLOCKED_KEY);
             }
             markLoaded('unlocked_modules');
@@ -1829,7 +1842,7 @@ function initFirestoreSync(onCollectionLoaded) {
                             .catch(err => console.error("Error migrating module_order in Firestore", err));
                     }
                 }
-                localStorage.setItem(ORDER_KEY, JSON.stringify(data.list));
+                safeLocalStorageSet(ORDER_KEY, JSON.stringify(data.list));
                 triggerStorageSync(ORDER_KEY);
             }
             markLoaded('module_order');
@@ -1858,7 +1871,7 @@ function initFirestoreSync(onCollectionLoaded) {
             snapshot.forEach(doc => {
                 list.push({ id: doc.id, ...doc.data() });
             });
-            localStorage.setItem(ARCHIVED_KEY, JSON.stringify(list));
+            safeLocalStorageSet(ARCHIVED_KEY, JSON.stringify(list));
             triggerStorageSync(ARCHIVED_KEY);
             markLoaded('archived_modules');
         }, err => {
@@ -1892,7 +1905,7 @@ function initFirestoreSync(onCollectionLoaded) {
                 list.push(newMain);
                 firebaseDb.collection('admins').doc('JILGM RiyadhRC').set(newMain).catch(e => console.error("Firestore set new admin error", e));
             }
-            localStorage.setItem('jilgm_admins', JSON.stringify(list));
+            safeLocalStorageSet('jilgm_admins', JSON.stringify(list));
             triggerStorageSync('jilgm_admins');
             markLoaded('admins');
         }, err => {
@@ -1911,14 +1924,17 @@ function initFirestoreSync(onCollectionLoaded) {
                 list.push({ id: doc.id, ...doc.data() });
             });
             window.liveInstructors = list;
-            localStorage.setItem('jilgm_instructors', JSON.stringify(list));
 
             // Sync current instructor session if they are logged in
             const currentInst = AuthAPI.getCurrentInstructor();
             if (currentInst) {
                 const freshInst = list.find(i => i.id === currentInst.id);
                 if (freshInst) {
-                    localStorage.setItem('jilgm_current_instructor', JSON.stringify(freshInst));
+                    try {
+                        localStorage.setItem('jilgm_current_instructor', JSON.stringify(freshInst));
+                    } catch (e) {
+                        console.warn("Storage quota exceeded for instructor session:", e);
+                    }
                 }
             }
 
