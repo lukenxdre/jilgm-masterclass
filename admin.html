@@ -1318,7 +1318,22 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (window.syncPromise) {
+                try {
+                    await window.syncPromise;
+                } catch (err) {
+                    console.warn("Firebase sync error in admin.html:", err);
+                }
+            }
+            if (window.firebaseSyncPromise) {
+                try {
+                    await window.firebaseSyncPromise;
+                } catch (err) {
+                    console.warn("Firebase sync error in admin.html:", err);
+                }
+            }
+
             try {
                 // Secure page check immediately for admin only
                 if (window.AuthAPI) {

@@ -2023,27 +2023,10 @@ window.syncPromise = (async () => {
                 });
                 isFirebaseInitialized = true;
                 console.log("Firebase initialized successfully");
+                resolve(); // Resolve immediately so page boot is never blocked!
 
-                let loadedCount = 0;
-                const totalToLoad = 8;
-                let resolved = false;
-
-                const triggerResolve = () => {
-                    if (!resolved) {
-                        resolved = true;
-                        resolve();
-                    }
-                };
-
-                // Fallback timeout to guarantee page load
-                setTimeout(triggerResolve, 1500);
-
-                initFirestoreSync(() => {
-                    loadedCount++;
-                    if (loadedCount >= totalToLoad) {
-                        triggerResolve();
-                    }
-                });
+                // Initialize sync listeners in the background asynchronously
+                initFirestoreSync(() => {});
             } catch (err) {
                 console.error("Firebase initializeApp or firestore failed:", err);
                 isFirebaseInitialized = false;
