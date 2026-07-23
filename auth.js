@@ -2455,9 +2455,16 @@ const AuthAPI = {
             return;
         }
         const students = AuthAPI.getAllStudents();
-        const freshUser = students.find(s => s.id === user.id);
-        if (!freshUser || !freshUser.status || freshUser.status.toLowerCase() !== 'approved') {
-            AuthAPI.logout();
+        if (students && students.length > 0) {
+            const freshUser = students.find(s => s.id === user.id);
+            if (freshUser) {
+                if (!freshUser.status || freshUser.status.toLowerCase() !== 'approved') {
+                    console.warn("Student account is not approved. Logging out.");
+                    AuthAPI.logout();
+                }
+            } else {
+                console.warn("Student session exists but user not found in loaded student list. Skipping logout.");
+            }
         }
     },
 
