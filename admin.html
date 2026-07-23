@@ -938,11 +938,15 @@
             </div>
             <div class="glass-card" style="padding: 2.5rem; border-color: var(--glass-border); text-align: center;">
                 <h3 style="color: var(--accent-gold); margin-bottom: 1rem;">LMS Configuration Controls</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 2rem;">You can reset the database and restore
-                    default student profiles and modules here.</p>
-                <button class="btn btn-secondary"
-                    onclick="if(confirm('Are you sure you want to reset all students, progress, and modules to default content?')){const c=localStorage.getItem('jilgm_firebase_config');const a=localStorage.getItem('jilgm_current_admin');const i=localStorage.getItem('jilgm_current_instructor');localStorage.clear();if(c)localStorage.setItem('jilgm_firebase_config',c);if(a)localStorage.setItem('jilgm_current_admin',a);if(i)localStorage.setItem('jilgm_current_instructor',i);location.reload();}"
-                    style="border-color: #ef4444; color: #ef4444;">Reset Local Database</button>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">You can reset the local database cache or trigger a cloud Firestore modules seed here.</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn btn-secondary"
+                        onclick="if(confirm('Are you sure you want to reset all students, progress, and modules to default content locally?')){const c=localStorage.getItem('jilgm_firebase_config');const a=localStorage.getItem('jilgm_current_admin');const i=localStorage.getItem('jilgm_current_instructor');localStorage.clear();if(c)localStorage.setItem('jilgm_firebase_config',c);if(a)localStorage.setItem('jilgm_current_admin',a);if(i)localStorage.setItem('jilgm_current_instructor',i);location.reload();}"
+                        style="border-color: #ef4444; color: #ef4444;">Reset Local Database</button>
+                    <button class="btn btn-primary" id="btn-seed-firestore" style="background: var(--accent-gold); color: #000; padding: 0.8rem 2rem;">
+                        Seed Firestore Default Modules
+                    </button>
+                </div>
             </div>
             <div class="glass-card" style="padding: 2.5rem; border-color: var(--glass-border); margin-top: 2rem;">
                 <h3 style="color: var(--accent-gold); margin-bottom: 1rem; text-align: left;">Firebase Shared Cloud
@@ -3638,6 +3642,26 @@
                             btnClearFirebase.innerText = "Disconnecting...";
                             await AuthAPI.clearFirebaseConfig();
                             location.reload();
+                        }
+                    });
+                }
+
+                const btnSeedFirestore = document.getElementById('btn-seed-firestore');
+                if (btnSeedFirestore) {
+                    btnSeedFirestore.addEventListener('click', async () => {
+                        if (confirm("Are you sure you want to seed default modules into Firestore? This will restore any missing default modules. Existing documents in Firestore with the same ID will be overwritten.")) {
+                            btnSeedFirestore.disabled = true;
+                            const originalText = btnSeedFirestore.innerText;
+                            btnSeedFirestore.innerText = "Seeding Modules...";
+                            try {
+                                const success = await AuthAPI.seedDefaultModules();
+                                if (success) {
+                                    location.reload();
+                                }
+                            } finally {
+                                btnSeedFirestore.disabled = false;
+                                btnSeedFirestore.innerText = originalText;
+                            }
                         }
                     });
                 }

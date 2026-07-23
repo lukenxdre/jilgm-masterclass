@@ -1524,9 +1524,7 @@ async function syncFromCloud() {
                 localStorage.setItem(CONTENT_KEY, JSON.stringify(defaultModules));
                 await saveToCloud('modules', defaultModules);
             }
-        } else {
-            console.log("Failed to fetch cloud modules. Falling back to local defaultModules seeding check...");
-            await checkAndSeedModules();
+            console.log("Failed to fetch cloud modules. Bypassing check.");
         }
 
         const resUnlock = await fetch(SYNC_URL + 'unlocked');
@@ -1602,22 +1600,6 @@ async function saveToCloud(key, data) {
         console.error("Cloud database synchronization failed:", e);
     }
 }
-
-async function checkAndSeedModules() {
-    // This function no longer overwrites Firestore with defaults.
-    // Firebase is the source of truth. We only need local defaults
-    // as a fallback if localStorage is empty AND Firebase hasn't loaded yet.
-    // The real sync happens in initFirestoreSync via onSnapshot.
-    const stored = localStorage.getItem(CONTENT_KEY);
-    if (!stored) {
-        // Temporarily seed localStorage from defaultModules so the UI
-        // isn't blank while waiting for the Firestore snapshot to arrive.
-        console.log("localStorage empty — seeding temporary defaults while waiting for Firestore sync...");
-        localStorage.setItem(CONTENT_KEY, JSON.stringify(defaultModules));
-        // NOTE: We do NOT write to Firestore here. Firebase is the source of truth.
-    }
-}
-checkAndSeedModules();
 
 // --- Firebase Integration ---
 let firebaseDb = null;
@@ -1748,19 +1730,9 @@ function initFirestoreSync(onCollectionLoaded) {
     // 4. Sync modules content
     firebaseDb.collection('modules_content').onSnapshot(snapshot => {
         if (snapshot.empty) {
-            if (isTeacherOrAdmin) {
-                // Seed defaults
-                const batch = firebaseDb.batch();
-                Object.keys(defaultModules).forEach(id => {
-                    batch.set(firebaseDb.collection('modules_content').doc(id), defaultModules[id]);
-                });
-                batch.commit().then(() => markLoaded('modules_content')).catch(err => {
-                    console.error("Firestore seeding modules error", err);
-                    markLoaded('modules_content');
-                });
-            } else {
-                markLoaded('modules_content');
-            }
+            window.liveModules = [];
+            triggerStorageSync(CONTENT_KEY);
+            markLoaded('modules_content');
             return;
         }
         const mods = {};
@@ -1771,22 +1743,6 @@ function initFirestoreSync(onCollectionLoaded) {
             liveMods.push({ id: doc.id, ...data });
         });
         window.liveModules = liveMods;
-
-        // Firebase is the source of truth — never overwrite existing docs with defaults.
-        // Only seed docs that are completely missing from Firestore (no document at all).
-        if (isTeacherOrAdmin) {
-            const archivedList = AuthAPI.getArchivedModules();
-            const archivedIds = archivedList.map(m => m.id);
-            Object.keys(defaultModules).forEach(id => {
-                if (!mods[id] && !archivedIds.includes(id)) {
-                    // This module ID doesn't exist in Firestore at all and is not archived — safe to seed
-                    console.log(`Safe Seeding: Adding new module ${id} to Firestore (did not exist)...`);
-                    firebaseDb.collection('modules_content').doc(id).set(defaultModules[id])
-                        .catch(err => console.error(`Error seeding new module ${id} in Firestore`, err));
-                }
-                // If the doc already exists, leave it completely untouched.
-            });
-        }
 
         triggerStorageSync(CONTENT_KEY);
         markLoaded('modules_content');
@@ -2753,6 +2709,27 @@ const AuthAPI = {
             console.error("Firestore restoreModule error:", e);
             alert("Database Error: Failed to restore module. " + e.message);
             throw e;
+        }
+    },
+
+    seedDefaultModules: async () => {
+        if (!isFirebaseInitialized || !firebaseDb) {
+            alert('Database is offline or not configured. Operation blocked.');
+            return false;
+        }
+        try {
+            console.log("Manually seeding default modules to Firestore...");
+            const batch = firebaseDb.batch();
+            Object.keys(defaultModules).forEach(id => {
+                batch.set(firebaseDb.collection('modules_content').doc(id), defaultModules[id]);
+            });
+            await withTimeout(batch.commit(), 10000, "Manually seeding default modules timed out.");
+            alert("Default modules seeded successfully into Firestore!");
+            return true;
+        } catch (e) {
+            console.error("Firestore manually seeding error:", e);
+            alert("Failed to seed modules: " + e.message);
+            return false;
         }
     },
 
