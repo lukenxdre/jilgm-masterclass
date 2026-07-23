@@ -3649,7 +3649,7 @@
                 const btnSeedFirestore = document.getElementById('btn-seed-firestore');
                 if (btnSeedFirestore) {
                     btnSeedFirestore.addEventListener('click', async () => {
-                        if (confirm("Are you sure you want to seed default modules into Firestore? This will restore any missing default modules. Existing documents in Firestore with the same ID will be overwritten.")) {
+                        if (confirm("WARNING: This will overwrite module content with default templates. Proceed?")) {
                             btnSeedFirestore.disabled = true;
                             const originalText = btnSeedFirestore.innerText;
                             btnSeedFirestore.innerText = "Seeding Modules...";

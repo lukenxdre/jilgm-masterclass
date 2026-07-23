@@ -1730,6 +1730,7 @@ function initFirestoreSync(onCollectionLoaded) {
     // 4. Sync modules content
     firebaseDb.collection('modules_content').onSnapshot(snapshot => {
         if (snapshot.empty) {
+            console.warn("Attempted automated seed intercepted and blocked.");
             window.liveModules = [];
             triggerStorageSync(CONTENT_KEY);
             markLoaded('modules_content');
