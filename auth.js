@@ -1946,6 +1946,11 @@ async function clearFirebaseConfigFromBootstrap() {
 }
 
 // Coordinated sync flow
+let resolveFirebaseInit;
+window.firebaseInitPromise = new Promise((resolve) => {
+    resolveFirebaseInit = resolve;
+});
+
 window.syncPromise = (async () => {
     // 1. First sync remote Firebase configuration from the bootstrap KV cloud DB (keyvalue.immanuel.co)
     try {
@@ -2023,14 +2028,37 @@ window.syncPromise = (async () => {
                 });
                 isFirebaseInitialized = true;
                 console.log("Firebase initialized successfully");
-                resolve(); // Resolve immediately so page boot is never blocked!
+                if (typeof resolveFirebaseInit === 'function') {
+                    resolveFirebaseInit();
+                }
 
-                // Initialize sync listeners in the background asynchronously
-                initFirestoreSync(() => {});
+                let loadedCount = 0;
+                const totalToLoad = 8;
+                let resolved = false;
+
+                const triggerResolve = () => {
+                    if (!resolved) {
+                        resolved = true;
+                        resolve();
+                    }
+                };
+
+                // Fallback timeout to guarantee page load
+                setTimeout(triggerResolve, 1500);
+
+                initFirestoreSync(() => {
+                    loadedCount++;
+                    if (loadedCount >= totalToLoad) {
+                        triggerResolve();
+                    }
+                });
             } catch (err) {
                 console.error("Firebase initializeApp or firestore failed:", err);
                 isFirebaseInitialized = false;
                 firebaseDb = null;
+                if (typeof resolveFirebaseInit === 'function') {
+                    resolveFirebaseInit();
+                }
                 resolve(); // Resolve so window.syncPromise is not blocked
             }
         });

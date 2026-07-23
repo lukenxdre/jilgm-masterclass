@@ -10,7 +10,14 @@
 
         // Initialize features
         init: async function () {
-            // Wait for Firebase to be ready via the auth.js syncPromise if not loaded yet
+            // Wait for Firebase to be ready via the auth.js init promise first
+            if (window.firebaseInitPromise) {
+                try {
+                    await window.firebaseInitPromise;
+                } catch (err) {
+                    console.error("Firebase init error in features.js:", err);
+                }
+            }
             if (typeof firebase === 'undefined' && window.syncPromise) {
                 try {
                     await window.syncPromise;
