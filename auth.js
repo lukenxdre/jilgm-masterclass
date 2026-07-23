@@ -1963,11 +1963,11 @@ window.syncPromise = (async () => {
             }
         }
 
-        const localConfigStr = localStorage.getItem('jilgm_firebase_config');
+        const localConfigStr = localStorage.getItem('firebase_config_json');
 
         // Strictly validate both cloud and local Firebase configuration objects before sync/backup
         if (cloudConfig && typeof cloudConfig === 'object' && cloudConfig.apiKey && cloudConfig.projectId && cloudConfig.appId) {
-            localStorage.setItem('jilgm_firebase_config', JSON.stringify(cloudConfig));
+            localStorage.setItem('firebase_config_json', JSON.stringify(cloudConfig));
         } else if (localConfigStr) {
             try {
                 const localConfig = JSON.parse(localConfigStr);
@@ -1987,12 +1987,22 @@ window.syncPromise = (async () => {
     // 3. Centralized Firebase configuration is imported from firebase.js
 
 
+    const defaultFirebaseConfig = {
+      apiKey: "AIzaSyDs2uHFnqORukE0o_DR91nXsuReF_2X7Ok",
+      authDomain: "jilgm-masterclass.firebaseapp.com",
+      projectId: "jilgm-masterclass",
+      storageBucket: "jilgm-masterclass.firebasestorage.app",
+      messagingSenderId: "41602432312",
+      appId: "1:41602432312:web:6ab3c5b7a11fc0598cd5cd",
+      measurementId: "G-GNTZNHWEP9"
+    };
+
     const initializeFirebaseWithConfig = () => {
         return new Promise((resolve) => {
             try {
-                let configToUse = firebaseConfig;
+                let configToUse = defaultFirebaseConfig;
                 try {
-                    const stored = localStorage.getItem('jilgm_firebase_config');
+                    const stored = localStorage.getItem('firebase_config_json');
                     if (stored) {
                         const parsed = JSON.parse(stored);
                         if (parsed && parsed.apiKey && parsed.projectId && parsed.appId) {
@@ -2070,15 +2080,19 @@ window.firebaseSyncPromise = window.syncPromise;
 
 const AuthAPI = {
     saveFirebaseConfig: async (configObj) => {
-        localStorage.setItem('jilgm_firebase_config', JSON.stringify(configObj));
+        localStorage.setItem('firebase_config_json', JSON.stringify(configObj));
         await saveToCloud('firebase_config', configObj);
         await saveFirebaseConfigToBootstrap(configObj);
     },
 
     clearFirebaseConfig: async () => {
-        localStorage.removeItem('jilgm_firebase_config');
+        localStorage.removeItem('firebase_config_json');
         await saveToCloud('firebase_config', {});
         await clearFirebaseConfigFromBootstrap();
+    },
+
+    isFirebaseConnected: () => {
+        return isFirebaseInitialized && firebaseDb !== null;
     },
 
     getAllStudents: () => {

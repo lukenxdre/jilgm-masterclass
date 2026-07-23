@@ -335,11 +335,14 @@
         <div id="panel-dashboard">
             <div class="dashboard-header">
                 <h1>Overview Dashboard</h1>
-                <div class="heartbeat-container"
-                    style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: bold; color: var(--accent-gold);">
-                    <span
-                        style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 8px #22c55e;"></span>
-                    <span>ONLINE TELEMETRY</span>
+                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                    <div class="heartbeat-container"
+                        style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: bold; color: var(--accent-gold);">
+                        <span
+                            style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 8px #22c55e;"></span>
+                        <span>ONLINE TELEMETRY</span>
+                    </div>
+                    <div id="firebase-connection-badge"></div>
                 </div>
             </div>
 
@@ -941,7 +944,7 @@
                 <p style="color: var(--text-secondary); margin-bottom: 2rem;">You can reset the local database cache or trigger a cloud Firestore modules seed here.</p>
                 <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
                     <button class="btn btn-secondary"
-                        onclick="if(confirm('Are you sure you want to reset all students, progress, and modules to default content locally?')){const c=localStorage.getItem('jilgm_firebase_config');const a=localStorage.getItem('jilgm_current_admin');const i=localStorage.getItem('jilgm_current_instructor');localStorage.clear();if(c)localStorage.setItem('jilgm_firebase_config',c);if(a)localStorage.setItem('jilgm_current_admin',a);if(i)localStorage.setItem('jilgm_current_instructor',i);location.reload();}"
+                        onclick="if(confirm('Are you sure you want to reset all students, progress, and modules to default content locally?')){const c=localStorage.getItem('firebase_config_json');const a=localStorage.getItem('jilgm_current_admin');const i=localStorage.getItem('jilgm_current_instructor');localStorage.clear();if(c)localStorage.setItem('firebase_config_json',c);if(a)localStorage.setItem('jilgm_current_admin',a);if(i)localStorage.setItem('jilgm_current_instructor',i);location.reload();}"
                         style="border-color: #ef4444; color: #ef4444;">Reset Local Database</button>
                     <button class="btn btn-primary" id="btn-seed-firestore" style="background: var(--accent-gold); color: #000; padding: 0.8rem 2rem;">
                         Seed Firestore Default Modules
@@ -1332,6 +1335,34 @@
                 // Secure page check immediately for admin only
                 if (window.AuthAPI) {
                     window.AuthAPI.requireAdminAuth();
+                    const badge = document.getElementById('firebase-connection-badge');
+                    if (badge) {
+                        const isConnected = window.AuthAPI.isFirebaseConnected();
+                        badge.style.display = 'flex';
+                        badge.style.alignItems = 'center';
+                        badge.style.gap = '0.5rem';
+                        badge.style.fontSize = '0.8rem';
+                        badge.style.fontWeight = 'bold';
+                        badge.style.padding = '0.4rem 1rem';
+                        badge.style.borderRadius = '20px';
+                        if (isConnected) {
+                            badge.style.background = 'rgba(34, 197, 94, 0.1)';
+                            badge.style.color = '#22c55e';
+                            badge.style.border = '1px solid rgba(34, 197, 94, 0.2)';
+                            badge.innerHTML = `
+                                <span style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 8px #22c55e;"></span>
+                                <span>Firebase Connected</span>
+                            `;
+                        } else {
+                            badge.style.background = 'rgba(239, 68, 68, 0.1)';
+                            badge.style.color = '#ef4444';
+                            badge.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+                            badge.innerHTML = `
+                                <span style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 8px #ef4444;"></span>
+                                <span>Local Mode</span>
+                            `;
+                        }
+                    }
                 } else {
                     console.error("AuthAPI is missing. Blocking entry.");
                     window.location.href = 'admin_login.html';
@@ -3614,7 +3645,7 @@
                 const firebaseConfigInput = document.getElementById('firebaseConfigInput');
 
                 if (firebaseConfigInput) {
-                    firebaseConfigInput.value = localStorage.getItem('jilgm_firebase_config') || '';
+                    firebaseConfigInput.value = localStorage.getItem('firebase_config_json') || '';
                 }
 
                 if (btnSaveFirebase) {
@@ -3679,7 +3710,7 @@
                         adminDisplayNameInput.value = currentAdmin.displayName || currentAdmin.username || '';
                     }
                     if (firebaseConfigInput) {
-                        firebaseConfigInput.value = localStorage.getItem('jilgm_firebase_config') || '';
+                        firebaseConfigInput.value = localStorage.getItem('firebase_config_json') || '';
                     }
                 }
 

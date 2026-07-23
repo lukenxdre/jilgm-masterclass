@@ -11,7 +11,7 @@ let firebaseConfig = {
 
 // Check if a valid custom Firebase configuration is stored in localStorage
 if (typeof window !== "undefined" && window.localStorage) {
-  const storedConfigStr = window.localStorage.getItem('jilgm_firebase_config');
+  const storedConfigStr = window.localStorage.getItem('firebase_config_json');
   if (storedConfigStr) {
     try {
       const parsed = JSON.parse(storedConfigStr);
