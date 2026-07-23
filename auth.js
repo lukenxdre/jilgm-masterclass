@@ -2486,12 +2486,16 @@ const AuthAPI = {
     },
 
     setModuleUnlocked: async (moduleId, isUnlocked) => {
-        let unlocked = AuthAPI.getUnlockedModules();
+        return AuthAPI.toggleModuleRelease(moduleId, isUnlocked);
+    },
+
+    toggleModuleRelease: async (moduleId, makeReleased) => {
         if (!isFirebaseInitialized || !firebaseDb) {
-            alert('Database is offline or not configured. Operation blocked.');
-            return unlocked;
+            throw new Error("Failed to connect to Firestore. Module state was NOT saved.");
         }
-        if (isUnlocked) {
+        
+        let unlocked = AuthAPI.getUnlockedModules();
+        if (makeReleased) {
             if (!unlocked.includes(moduleId)) {
                 unlocked.push(moduleId);
             }
@@ -2499,23 +2503,52 @@ const AuthAPI = {
             unlocked = unlocked.filter(id => id !== moduleId);
         }
 
-        await firebaseDb.collection('settings').doc('unlocked_modules').set({ list: unlocked });
-        // Trigger recalculation for all students under Firestore
-        const snapshot = await firebaseDb.collection('students').get();
-        const batch = firebaseDb.batch();
-        snapshot.forEach(doc => {
-            const student = doc.data();
-            const completedCount = unlocked.filter(modId =>
-                (student.answers || []).some(a => a.moduleId === modId && a.type === 'lesson_completion')
-            ).length;
-            const progress = unlocked.length > 0 ? Math.round((completedCount / unlocked.length) * 100) : 0;
-            batch.update(doc.ref, { progress });
-        });
-        await batch.commit();
-        return unlocked;
+        try {
+            // 1. Force state save to modules_content collection in Firestore
+            const modDocRef = firebaseDb.collection('modules_content').doc(moduleId);
+            const saveModPromise = modDocRef.set({ released: makeReleased }, { merge: true });
+            
+            // 2. Save settings/unlocked_modules list
+            const settingsDocRef = firebaseDb.collection('settings').doc('unlocked_modules');
+            const saveSettingsPromise = settingsDocRef.set({ list: unlocked });
+
+            await withTimeout(
+                Promise.all([saveModPromise, saveSettingsPromise]),
+                10000,
+                "Failed to connect to Firestore. Module state was NOT saved."
+            );
+
+            // 3. Trigger recalculation for all students under Firestore
+            const snapshot = await firebaseDb.collection('students').get();
+            const batch = firebaseDb.batch();
+            snapshot.forEach(doc => {
+                const student = doc.data();
+                const completedCount = unlocked.filter(modId =>
+                    (student.answers || []).some(a => a.moduleId === modId && a.type === 'lesson_completion')
+                ).length;
+                const progress = unlocked.length > 0 ? Math.round((completedCount / unlocked.length) * 100) : 0;
+                batch.update(doc.ref, { progress });
+            });
+            await batch.commit();
+            return unlocked;
+        } catch (e) {
+            console.error("Firestore toggleModuleRelease error:", e);
+            throw new Error("Failed to connect to Firestore. Module state was NOT saved.");
+        }
     },
 
     isModuleUnlocked: (moduleId) => {
+        if (moduleId === 'module1') return true; // module 1 is always unlocked by default
+        if (window.liveModules && window.liveModules.length > 0) {
+            const found = window.liveModules.find(m => m.id === moduleId);
+            if (found) {
+                return found.released === true;
+            }
+        }
+        const mods = AuthAPI.getModulesContent();
+        if (mods && mods[moduleId]) {
+            return mods[moduleId].released === true;
+        }
         const unlocked = AuthAPI.getUnlockedModules();
         return unlocked.includes(moduleId);
     },

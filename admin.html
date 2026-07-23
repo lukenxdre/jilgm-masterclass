@@ -21,6 +21,10 @@
     <!-- html2pdf.js for PPT PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         .builder-block-card {
             transition: all 0.2s ease;
             cursor: pointer;
@@ -2129,13 +2133,24 @@
                 };
 
                 // Expose toggleModule globally
-                window.toggleModule = async (moduleId, makeUnlocked) => {
+                window.toggleModule = async (moduleId, makeUnlocked, event) => {
+                    const btn = event ? event.target : null;
+                    let originalText = "";
+                    if (btn) {
+                        originalText = btn.innerText;
+                        btn.disabled = true;
+                        btn.innerHTML = `<span class="spinner" style="display:inline-block; width:12px; height:12px; border:2px solid currentColor; border-top-color:transparent; border-radius:50%; margin-right:6px; animation:spin 0.6s linear infinite; vertical-align:middle;"></span> Saving to Cloud...`;
+                    }
                     try {
-                        await AuthAPI.setModuleUnlocked(moduleId, makeUnlocked);
+                        await AuthAPI.toggleModuleRelease(moduleId, makeUnlocked);
                         renderDashboard();
-                        showToast(`Module access updated!`);
+                        showToast(makeUnlocked ? `Module released successfully!` : `Module locked successfully!`);
                     } catch (e) {
-                        alert('Failed to update module access: ' + e.message);
+                        alert(e.message || 'Failed to update module access.');
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerText = originalText;
+                        }
                     }
                 };
 
@@ -3239,7 +3254,7 @@
                                 </div>
                                 <h4 style="margin-top: 0.8rem; font-size: 1.05rem; color: ${isUnlocked ? 'var(--accent-gold-light)' : 'var(--text-secondary)'};">${mod.name}</h4>
                             </div>
-                            <button class="btn ${isUnlocked ? 'btn-secondary' : 'btn-primary'}" onclick="toggleModule('${mod.id}', ${!isUnlocked})" style="padding: 0.5rem 1rem; font-size: 0.85rem; width: 100%; font-family: var(--font-sans);">
+                            <button class="btn ${isUnlocked ? 'btn-secondary' : 'btn-primary'}" onclick="toggleModule('${mod.id}', ${!isUnlocked}, event)" style="padding: 0.5rem 1rem; font-size: 0.85rem; width: 100%; font-family: var(--font-sans);">
                                 ${isUnlocked ? 'Lock Module' : 'Release Module'}
                             </button>
                             <button class="btn btn-secondary" onclick="generateModulePPT('${mod.id}')" style="padding: 0.5rem 1rem; font-size: 0.85rem; width: 100%; font-family: var(--font-sans); margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem; border-color: var(--accent-gold); color: var(--accent-gold-light); background: rgba(212,175,55,0.02);">
