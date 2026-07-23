@@ -2485,17 +2485,19 @@ const AuthAPI = {
         }
     },
 
-    setModuleUnlocked: async (moduleId, isUnlocked) => {
-        return AuthAPI.toggleModuleRelease(moduleId, isUnlocked);
+    setModuleUnlocked: async (moduleId, isLocked) => {
+        return AuthAPI.toggleModuleRelease(moduleId, isLocked);
     },
 
-    toggleModuleRelease: async (moduleId, makeReleased) => {
+    toggleModuleRelease: async (moduleId, isLocked) => {
         if (!isFirebaseInitialized || !firebaseDb) {
             throw new Error("Failed to connect to Firestore. Module state was NOT saved.");
         }
         
+        const makeUnlocked = !isLocked;
+        
         let unlocked = AuthAPI.getUnlockedModules();
-        if (makeReleased) {
+        if (makeUnlocked) {
             if (!unlocked.includes(moduleId)) {
                 unlocked.push(moduleId);
             }
@@ -2506,7 +2508,7 @@ const AuthAPI = {
         try {
             // 1. Force state save to modules_content collection in Firestore
             const modDocRef = firebaseDb.collection('modules_content').doc(moduleId);
-            const saveModPromise = modDocRef.set({ released: makeReleased }, { merge: true });
+            const saveModPromise = modDocRef.set({ isLocked: isLocked }, { merge: true });
             
             // 2. Save settings/unlocked_modules list
             const settingsDocRef = firebaseDb.collection('settings').doc('unlocked_modules');
@@ -2517,6 +2519,8 @@ const AuthAPI = {
                 10000,
                 "Failed to connect to Firestore. Module state was NOT saved."
             );
+
+            console.log("Updated module release state in Firestore:", moduleId, isLocked);
 
             // 3. Trigger recalculation for all students under Firestore
             const snapshot = await firebaseDb.collection('students').get();
@@ -2538,16 +2542,17 @@ const AuthAPI = {
     },
 
     isModuleUnlocked: (moduleId) => {
-        if (moduleId === 'module1') return true; // module 1 is always unlocked by default
         if (window.liveModules && window.liveModules.length > 0) {
             const found = window.liveModules.find(m => m.id === moduleId);
             if (found) {
-                return found.released === true;
+                const isLocked = found.isLocked === undefined ? (moduleId !== 'module1') : (found.isLocked === true);
+                return !isLocked;
             }
         }
         const mods = AuthAPI.getModulesContent();
         if (mods && mods[moduleId]) {
-            return mods[moduleId].released === true;
+            const isLocked = mods[moduleId].isLocked === undefined ? (moduleId !== 'module1') : (mods[moduleId].isLocked === true);
+            return !isLocked;
         }
         const unlocked = AuthAPI.getUnlockedModules();
         return unlocked.includes(moduleId);

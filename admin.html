@@ -2133,7 +2133,7 @@
                 };
 
                 // Expose toggleModule globally
-                window.toggleModule = async (moduleId, makeUnlocked, event) => {
+                window.toggleModule = async (moduleId, isLocked, event) => {
                     const btn = event ? event.target : null;
                     let originalText = "";
                     if (btn) {
@@ -2142,9 +2142,9 @@
                         btn.innerHTML = `<span class="spinner" style="display:inline-block; width:12px; height:12px; border:2px solid currentColor; border-top-color:transparent; border-radius:50%; margin-right:6px; animation:spin 0.6s linear infinite; vertical-align:middle;"></span> Saving to Cloud...`;
                     }
                     try {
-                        await AuthAPI.toggleModuleRelease(moduleId, makeUnlocked);
+                        await AuthAPI.toggleModuleRelease(moduleId, isLocked);
                         renderDashboard();
-                        showToast(makeUnlocked ? `Module released successfully!` : `Module locked successfully!`);
+                        showToast(!isLocked ? `Module released successfully!` : `Module locked successfully!`);
                     } catch (e) {
                         alert(e.message || 'Failed to update module access.');
                         if (btn) {
@@ -3218,7 +3218,8 @@
                     if (grid) {
                         grid.innerHTML = '';
                         modulesList.forEach(mod => {
-                            const isUnlocked = unlockedModules.includes(mod.id);
+                            const isLocked = mod.isLocked === undefined ? (mod.id !== 'module1') : (mod.isLocked === true);
+                            const isUnlocked = !isLocked;
                             const card = document.createElement('div');
                             card.className = 'glass-card';
 
@@ -3254,7 +3255,7 @@
                                 </div>
                                 <h4 style="margin-top: 0.8rem; font-size: 1.05rem; color: ${isUnlocked ? 'var(--accent-gold-light)' : 'var(--text-secondary)'};">${mod.name}</h4>
                             </div>
-                            <button class="btn ${isUnlocked ? 'btn-secondary' : 'btn-primary'}" onclick="toggleModule('${mod.id}', ${!isUnlocked}, event)" style="padding: 0.5rem 1rem; font-size: 0.85rem; width: 100%; font-family: var(--font-sans);">
+                            <button class="btn ${isUnlocked ? 'btn-secondary' : 'btn-primary'}" onclick="toggleModule('${mod.id}', ${isUnlocked}, event)" style="padding: 0.5rem 1rem; font-size: 0.85rem; width: 100%; font-family: var(--font-sans);">
                                 ${isUnlocked ? 'Lock Module' : 'Release Module'}
                             </button>
                             <button class="btn btn-secondary" onclick="generateModulePPT('${mod.id}')" style="padding: 0.5rem 1rem; font-size: 0.85rem; width: 100%; font-family: var(--font-sans); margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem; border-color: var(--accent-gold); color: var(--accent-gold-light); background: rgba(212,175,55,0.02);">
