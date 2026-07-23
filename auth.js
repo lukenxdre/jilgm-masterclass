@@ -2018,6 +2018,9 @@ window.syncPromise = (async () => {
                     firebase.initializeApp(configToUse);
                 }
                 firebaseDb = firebase.firestore();
+                firebaseDb.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+                    console.warn("Firestore enablePersistence error:", err);
+                });
                 isFirebaseInitialized = true;
                 console.log("Firebase initialized successfully");
 

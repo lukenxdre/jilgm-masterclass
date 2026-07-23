@@ -1318,23 +1318,7 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Wait for auth.js and Firebase sync to resolve first!
-            if (window.syncPromise) {
-                try {
-                    await window.syncPromise;
-                } catch (err) {
-                    console.warn("Firebase sync error in admin.html:", err);
-                }
-            }
-            if (window.firebaseSyncPromise) {
-                try {
-                    await window.firebaseSyncPromise;
-                } catch (err) {
-                    console.warn("Firebase sync error in admin.html:", err);
-                }
-            }
-
+        document.addEventListener('DOMContentLoaded', () => {
             try {
                 // Secure page check immediately for admin only
                 if (window.AuthAPI) {
